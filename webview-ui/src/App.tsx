@@ -106,7 +106,7 @@ const App = () => {
 	const switchTab = useCallback(
 		(newTab: Tab) => {
 			// Check MDM compliance before allowing tab switching
-			if (mdmCompliant === false && newTab !== "account") {
+			if (mdmCompliant === false) {
 				return
 			}
 

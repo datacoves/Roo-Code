@@ -23,7 +23,6 @@ export const TaskActions = ({ item, buttonsDisabled }: TaskActionsProps) => {
 
 	return (
 		<div className="flex flex-row gap-1">
-			<ShareButton item={item} disabled={false} />
 			<IconButton
 				iconClass="codicon-desktop-download"
 				title={t("chat:task.export")}

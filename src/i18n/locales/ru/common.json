@@ -1,6 +1,6 @@
 {
 	"extension": {
-		"name": "Roo Code",
+		"name": "Datacoves Copilot",
 		"description": "Целая команда ИИ-разработчиков в вашем редакторе."
 	},
 	"number_format": {
@@ -84,7 +84,7 @@
 			"processExitedWithError": "Процесс Claude Code завершился с кодом {{exitCode}}. Вывод ошибки: {{output}}",
 			"stoppedWithReason": "Claude Code остановился по причине: {{reason}}",
 			"apiKeyModelPlanMismatch": "API keys and subscription plans allow different models. Make sure the selected model is included in your plan.",
-			"notFound": "Claude Code executable '{{claudePath}}' not found.\n\nPlease install Claude Code CLI:\n1. Visit {{installationUrl}} to download Claude Code\n2. Follow the installation instructions for your operating system\n3. Ensure the 'claude' command is available in your PATH\n4. Alternatively, configure a custom path in Roo settings under 'Claude Code Path'\n\nOriginal error: {{originalError}}"
+			"notFound": "Claude Code executable '{{claudePath}}' not found.\n\nPlease install Claude Code CLI:\n1. Visit {{installationUrl}} to download Claude Code\n2. Follow the installation instructions for your operating system\n3. Ensure the 'claude' command is available in your PATH\n4. Alternatively, configure a custom path in Copilot settings under 'Claude Code Path'\n\nOriginal error: {{originalError}}"
 		},
 		"gemini": {
 			"generate_stream": "Ошибка потока контекста генерации Gemini: {{error}}",
@@ -113,7 +113,7 @@
 		"custom_storage_path_set": "Установлен пользовательский путь хранения: {{path}}",
 		"default_storage_path": "Возвращено использование пути хранения по умолчанию",
 		"settings_imported": "Настройки успешно импортированы.",
-		"auto_import_success": "Настройки RooCode автоматически импортированы из {{filename}}",
+		"auto_import_success": "Настройки Datacoves Copilotавтоматически импортированы из {{filename}}",
 		"share_link_copied": "Ссылка для совместного использования скопирована в буфер обмена",
 		"image_copied_to_clipboard": "URI данных изображения скопирован в буфер обмена",
 		"image_saved": "Изображение сохранено в {{path}}",
@@ -184,8 +184,8 @@
 	},
 	"mdm": {
 		"errors": {
-			"cloud_auth_required": "Ваша организация требует аутентификации Roo Code Cloud. Войдите в систему, чтобы продолжить.",
-			"organization_mismatch": "Вы должны быть аутентифицированы с учетной записью Roo Code Cloud вашей организации.",
+			"cloud_auth_required": "Ваша организация требует аутентификации Datacoves Copilot Cloud. Войдите в систему, чтобы продолжить.",
+			"organization_mismatch": "Вы должны быть аутентифицированы с учетной записью Datacoves Copilot Cloud вашей организации.",
 			"verification_failed": "Не удается проверить аутентификацию организации."
 		}
 	},

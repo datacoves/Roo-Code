@@ -922,7 +922,7 @@ const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 					<div className="shrink-0">{renderModeSelector()}</div>
 
 					<div className={cn("flex-1", "min-w-0", "overflow-hidden")}>
-						<ApiConfigSelector
+						{/* <ApiConfigSelector
 							value={currentConfigId}
 							displayName={displayName}
 							disabled={selectApiConfigDisabled}
@@ -932,7 +932,7 @@ const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 							listApiConfigMeta={listApiConfigMeta || []}
 							pinnedApiConfigs={pinnedApiConfigs}
 							togglePinnedApiConfig={togglePinnedApiConfig}
-						/>
+						/> */}
 					</div>
 				</div>
 
@@ -958,7 +958,7 @@ const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 						</StandardTooltip>
 					)}
 					<SlashCommandsPopover />
-					<IndexingStatusBadge />
+					{/* <IndexingStatusBadge /> */}
 					<StandardTooltip content={t("chat:addImages")}>
 						<button
 							aria-label={t("chat:addImages")}

@@ -79,7 +79,7 @@ export interface SettingsViewRef {
 }
 
 const sectionNames = [
-	"providers",
+	// "providers",
 	"autoApprove",
 	"browser",
 	"checkpoints",
@@ -89,7 +89,7 @@ const sectionNames = [
 	"prompts",
 	"experimental",
 	"language",
-	"about",
+	// "about",
 ] as const
 
 type SectionName = (typeof sectionNames)[number]
@@ -111,7 +111,7 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>(({ onDone, t
 	const [activeTab, setActiveTab] = useState<SectionName>(
 		targetSection && sectionNames.includes(targetSection as SectionName)
 			? (targetSection as SectionName)
-			: "providers",
+			: "autoApprove",
 	)
 
 	const prevApiConfigName = useRef(currentApiConfigName)
@@ -414,7 +414,7 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>(({ onDone, t
 
 	const sections: { id: SectionName; icon: LucideIcon }[] = useMemo(
 		() => [
-			{ id: "providers", icon: Webhook },
+			// { id: "providers", icon: Webhook },
 			{ id: "autoApprove", icon: CheckCheck },
 			{ id: "browser", icon: SquareMousePointer },
 			{ id: "checkpoints", icon: GitBranch },
@@ -424,7 +424,7 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>(({ onDone, t
 			{ id: "prompts", icon: MessageSquare },
 			{ id: "experimental", icon: FlaskConical },
 			{ id: "language", icon: Globe },
-			{ id: "about", icon: Info },
+			// { id: "about", icon: Info },
 		],
 		[], // No dependencies needed now
 	)

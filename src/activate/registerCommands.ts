@@ -23,7 +23,7 @@ import { t } from "../i18n"
 export function getVisibleProviderOrLog(outputChannel: vscode.OutputChannel): ClineProvider | undefined {
 	const visibleProvider = ClineProvider.getVisibleInstance()
 	if (!visibleProvider) {
-		outputChannel.appendLine("Cannot find any visible Roo Code instances.")
+		outputChannel.appendLine("Cannot find any visible Datacoves Copilot instances.")
 		return undefined
 	}
 	return visibleProvider
@@ -74,17 +74,6 @@ export const registerCommands = (options: RegisterCommandOptions) => {
 
 const getCommandsMap = ({ context, outputChannel, provider }: RegisterCommandOptions): Record<CommandId, any> => ({
 	activationCompleted: () => {},
-	accountButtonClicked: () => {
-		const visibleProvider = getVisibleProviderOrLog(outputChannel)
-
-		if (!visibleProvider) {
-			return
-		}
-
-		TelemetryService.instance.captureTitleButtonClicked("account")
-
-		visibleProvider.postMessageToWebview({ type: "action", action: "accountButtonClicked" })
-	},
 	plusButtonClicked: async () => {
 		const visibleProvider = getVisibleProviderOrLog(outputChannel)
 
@@ -250,7 +239,7 @@ export const openClineInNewTab = async ({ context, outputChannel }: Omit<Registe
 
 	const targetCol = hasVisibleEditors ? Math.max(lastCol + 1, 1) : vscode.ViewColumn.Two
 
-	const newPanel = vscode.window.createWebviewPanel(ClineProvider.tabPanelId, "Roo Code", targetCol, {
+	const newPanel = vscode.window.createWebviewPanel(ClineProvider.tabPanelId, "Datacoves Copilot", targetCol, {
 		enableScripts: true,
 		retainContextWhenHidden: true,
 		localResourceRoots: [context.extensionUri],

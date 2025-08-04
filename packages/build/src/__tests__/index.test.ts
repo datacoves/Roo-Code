@@ -67,11 +67,6 @@ describe("generatePackageJson", () => {
 								group: "navigation@6",
 								when: "activeWebviewPanelId == roo-cline.TabPanelProvider",
 							},
-							{
-								command: "roo-cline.accountButtonClicked",
-								group: "navigation@6",
-								when: "activeWebviewPanelId == roo-cline.TabPanelProvider",
-							},
 						],
 					},
 					submenus: [
@@ -109,7 +104,7 @@ describe("generatePackageJson", () => {
 			},
 			overrideJson: {
 				name: "roo-code-nightly",
-				displayName: "Roo Code Nightly",
+				displayName: "Datacoves Copilot Nightly",
 				publisher: "RooVeterinaryInc",
 				version: "0.0.1",
 				icon: "assets/icons/icon-nightly.png",
@@ -120,7 +115,7 @@ describe("generatePackageJson", () => {
 
 		expect(generatedPackageJson).toStrictEqual({
 			name: "roo-code-nightly",
-			displayName: "Roo Code Nightly",
+			displayName: "Datacoves Copilot Nightly",
 			description: "%extension.description%",
 			publisher: "RooVeterinaryInc",
 			version: "0.0.1",

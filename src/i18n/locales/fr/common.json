@@ -1,6 +1,6 @@
 {
 	"extension": {
-		"name": "Roo Code",
+		"name": "Datacoves Copilot",
 		"description": "Une équipe complète de développeurs IA dans votre éditeur."
 	},
 	"number_format": {
@@ -84,7 +84,7 @@
 			"processExitedWithError": "Le processus Claude Code s'est terminé avec le code {{exitCode}}. Sortie d'erreur : {{output}}",
 			"stoppedWithReason": "Claude Code s'est arrêté pour la raison : {{reason}}",
 			"apiKeyModelPlanMismatch": "Les clés API et les plans d'abonnement permettent différents modèles. Assurez-vous que le modèle sélectionné est inclus dans votre plan.",
-			"notFound": "Exécutable Claude Code '{{claudePath}}' introuvable.\n\nVeuillez installer Claude Code CLI :\n1. Visitez {{installationUrl}} pour télécharger Claude Code\n2. Suivez les instructions d'installation pour votre système d'exploitation\n3. Assurez-vous que la commande 'claude' est disponible dans votre PATH\n4. Alternativement, configurez un chemin personnalisé dans les paramètres Roo sous 'Chemin de Claude Code'\n\nErreur originale : {{originalError}}"
+			"notFound": "Exécutable Claude Code '{{claudePath}}' introuvable.\n\nVeuillez installer Claude Code CLI :\n1. Visitez {{installationUrl}} pour télécharger Claude Code\n2. Suivez les instructions d'installation pour votre système d'exploitation\n3. Assurez-vous que la commande 'claude' est disponible dans votre PATH\n4. Alternativement, configurez un chemin personnalisé dans les paramètres Copilot sous 'Chemin de Claude Code'\n\nErreur originale : {{originalError}}"
 		},
 		"gemini": {
 			"generate_stream": "Erreur du flux de contexte de génération Gemini : {{error}}",
@@ -104,7 +104,7 @@
 	"warnings": {
 		"no_terminal_content": "Aucun contenu de terminal sélectionné",
 		"missing_task_files": "Les fichiers de cette tâche sont introuvables. Souhaitez-vous la supprimer de la liste des tâches ?",
-		"auto_import_failed": "Échec de l'importation automatique des paramètres RooCode : {{error}}"
+		"auto_import_failed": "Échec de l'importation automatique des paramètres Datacoves Copilot: {{error}}"
 	},
 	"info": {
 		"no_changes": "Aucun changement trouvé.",
@@ -113,7 +113,7 @@
 		"custom_storage_path_set": "Chemin de stockage personnalisé défini : {{path}}",
 		"default_storage_path": "Retour au chemin de stockage par défaut",
 		"settings_imported": "Paramètres importés avec succès.",
-		"auto_import_success": "Paramètres RooCode importés automatiquement depuis {{filename}}",
+		"auto_import_success": "Paramètres Datacoves Copilot importés automatiquement depuis {{filename}}",
 		"share_link_copied": "Lien de partage copié dans le presse-papiers",
 		"image_copied_to_clipboard": "URI de données d'image copiée dans le presse-papiers",
 		"image_saved": "Image enregistrée dans {{path}}",
@@ -146,7 +146,7 @@
 		"enter_valid_path": "Veuillez entrer un chemin valide"
 	},
 	"input": {
-		"task_prompt": "Que doit faire Roo ?",
+		"task_prompt": "Que doit faire Copilot ?",
 		"task_placeholder": "Écris ta tâche ici"
 	},
 	"settings": {
@@ -184,8 +184,8 @@
 	},
 	"mdm": {
 		"errors": {
-			"cloud_auth_required": "Votre organisation nécessite une authentification Roo Code Cloud. Veuillez vous connecter pour continuer.",
-			"organization_mismatch": "Vous devez être authentifié avec le compte Roo Code Cloud de votre organisation.",
+			"cloud_auth_required": "Votre organisation nécessite une authentification Datacoves Copilot Cloud. Veuillez vous connecter pour continuer.",
+			"organization_mismatch": "Vous devez être authentifié avec le compte Datacoves Copilot Cloud de votre organisation.",
 			"verification_failed": "Impossible de vérifier l'authentification de l'organisation."
 		}
 	},

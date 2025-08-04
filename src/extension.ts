@@ -74,7 +74,7 @@ export async function activate(context: vscode.ExtensionContext) {
 	// Create logger for cloud services
 	const cloudLogger = createDualLogger(createOutputChannelLogger(outputChannel))
 
-	// Initialize Roo Code Cloud service.
+	// Initialize Datacoves Copilot Cloud service.
 	const cloudService = await CloudService.createInstance(context, cloudLogger)
 
 	try {

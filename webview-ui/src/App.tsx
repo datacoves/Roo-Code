@@ -21,12 +21,12 @@ import ModesView from "./components/modes/ModesView"
 import { HumanRelayDialog } from "./components/human-relay/HumanRelayDialog"
 import { DeleteMessageDialog, EditMessageDialog } from "./components/chat/MessageModificationConfirmationDialog"
 import ErrorBoundary from "./components/ErrorBoundary"
-import { AccountView } from "./components/account/AccountView"
+// import { AccountView } from "./components/account/AccountView"
 import { useAddNonInteractiveClickListener } from "./components/ui/hooks/useNonInteractiveClick"
 import { TooltipProvider } from "./components/ui/tooltip"
 import { STANDARD_TOOLTIP_DELAY } from "./components/ui/standard-tooltip"
 
-type Tab = "settings" | "history" | "mcp" | "modes" | "chat" | "marketplace" | "account"
+type Tab = "settings" | "history" | "mcp" | "modes" | "chat" | "marketplace"
 
 interface HumanRelayDialogState {
 	isOpen: boolean
@@ -58,7 +58,7 @@ const tabsByMessageAction: Partial<Record<NonNullable<ExtensionMessage["action"]
 	mcpButtonClicked: "mcp",
 	historyButtonClicked: "history",
 	marketplaceButtonClicked: "marketplace",
-	accountButtonClicked: "account",
+	// accountButtonClicked: "account",
 }
 
 const App = () => {
@@ -246,14 +246,14 @@ const App = () => {
 					targetTab={currentMarketplaceTab as "mcp" | "mode" | undefined}
 				/>
 			)}
-			{tab === "account" && (
+			{/* {tab === "account" && (
 				<AccountView
 					userInfo={cloudUserInfo}
 					isAuthenticated={cloudIsAuthenticated}
 					cloudApiUrl={cloudApiUrl}
 					onDone={() => switchTab("chat")}
 				/>
-			)}
+			)} */}
 			<ChatView
 				ref={chatViewRef}
 				isHidden={tab !== "chat"}

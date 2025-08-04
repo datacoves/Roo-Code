@@ -1,7 +1,7 @@
 {
-	"extension.displayName": "Roo Code Nightly",
-	"views.contextMenu.label": "Roo Code Nightly",
-	"views.terminalMenu.label": "Roo Code Nightly",
-	"views.activitybar.title": "Roo Code Nightly",
-	"configuration.title": "Roo Code Nightly"
+	"extension.displayName": "Datacoves Copilot Nightly",
+	"views.contextMenu.label": "Datacoves Copilot Nightly",
+	"views.terminalMenu.label": "Datacoves Copilot Nightly",
+	"views.activitybar.title": "Datacoves Copilot Nightly",
+	"configuration.title": "Datacoves Copilot Nightly"
 }

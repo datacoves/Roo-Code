@@ -1,6 +1,6 @@
 {
 	"extension": {
-		"name": "Roo Code",
+		"name": "Datacoves Copilot",
 		"description": "आपके एडिटर में AI डेवलपर्स की पूरी टीम।"
 	},
 	"number_format": {
@@ -84,7 +84,7 @@
 			"processExitedWithError": "Claude Code प्रक्रिया कोड {{exitCode}} के साथ समाप्त हुई। त्रुटि आउटपुट: {{output}}",
 			"stoppedWithReason": "Claude Code इस कारण से रुका: {{reason}}",
 			"apiKeyModelPlanMismatch": "API keys and subscription plans allow different models. Make sure the selected model is included in your plan.",
-			"notFound": "Claude Code executable '{{claudePath}}' not found.\n\nPlease install Claude Code CLI:\n1. Visit {{installationUrl}} to download Claude Code\n2. Follow the installation instructions for your operating system\n3. Ensure the 'claude' command is available in your PATH\n4. Alternatively, configure a custom path in Roo settings under 'Claude Code Path'\n\nOriginal error: {{originalError}}"
+			"notFound": "Claude Code executable '{{claudePath}}' not found.\n\nPlease install Claude Code CLI:\n1. Visit {{installationUrl}} to download Claude Code\n2. Follow the installation instructions for your operating system\n3. Ensure the 'claude' command is available in your PATH\n4. Alternatively, configure a custom path in Copilot settings under 'Claude Code Path'\n\nOriginal error: {{originalError}}"
 		},
 		"gemini": {
 			"generate_stream": "जेमिनी जनरेट कॉन्टेक्स्ट स्ट्रीम त्रुटि: {{error}}",
@@ -104,7 +104,7 @@
 	"warnings": {
 		"no_terminal_content": "कोई टर्मिनल सामग्री चयनित नहीं",
 		"missing_task_files": "इस टास्क की फाइलें गायब हैं। क्या आप इसे टास्क सूची से हटाना चाहते हैं?",
-		"auto_import_failed": "RooCode सेटिंग्स का स्वचालित आयात विफल: {{error}}"
+		"auto_import_failed": "Datacoves Copilotसेटिंग्स का स्वचालित आयात विफल: {{error}}"
 	},
 	"info": {
 		"no_changes": "कोई परिवर्तन नहीं मिला।",
@@ -113,7 +113,7 @@
 		"custom_storage_path_set": "कस्टम स्टोरेज पाथ सेट किया गया: {{path}}",
 		"default_storage_path": "डिफ़ॉल्ट स्टोरेज पाथ का उपयोग पुनः शुरू किया गया",
 		"settings_imported": "सेटिंग्स सफलतापूर्वक इम्पोर्ट की गईं।",
-		"auto_import_success": "RooCode सेटिंग्स {{filename}} से स्वचालित रूप से आयात की गईं",
+		"auto_import_success": "Datacoves Copilotसेटिंग्स {{filename}} से स्वचालित रूप से आयात की गईं",
 		"share_link_copied": "साझा लिंक क्लिपबोर्ड पर कॉपी किया गया",
 		"image_copied_to_clipboard": "छवि डेटा URI क्लिपबोर्ड में कॉपी की गई",
 		"image_saved": "छवि {{path}} में सहेजी गई",
@@ -146,7 +146,7 @@
 		"enter_valid_path": "कृपया एक वैध पाथ दर्ज करें"
 	},
 	"input": {
-		"task_prompt": "Roo को क्या करना है?",
+		"task_prompt": "Copilot को क्या करना है?",
 		"task_placeholder": "अपना कार्य यहाँ लिखें"
 	},
 	"settings": {
@@ -184,8 +184,8 @@
 	},
 	"mdm": {
 		"errors": {
-			"cloud_auth_required": "आपके संगठन को Roo Code Cloud प्रमाणीकरण की आवश्यकता है। कृपया जारी रखने के लिए साइन इन करें।",
-			"organization_mismatch": "आपको अपने संगठन के Roo Code Cloud खाते से प्रमाणित होना होगा।",
+			"cloud_auth_required": "आपके संगठन को Datacoves Copilot Cloud प्रमाणीकरण की आवश्यकता है। कृपया जारी रखने के लिए साइन इन करें।",
+			"organization_mismatch": "आपको अपने संगठन के Datacoves Copilot Cloud खाते से प्रमाणित होना होगा।",
 			"verification_failed": "संगठन प्रमाणीकरण सत्यापित करने में असमर्थ।"
 		}
 	},

@@ -1799,16 +1799,16 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 					<div
 						className={` w-full flex flex-col gap-4 m-auto ${isExpanded && tasks.length > 0 ? "mt-0" : ""} px-3.5 min-[370px]:px-10 pt-5 transition-all duration-300`}>
 						{/* Version indicator in top-right corner - only on welcome screen */}
-						<VersionIndicator
+						{/* <VersionIndicator
 							onClick={() => setShowAnnouncementModal(true)}
 							className="absolute top-2 right-3 z-10"
-						/>
+						/> */}
 
 						<RooHero />
 						{telemetrySetting === "unset" && <TelemetryBanner />}
 
 						<div className="mb-2.5">
-							{cloudIsAuthenticated || taskHistory.length < 4 ? <RooTips /> : <RooCloudCTA />}
+							{cloudIsAuthenticated || taskHistory.length < 4 ? <RooTips /> : <div />}
 						</div>
 						{/* Show the task history preview if expanded and tasks exist */}
 						{taskHistory.length > 0 && isExpanded && <HistoryPreview />}

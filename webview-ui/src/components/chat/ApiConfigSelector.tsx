@@ -95,7 +95,7 @@ export const ApiConfigSelector = ({
 						"px-3 py-1.5 text-sm cursor-pointer flex items-center group",
 						"hover:bg-vscode-list-hoverBackground",
 						isCurrentConfig &&
-							"bg-vscode-list-activeSelectionBackground text-vscode-list-activeSelectionForeground",
+						"bg-vscode-list-activeSelectionBackground text-vscode-list-activeSelectionForeground",
 					)}>
 					<span className="flex-1 truncate">{config.name}</span>
 					<div className="flex items-center gap-1">
@@ -214,7 +214,7 @@ export const ApiConfigSelector = ({
 					</div>
 
 					{/* Bottom bar with buttons on left and title on right */}
-					<div className="flex flex-row items-center justify-between p-2 border-t border-vscode-dropdown-border">
+					{/* <div className="flex flex-row items-center justify-between p-2 border-t border-vscode-dropdown-border">
 						<div className="flex flex-row gap-1">
 							<IconButton
 								iconClass="codicon-settings-gear"
@@ -223,7 +223,7 @@ export const ApiConfigSelector = ({
 							/>
 						</div>
 
-						{/* Info icon and title on the right with matching spacing */}
+
 						<div className="flex items-center gap-1 pr-1">
 							{listApiConfigMeta.length > 6 && (
 								<StandardTooltip content={t("prompts:apiConfiguration.select")}>
@@ -234,7 +234,7 @@ export const ApiConfigSelector = ({
 								{t("prompts:apiConfiguration.title")}
 							</h4>
 						</div>
-					</div>
+					</div> */}
 				</div>
 			</PopoverContent>
 		</Popover>

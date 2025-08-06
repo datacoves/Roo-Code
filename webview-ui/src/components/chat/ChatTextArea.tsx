@@ -922,7 +922,7 @@ const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 					<div className="shrink-0">{renderModeSelector()}</div>
 
 					<div className={cn("flex-1", "min-w-0", "overflow-hidden")}>
-						{/* <ApiConfigSelector
+						<ApiConfigSelector
 							value={currentConfigId}
 							displayName={displayName}
 							disabled={selectApiConfigDisabled}
@@ -932,7 +932,7 @@ const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 							listApiConfigMeta={listApiConfigMeta || []}
 							pinnedApiConfigs={pinnedApiConfigs}
 							togglePinnedApiConfig={togglePinnedApiConfig}
-						/> */}
+						/>
 					</div>
 				</div>
 
@@ -975,7 +975,7 @@ const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 								"active:bg-[rgba(255,255,255,0.1)]",
 								!shouldDisableImages && "cursor-pointer",
 								shouldDisableImages &&
-									"opacity-40 cursor-not-allowed grayscale-[30%] hover:bg-transparent hover:border-[rgba(255,255,255,0.08)] active:bg-transparent",
+								"opacity-40 cursor-not-allowed grayscale-[30%] hover:bg-transparent hover:border-[rgba(255,255,255,0.08)] active:bg-transparent",
 								"mr-1",
 							)}>
 							<Image className="w-4 h-4" />

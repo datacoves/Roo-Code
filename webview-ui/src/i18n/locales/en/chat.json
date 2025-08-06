@@ -118,7 +118,7 @@
 		"title": "Modes",
 		"marketplace": "Mode Marketplace",
 		"settings": "Mode Settings",
-		"description": "Specialized personas that tailor Roo's behavior.",
+		"description": "Specialized personas that tailor Copilot's behavior.",
 		"searchPlaceholder": "Search modes...",
 		"noResults": "No results found"
 	},
@@ -350,7 +350,7 @@
 	},
 	"rooCloudCTA": {
 		"title": "Datacoves Copilot Cloud is coming soon!",
-		"description": "Run Roomote agents in the cloud, access your tasks from anywhere, collaborate with others, and more.",
+		"description": "Run Copilotmote agents in the cloud, access your tasks from anywhere, collaborate with others, and more.",
 		"joinWaitlist": "Join the waitlist to get early access."
 	},
 	"command": {

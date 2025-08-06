@@ -1,6 +1,6 @@
 {
 	"input": {
-		"task_prompt": "Què vols que faci Roo?",
+		"task_prompt": "Què vols que faci Copilot?",
 		"task_placeholder": "Escriu la teva tasca aquí"
 	},
 	"extension": {
@@ -108,7 +108,7 @@
 	"warnings": {
 		"no_terminal_content": "No s'ha seleccionat contingut de terminal",
 		"missing_task_files": "Els fitxers d'aquesta tasca falten. Vols eliminar-la de la llista de tasques?",
-		"auto_import_failed": "Ha fallat la importació automàtica de la configuració de RooCode: {{error}}"
+		"auto_import_failed": "Ha fallat la importació automàtica de la configuració de Copilot: {{error}}"
 	},
 	"info": {
 		"no_changes": "No s'han trobat canvis.",

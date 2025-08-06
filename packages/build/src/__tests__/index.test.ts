@@ -6,7 +6,7 @@ describe("generatePackageJson", () => {
 	it("should be a test", () => {
 		const generatedPackageJson = generatePackageJson({
 			packageJson: {
-				name: "roo-cline",
+				name: "datacoves-copilot",
 				displayName: "%extension.displayName%",
 				description: "%extension.description%",
 				publisher: "RooVeterinaryInc",
@@ -16,29 +16,29 @@ describe("generatePackageJson", () => {
 					viewsContainers: {
 						activitybar: [
 							{
-								id: "roo-cline-ActivityBar",
+								id: "datacoves-copilot-ActivityBar",
 								title: "%views.activitybar.title%",
 								icon: "assets/icons/icon.svg",
 							},
 						],
 					},
 					views: {
-						"roo-cline-ActivityBar": [
+						"datacoves-copilot-ActivityBar": [
 							{
 								type: "webview",
-								id: "roo-cline.SidebarProvider",
+								id: "datacoves-copilot.SidebarProvider",
 								name: "",
 							},
 						],
 					},
 					commands: [
 						{
-							command: "roo-cline.plusButtonClicked",
+							command: "datacoves-copilot.plusButtonClicked",
 							title: "%command.newTask.title%",
 							icon: "$(add)",
 						},
 						{
-							command: "roo-cline.openInNewTab",
+							command: "datacoves-copilot.openInNewTab",
 							title: "%command.openInNewTab.title%",
 							category: "%configuration.title%",
 						},
@@ -46,43 +46,43 @@ describe("generatePackageJson", () => {
 					menus: {
 						"editor/context": [
 							{
-								submenu: "roo-cline.contextMenu",
+								submenu: "datacoves-copilot.contextMenu",
 								group: "navigation",
 							},
 						],
-						"roo-cline.contextMenu": [
+						"datacoves-copilot.contextMenu": [
 							{
-								command: "roo-cline.addToContext",
+								command: "datacoves-copilot.addToContext",
 								group: "1_actions@1",
 							},
 						],
 						"editor/title": [
 							{
-								command: "roo-cline.plusButtonClicked",
+								command: "datacoves-copilot.plusButtonClicked",
 								group: "navigation@1",
-								when: "activeWebviewPanelId == roo-cline.TabPanelProvider",
+								when: "activeWebviewPanelId == datacoves-copilot.TabPanelProvider",
 							},
 							{
-								command: "roo-cline.settingsButtonClicked",
+								command: "datacoves-copilot.settingsButtonClicked",
 								group: "navigation@6",
-								when: "activeWebviewPanelId == roo-cline.TabPanelProvider",
+								when: "activeWebviewPanelId == datacoves-copilot.TabPanelProvider",
 							},
 						],
 					},
 					submenus: [
 						{
-							id: "roo-cline.contextMenu",
+							id: "datacoves-copilot.contextMenu",
 							label: "%views.contextMenu.label%",
 						},
 						{
-							id: "roo-cline.terminalMenu",
+							id: "datacoves-copilot.terminalMenu",
 							label: "%views.terminalMenu.label%",
 						},
 					],
 					configuration: {
 						title: "%configuration.title%",
 						properties: {
-							"roo-cline.allowedCommands": {
+							"datacoves-copilot.allowedCommands": {
 								type: "array",
 								items: {
 									type: "string",
@@ -90,7 +90,7 @@ describe("generatePackageJson", () => {
 								default: ["npm test", "npm install", "tsc", "git log", "git diff", "git show"],
 								description: "%commands.allowedCommands.description%",
 							},
-							"roo-cline.customStoragePath": {
+							"datacoves-copilot.customStoragePath": {
 								type: "string",
 								default: "",
 								description: "%settings.customStoragePath.description%",
@@ -110,7 +110,7 @@ describe("generatePackageJson", () => {
 				icon: "assets/icons/icon-nightly.png",
 				scripts: {},
 			},
-			substitution: ["roo-cline", "roo-code-nightly"],
+			substitution: ["datacoves-copilot", "roo-code-nightly"],
 		})
 
 		expect(generatedPackageJson).toStrictEqual({

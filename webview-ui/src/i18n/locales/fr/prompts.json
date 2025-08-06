@@ -9,7 +9,7 @@
 		"editModesConfig": "Modifier la configuration des modes",
 		"editGlobalModes": "Modifier les modes globaux",
 		"editProjectModes": "Modifier les modes du projet (.roomodes)",
-		"createModeHelpText": "Les modes sont des personas spécialisés qui adaptent le comportement de Roo. <0>En savoir plus sur l'utilisation des modes</0> ou <1>la personnalisation des modes.</1>",
+		"createModeHelpText": "Les modes sont des personas spécialisés qui adaptent le comportement de Copilot. <0>En savoir plus sur l'utilisation des modes</0> ou <1>la personnalisation des modes.</1>",
 		"selectMode": "Rechercher les modes"
 	},
 	"apiConfiguration": {

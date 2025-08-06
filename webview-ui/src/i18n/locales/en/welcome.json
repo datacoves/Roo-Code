@@ -13,7 +13,7 @@
 		}
 	},
 	"chooseProvider": "To do its magic, Copilot needs an API key.",
-	"startRouter": "We recommend using an LLM Router:",
+	"startRouter": "No LLM API key found. Learn how to configure it <docsLink>here</docsLink>.",
 	"startCustom": "Or you can bring your provider API key:",
 	"telemetry": {
 		"title": "Help Improve Datacoves Copilot",

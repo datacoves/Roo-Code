@@ -84,7 +84,7 @@ const faqs: FAQItem[] = [
 			<>
 				Install Datacoves Copilot from the{" "}
 				<a
-					href="https://marketplace.visualstudio.com/items?itemName=RooVeterinaryInc.roo-cline"
+					href="https://marketplace.visualstudio.com/items?itemName=Datacoves.datacoves-copilot"
 					target="_blank"
 					rel="noopener noreferrer"
 					className="text-primary underline-offset-4 hover:underline">

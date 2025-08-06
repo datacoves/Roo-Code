@@ -104,7 +104,7 @@
 	"warnings": {
 		"no_terminal_content": "Не выбрано содержимое терминала",
 		"missing_task_files": "Файлы этой задачи отсутствуют. Хотите удалить её из списка задач?",
-		"auto_import_failed": "Не удалось автоматически импортировать настройки RooCode: {{error}}"
+		"auto_import_failed": "Не удалось автоматически импортировать настройки Copilot: {{error}}"
 	},
 	"info": {
 		"no_changes": "Изменения не найдены.",
@@ -146,7 +146,7 @@
 		"enter_valid_path": "Пожалуйста, введите корректный путь"
 	},
 	"input": {
-		"task_prompt": "Что должен сделать Roo?",
+		"task_prompt": "Что должен сделать Copilot?",
 		"task_placeholder": "Введите вашу задачу здесь"
 	},
 	"settings": {

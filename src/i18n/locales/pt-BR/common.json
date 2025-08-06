@@ -108,7 +108,7 @@
 	"warnings": {
 		"no_terminal_content": "Nenhum conteúdo do terminal selecionado",
 		"missing_task_files": "Os arquivos desta tarefa estão faltando. Deseja removê-la da lista de tarefas?",
-		"auto_import_failed": "Falha ao importar automaticamente as configurações do RooCode: {{error}}"
+		"auto_import_failed": "Falha ao importar automaticamente as configurações do Copilot: {{error}}"
 	},
 	"info": {
 		"no_changes": "Nenhuma alteração encontrada.",

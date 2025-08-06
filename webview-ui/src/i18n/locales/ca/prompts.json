@@ -9,7 +9,7 @@
 		"editModesConfig": "Editar configuració de modes",
 		"editGlobalModes": "Editar modes globals",
 		"editProjectModes": "Editar modes de projecte (.roomodes)",
-		"createModeHelpText": "Els modes són persones especialitzades que adapten el comportament de Roo. <0>Aprèn sobre l'ús de modes</0> o <1>Personalització de modes.</1>",
+		"createModeHelpText": "Els modes són persones especialitzades que adapten el comportament de Copilot. <0>Aprèn sobre l'ús de modes</0> o <1>Personalització de modes.</1>",
 		"selectMode": "Cerqueu modes"
 	},
 	"apiConfiguration": {

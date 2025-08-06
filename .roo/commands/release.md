@@ -11,7 +11,7 @@ argument-hint: patch | minor | major
 
 ```
 ---
-"roo-cline": patch|minor|major
+"datacoves-copilot": patch|minor|major
 ---
 [list of changes]
 ```

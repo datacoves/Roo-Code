@@ -104,7 +104,7 @@
 	"warnings": {
 		"no_terminal_content": "Không có nội dung terminal được chọn",
 		"missing_task_files": "Các tệp của nhiệm vụ này bị thiếu. Bạn có muốn xóa nó khỏi danh sách nhiệm vụ không?",
-		"auto_import_failed": "Không thể tự động nhập cài đặt RooCode: {{error}}"
+		"auto_import_failed": "Không thể tự động nhập cài đặt Copilot: {{error}}"
 	},
 	"info": {
 		"no_changes": "Không tìm thấy thay đổi nào.",

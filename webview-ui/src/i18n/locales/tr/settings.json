@@ -34,7 +34,7 @@
 		"about": "Datacoves Copilot Hakkında"
 	},
 	"prompts": {
-		"description": "Prompt geliştirme, kod açıklama ve sorun çözme gibi hızlı eylemler için kullanılan destek promptlarını yapılandırın. Bu promptlar, Roo'nun yaygın geliştirme görevleri için daha iyi destek sağlamasına yardımcı olur."
+		"description": "Prompt geliştirme, kod açıklama ve sorun çözme gibi hızlı eylemler için kullanılan destek promptlarını yapılandırın. Bu promptlar, Copilot'nun yaygın geliştirme görevleri için daha iyi destek sağlamasına yardımcı olur."
 	},
 	"codeIndex": {
 		"title": "Kod Tabanı İndeksleme",
@@ -518,7 +518,7 @@
 		},
 		"maxReadFile": {
 			"label": "Dosya okuma otomatik kısaltma eşiği",
-			"description": "Model başlangıç/bitiş değerlerini belirtmediğinde Copilot bu sayıda satırı okur. Bu sayı dosyanın toplam satır sayısından azsa, Copilot kod tanımlamalarının satır numarası dizinini oluşturur. Özel durumlar: -1, Roo'ya tüm dosyayı okumasını (dizinleme olmadan), 0 ise hiç satır okumamasını ve minimum bağlam için yalnızca satır dizinleri sağlamasını belirtir. Düşük değerler başlangıç bağlam kullanımını en aza indirir ve sonraki hassas satır aralığı okumalarına olanak tanır. Açık başlangıç/bitiş istekleri bu ayarla sınırlı değildir.",
+			"description": "Model başlangıç/bitiş değerlerini belirtmediğinde Copilot bu sayıda satırı okur. Bu sayı dosyanın toplam satır sayısından azsa, Copilot kod tanımlamalarının satır numarası dizinini oluşturur. Özel durumlar: -1, Copilot'ya tüm dosyayı okumasını (dizinleme olmadan), 0 ise hiç satır okumamasını ve minimum bağlam için yalnızca satır dizinleri sağlamasını belirtir. Düşük değerler başlangıç bağlam kullanımını en aza indirir ve sonraki hassas satır aralığı okumalarına olanak tanır. Açık başlangıç/bitiş istekleri bu ayarla sınırlı değildir.",
 			"lines": "satır",
 			"always_full_read": "Her zaman tüm dosyayı oku"
 		},
@@ -658,11 +658,11 @@
 		},
 		"SEARCH_AND_REPLACE": {
 			"name": "Deneysel arama ve değiştirme aracını kullan",
-			"description": "Deneysel arama ve değiştirme aracını etkinleştir, Roo'nun tek bir istekte bir arama teriminin birden fazla örneğini değiştirmesine olanak tanır."
+			"description": "Deneysel arama ve değiştirme aracını etkinleştir, Copilot'nun tek bir istekte bir arama teriminin birden fazla örneğini değiştirmesine olanak tanır."
 		},
 		"INSERT_BLOCK": {
 			"name": "Deneysel içerik ekleme aracını kullan",
-			"description": "Deneysel içerik ekleme aracını etkinleştir, Roo'nun bir diff oluşturma gereği duymadan belirli satır numaralarına içerik eklemesine olanak tanır."
+			"description": "Deneysel içerik ekleme aracını etkinleştir, Copilot'nun bir diff oluşturma gereği duymadan belirli satır numaralarına içerik eklemesine olanak tanır."
 		},
 		"POWER_STEERING": {
 			"name": "Deneysel \"güç direksiyon\" modunu kullan",

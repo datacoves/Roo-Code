@@ -9,7 +9,7 @@
 		"editModesConfig": "Edytuj konfigurację trybów",
 		"editGlobalModes": "Edytuj tryby globalne",
 		"editProjectModes": "Edytuj tryby projektu (.roomodes)",
-		"createModeHelpText": "Tryby to wyspecjalizowane persony, które dostosowują zachowanie Roo. <0>Dowiedz się o używaniu trybów</0> lub <1>dostosowywaniu trybów.</1>",
+		"createModeHelpText": "Tryby to wyspecjalizowane persony, które dostosowują zachowanie Copilot. <0>Dowiedz się o używaniu trybów</0> lub <1>dostosowywaniu trybów.</1>",
 		"selectMode": "Szukaj trybów"
 	},
 	"apiConfiguration": {

@@ -12,6 +12,7 @@ import React, {
 import {
 	CheckCheck,
 	SquareMousePointer,
+	Webhook,
 	GitBranch,
 	Bell,
 	Database,
@@ -19,6 +20,7 @@ import {
 	FlaskConical,
 	AlertTriangle,
 	Globe,
+	Info,
 	MessageSquare,
 	LucideIcon,
 } from "lucide-react"
@@ -49,6 +51,9 @@ import {
 
 import { Tab, TabContent, TabHeader, TabList, TabTrigger } from "../common/Tab"
 import { SetCachedStateField, SetExperimentEnabled } from "./types"
+import { SectionHeader } from "./SectionHeader"
+import ApiConfigManager from "./ApiConfigManager"
+import ApiOptions from "./ApiOptions"
 import { AutoApproveSettings } from "./AutoApproveSettings"
 import { BrowserSettings } from "./BrowserSettings"
 import { CheckpointSettings } from "./CheckpointSettings"
@@ -57,6 +62,8 @@ import { ContextManagementSettings } from "./ContextManagementSettings"
 import { TerminalSettings } from "./TerminalSettings"
 import { ExperimentalSettings } from "./ExperimentalSettings"
 import { LanguageSettings } from "./LanguageSettings"
+import { About } from "./About"
+import { Section } from "./Section"
 import PromptsSettings from "./PromptsSettings"
 import { cn } from "@/lib/utils"
 
@@ -82,7 +89,7 @@ const sectionNames = [
 	"prompts",
 	"experimental",
 	"language",
-	// "about",
+	"about",
 ] as const
 
 type SectionName = (typeof sectionNames)[number]
@@ -417,7 +424,7 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>(({ onDone, t
 			{ id: "prompts", icon: MessageSquare },
 			{ id: "experimental", icon: FlaskConical },
 			{ id: "language", icon: Globe },
-			// { id: "about", icon: Info },
+			{ id: "about", icon: Info },
 		],
 		[], // No dependencies needed now
 	)
@@ -554,6 +561,55 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>(({ onDone, t
 
 				{/* Content area */}
 				<TabContent className="p-0 flex-1 overflow-auto">
+					{/* Providers Section */}
+					{/* {activeTab === "providers" && (
+						<div>
+							<SectionHeader>
+								<div className="flex items-center gap-2">
+									<Webhook className="w-4" />
+									<div>{t("settings:sections.providers")}</div>
+								</div>
+							</SectionHeader>
+							-
+							<Section>
+								<ApiConfigManager
+									currentApiConfigName={currentApiConfigName}
+									listApiConfigMeta={listApiConfigMeta}
+									onSelectConfig={(configName: string) =>
+										checkUnsaveChanges(() =>
+											vscode.postMessage({ type: "loadApiConfiguration", text: configName }),
+										)
+									}
+									onDeleteConfig={(configName: string) =>
+										vscode.postMessage({ type: "deleteApiConfiguration", text: configName })
+									}
+									onRenameConfig={(oldName: string, newName: string) => {
+										vscode.postMessage({
+											type: "renameApiConfiguration",
+											values: { oldName, newName },
+											apiConfiguration,
+										})
+										prevApiConfigName.current = newName
+									}}
+									onUpsertConfig={(configName: string) =>
+										vscode.postMessage({
+											type: "upsertApiConfiguration",
+											text: configName,
+											apiConfiguration,
+										})
+									}
+								/>
+								<ApiOptions
+									uriScheme={uriScheme}
+									apiConfiguration={apiConfiguration}
+									setApiConfigurationField={setApiConfigurationField}
+									errorMessage={errorMessage}
+									setErrorMessage={setErrorMessage}
+								/>
+							</Section>
+						</div>
+					)} */}
+
 					{/* Auto-Approve Section */}
 					{activeTab === "autoApprove" && (
 						<AutoApproveSettings
@@ -668,6 +724,11 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>(({ onDone, t
 					{/* Language Section */}
 					{activeTab === "language" && (
 						<LanguageSettings language={language || "en"} setCachedStateField={setCachedStateField} />
+					)}
+
+					{/* About Section */}
+					{activeTab === "about" && (
+						<About telemetrySetting={telemetrySetting} setTelemetrySetting={setTelemetrySetting} />
 					)}
 				</TabContent>
 			</div>

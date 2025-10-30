@@ -25,8 +25,7 @@ export const About = ({ telemetrySetting, setTelemetrySetting, className, ...pro
 
 	return (
 		<div className={cn("flex flex-col gap-2", className)} {...props}>
-			<SectionHeader
-				description="Datacoves Copilot is a powerful AI assistant designed to enhance your coding experience. It's based on Roo Code, an open-source project that provides a robust foundation for AI-driven development tools.">
+			<SectionHeader description="Datacoves Copilot is a powerful AI assistant designed to enhance your coding experience. It's based on Roo Code, an open-source project that provides a robust foundation for AI-driven development tools.">
 				<div className="flex items-center gap-2">
 					<Info className="w-4" />
 					<div>{t("settings:sections.about")}</div>
@@ -34,7 +33,9 @@ export const About = ({ telemetrySetting, setTelemetrySetting, className, ...pro
 			</SectionHeader>
 
 			<Section>
-				<VSCodeLink href="https://docs.datacoves.com/how-tos/vscode/datacoves-copilot/">Learn more about Datacoves Copilot</VSCodeLink>
+				<VSCodeLink href="https://docs.datacoves.com/docs/how-tos/vs-code/datacoves-copilot/v2">
+					Learn more about Datacoves Copilot
+				</VSCodeLink>
 				<h4>Settings file</h4>
 				<div className="flex flex-wrap items-center gap-2 mt-2">
 					<Button onClick={() => vscode.postMessage({ type: "exportSettings" })} className="w-28">

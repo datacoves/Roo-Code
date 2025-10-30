@@ -55,7 +55,7 @@ const WelcomeView = () => {
 							i18nKey="welcome:startRouter"
 							components={{
 								docsLink: (
-									<VSCodeLink href="https://docs.datacoves.com/how-tos/vscode/datacoves-copilot/llm-config.html" />
+									<VSCodeLink href="https://docs.datacoves.com/docs/how-tos/vs-code/datacoves-copilot/v2" />
 								),
 							}}
 						/>

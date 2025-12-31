@@ -15,50 +15,40 @@ import ChatView, { ChatViewRef } from "./components/chat/ChatView"
 import HistoryView from "./components/history/HistoryView"
 import SettingsView, { SettingsViewRef } from "./components/settings/SettingsView"
 import WelcomeView from "./components/welcome/WelcomeView"
-import McpView from "./components/mcp/McpView"
 import { MarketplaceView } from "./components/marketplace/MarketplaceView"
-import ModesView from "./components/modes/ModesView"
-import { HumanRelayDialog } from "./components/human-relay/HumanRelayDialog"
+import { CheckpointRestoreDialog } from "./components/chat/CheckpointRestoreDialog"
 import { DeleteMessageDialog, EditMessageDialog } from "./components/chat/MessageModificationConfirmationDialog"
 import ErrorBoundary from "./components/ErrorBoundary"
-import { AccountView } from "./components/account/AccountView"
+import { CloudView } from "./components/cloud/CloudView"
 import { useAddNonInteractiveClickListener } from "./components/ui/hooks/useNonInteractiveClick"
 import { TooltipProvider } from "./components/ui/tooltip"
 import { STANDARD_TOOLTIP_DELAY } from "./components/ui/standard-tooltip"
 
-type Tab = "settings" | "history" | "mcp" | "modes" | "chat" | "marketplace" | "account"
-
-interface HumanRelayDialogState {
-	isOpen: boolean
-	requestId: string
-	promptText: string
-}
+type Tab = "settings" | "history" | "chat" | "marketplace" | "cloud"
 
 interface DeleteMessageDialogState {
 	isOpen: boolean
 	messageTs: number
+	hasCheckpoint: boolean
 }
 
 interface EditMessageDialogState {
 	isOpen: boolean
 	messageTs: number
 	text: string
+	hasCheckpoint: boolean
 	images?: string[]
 }
 
 // Memoize dialog components to prevent unnecessary re-renders
 const MemoizedDeleteMessageDialog = React.memo(DeleteMessageDialog)
 const MemoizedEditMessageDialog = React.memo(EditMessageDialog)
-const MemoizedHumanRelayDialog = React.memo(HumanRelayDialog)
-
+const MemoizedCheckpointRestoreDialog = React.memo(CheckpointRestoreDialog)
 const tabsByMessageAction: Partial<Record<NonNullable<ExtensionMessage["action"]>, Tab>> = {
 	chatButtonClicked: "chat",
 	settingsButtonClicked: "settings",
-	promptsButtonClicked: "modes",
-	mcpButtonClicked: "mcp",
 	historyButtonClicked: "history",
 	marketplaceButtonClicked: "marketplace",
-	accountButtonClicked: "account",
 }
 
 const App = () => {
@@ -72,6 +62,7 @@ const App = () => {
 		cloudUserInfo,
 		cloudIsAuthenticated,
 		cloudApiUrl,
+		cloudOrganizations,
 		renderContext,
 		mdmCompliant,
 	} = useExtensionState()
@@ -82,21 +73,17 @@ const App = () => {
 	const [showAnnouncement, setShowAnnouncement] = useState(false)
 	const [tab, setTab] = useState<Tab>("chat")
 
-	const [humanRelayDialogState, setHumanRelayDialogState] = useState<HumanRelayDialogState>({
-		isOpen: false,
-		requestId: "",
-		promptText: "",
-	})
-
 	const [deleteMessageDialogState, setDeleteMessageDialogState] = useState<DeleteMessageDialogState>({
 		isOpen: false,
 		messageTs: 0,
+		hasCheckpoint: false,
 	})
 
 	const [editMessageDialogState, setEditMessageDialogState] = useState<EditMessageDialogState>({
 		isOpen: false,
 		messageTs: 0,
 		text: "",
+		hasCheckpoint: false,
 		images: [],
 	})
 
@@ -105,8 +92,11 @@ const App = () => {
 
 	const switchTab = useCallback(
 		(newTab: Tab) => {
-			// Check MDM compliance before allowing tab switching
-			if (mdmCompliant === false && newTab !== "account") {
+			// Only check MDM compliance if mdmCompliant is explicitly false (meaning there's an MDM policy and user is non-compliant)
+			// If mdmCompliant is undefined or true, allow tab switching
+			if (mdmCompliant === false && newTab !== "cloud") {
+				// Notify the user that authentication is required by their organization
+				vscode.postMessage({ type: "showMdmAuthRequiredNotification" })
 				return
 			}
 
@@ -134,7 +124,9 @@ const App = () => {
 				if (message.action === "switchTab" && message.tab) {
 					const targetTab = message.tab as Tab
 					switchTab(targetTab)
-					setCurrentSection(undefined)
+					// Extract targetSection from values if provided
+					const targetSection = message.values?.section as string | undefined
+					setCurrentSection(targetSection)
 					setCurrentMarketplaceTab(undefined)
 				} else {
 					// Handle other actions using the mapping
@@ -150,13 +142,12 @@ const App = () => {
 				}
 			}
 
-			if (message.type === "showHumanRelayDialog" && message.requestId && message.promptText) {
-				const { requestId, promptText } = message
-				setHumanRelayDialogState({ isOpen: true, requestId, promptText })
-			}
-
 			if (message.type === "showDeleteMessageDialog" && message.messageTs) {
-				setDeleteMessageDialogState({ isOpen: true, messageTs: message.messageTs })
+				setDeleteMessageDialogState({
+					isOpen: true,
+					messageTs: message.messageTs,
+					hasCheckpoint: message.hasCheckpoint || false,
+				})
 			}
 
 			if (message.type === "showEditMessageDialog" && message.messageTs && message.text) {
@@ -164,6 +155,7 @@ const App = () => {
 					isOpen: true,
 					messageTs: message.messageTs,
 					text: message.text,
+					hasCheckpoint: message.hasCheckpoint || false,
 					images: message.images || [],
 				})
 			}
@@ -178,11 +170,11 @@ const App = () => {
 	useEvent("message", onMessage)
 
 	useEffect(() => {
-		if (shouldShowAnnouncement) {
+		if (shouldShowAnnouncement && tab === "chat") {
 			setShowAnnouncement(true)
 			vscode.postMessage({ type: "didShowAnnouncement" })
 		}
-	}, [shouldShowAnnouncement])
+	}, [shouldShowAnnouncement, tab])
 
 	useEffect(() => {
 		if (didHydrateState) {
@@ -233,8 +225,6 @@ const App = () => {
 		<WelcomeView />
 	) : (
 		<>
-			{tab === "modes" && <ModesView onDone={() => switchTab("chat")} />}
-			{tab === "mcp" && <McpView onDone={() => switchTab("chat")} />}
 			{tab === "history" && <HistoryView onDone={() => switchTab("chat")} />}
 			{tab === "settings" && (
 				<SettingsView ref={settingsRef} onDone={() => setTab("chat")} targetSection={currentSection} />
@@ -246,12 +236,12 @@ const App = () => {
 					targetTab={currentMarketplaceTab as "mcp" | "mode" | undefined}
 				/>
 			)}
-			{tab === "account" && (
-				<AccountView
+			{tab === "cloud" && (
+				<CloudView
 					userInfo={cloudUserInfo}
 					isAuthenticated={cloudIsAuthenticated}
 					cloudApiUrl={cloudApiUrl}
-					onDone={() => switchTab("chat")}
+					organizations={cloudOrganizations}
 				/>
 			)}
 			<ChatView
@@ -260,38 +250,65 @@ const App = () => {
 				showAnnouncement={showAnnouncement}
 				hideAnnouncement={() => setShowAnnouncement(false)}
 			/>
-			<MemoizedHumanRelayDialog
-				isOpen={humanRelayDialogState.isOpen}
-				requestId={humanRelayDialogState.requestId}
-				promptText={humanRelayDialogState.promptText}
-				onClose={() => setHumanRelayDialogState((prev) => ({ ...prev, isOpen: false }))}
-				onSubmit={(requestId, text) => vscode.postMessage({ type: "humanRelayResponse", requestId, text })}
-				onCancel={(requestId) => vscode.postMessage({ type: "humanRelayCancel", requestId })}
-			/>
-			<MemoizedDeleteMessageDialog
-				open={deleteMessageDialogState.isOpen}
-				onOpenChange={(open) => setDeleteMessageDialogState((prev) => ({ ...prev, isOpen: open }))}
-				onConfirm={() => {
-					vscode.postMessage({
-						type: "deleteMessageConfirm",
-						messageTs: deleteMessageDialogState.messageTs,
-					})
-					setDeleteMessageDialogState((prev) => ({ ...prev, isOpen: false }))
-				}}
-			/>
-			<MemoizedEditMessageDialog
-				open={editMessageDialogState.isOpen}
-				onOpenChange={(open) => setEditMessageDialogState((prev) => ({ ...prev, isOpen: open }))}
-				onConfirm={() => {
-					vscode.postMessage({
-						type: "editMessageConfirm",
-						messageTs: editMessageDialogState.messageTs,
-						text: editMessageDialogState.text,
-						images: editMessageDialogState.images,
-					})
-					setEditMessageDialogState((prev) => ({ ...prev, isOpen: false }))
-				}}
-			/>
+			{deleteMessageDialogState.hasCheckpoint ? (
+				<MemoizedCheckpointRestoreDialog
+					open={deleteMessageDialogState.isOpen}
+					type="delete"
+					hasCheckpoint={deleteMessageDialogState.hasCheckpoint}
+					onOpenChange={(open: boolean) => setDeleteMessageDialogState((prev) => ({ ...prev, isOpen: open }))}
+					onConfirm={(restoreCheckpoint: boolean) => {
+						vscode.postMessage({
+							type: "deleteMessageConfirm",
+							messageTs: deleteMessageDialogState.messageTs,
+							restoreCheckpoint,
+						})
+						setDeleteMessageDialogState((prev) => ({ ...prev, isOpen: false }))
+					}}
+				/>
+			) : (
+				<MemoizedDeleteMessageDialog
+					open={deleteMessageDialogState.isOpen}
+					onOpenChange={(open: boolean) => setDeleteMessageDialogState((prev) => ({ ...prev, isOpen: open }))}
+					onConfirm={() => {
+						vscode.postMessage({
+							type: "deleteMessageConfirm",
+							messageTs: deleteMessageDialogState.messageTs,
+						})
+						setDeleteMessageDialogState((prev) => ({ ...prev, isOpen: false }))
+					}}
+				/>
+			)}
+			{editMessageDialogState.hasCheckpoint ? (
+				<MemoizedCheckpointRestoreDialog
+					open={editMessageDialogState.isOpen}
+					type="edit"
+					hasCheckpoint={editMessageDialogState.hasCheckpoint}
+					onOpenChange={(open: boolean) => setEditMessageDialogState((prev) => ({ ...prev, isOpen: open }))}
+					onConfirm={(restoreCheckpoint: boolean) => {
+						vscode.postMessage({
+							type: "editMessageConfirm",
+							messageTs: editMessageDialogState.messageTs,
+							text: editMessageDialogState.text,
+							restoreCheckpoint,
+						})
+						setEditMessageDialogState((prev) => ({ ...prev, isOpen: false }))
+					}}
+				/>
+			) : (
+				<MemoizedEditMessageDialog
+					open={editMessageDialogState.isOpen}
+					onOpenChange={(open: boolean) => setEditMessageDialogState((prev) => ({ ...prev, isOpen: open }))}
+					onConfirm={() => {
+						vscode.postMessage({
+							type: "editMessageConfirm",
+							messageTs: editMessageDialogState.messageTs,
+							text: editMessageDialogState.text,
+							images: editMessageDialogState.images,
+						})
+						setEditMessageDialogState((prev) => ({ ...prev, isOpen: false }))
+					}}
+				/>
+			)}
 		</>
 	)
 }

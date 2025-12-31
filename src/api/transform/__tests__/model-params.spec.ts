@@ -87,6 +87,38 @@ describe("getModelParams", () => {
 			expect(result.temperature).toBe(0.5)
 		})
 
+		it("should use model defaultTemperature over provider defaultTemperature", () => {
+			const modelWithDefaultTemp: ModelInfo = {
+				...baseModel,
+				defaultTemperature: 0.8,
+			}
+
+			const result = getModelParams({
+				...anthropicParams,
+				settings: {},
+				model: modelWithDefaultTemp,
+				defaultTemperature: 0.5,
+			})
+
+			expect(result.temperature).toBe(0.8)
+		})
+
+		it("should prefer settings temperature over model defaultTemperature", () => {
+			const modelWithDefaultTemp: ModelInfo = {
+				...baseModel,
+				defaultTemperature: 0.8,
+			}
+
+			const result = getModelParams({
+				...anthropicParams,
+				settings: { modelTemperature: 0.3 },
+				model: modelWithDefaultTemp,
+				defaultTemperature: 0.5,
+			})
+
+			expect(result.temperature).toBe(0.3)
+		})
+
 		it("should use model maxTokens when available", () => {
 			const model: ModelInfo = {
 				...baseModel,
@@ -243,7 +275,6 @@ describe("getModelParams", () => {
 
 			expect(result.reasoningBudget).toBeUndefined()
 			expect(result.temperature).toBe(0)
-			expect(result.reasoning).toBeUndefined()
 		})
 
 		it("should honor customMaxTokens for reasoning budget models", () => {
@@ -293,12 +324,12 @@ describe("getModelParams", () => {
 		it("should not honor customMaxThinkingTokens for non-reasoning budget models", () => {
 			const model: ModelInfo = {
 				...baseModel,
-				maxTokens: 4000,
+				maxTokens: 3000, // 3000 is 18.75% of 16000 context window, within 20% threshold
 			}
 
 			expect(getModelParams({ ...anthropicParams, settings: { modelMaxThinkingTokens: 1500 }, model })).toEqual({
 				format: anthropicParams.format,
-				maxTokens: 4000,
+				maxTokens: 3000, // Uses model.maxTokens since it's within 20% threshold
 				temperature: 0, // Using default temperature.
 				reasoningEffort: undefined,
 				reasoningBudget: undefined, // Should remain undefined despite customMaxThinkingTokens being set.
@@ -327,6 +358,57 @@ describe("getModelParams", () => {
 				reasoning: {
 					type: "enabled",
 					budget_tokens: 1024,
+				},
+			})
+		})
+
+		it("should clamp Gemini 2.5 Pro thinking budget to at least 128 tokens", () => {
+			const model: ModelInfo = {
+				...baseModel,
+				requiredReasoningBudget: true,
+			}
+
+			expect(
+				getModelParams({
+					modelId: "gemini-2.5-pro",
+					format: "gemini" as const,
+					settings: { modelMaxTokens: 2000, modelMaxThinkingTokens: 50 },
+					model,
+				}),
+			).toEqual({
+				format: "gemini",
+				maxTokens: 2000,
+				temperature: 1.0,
+				reasoningEffort: undefined,
+				reasoningBudget: 128, // Minimum is 128 for Gemini 2.5 Pro
+				reasoning: {
+					thinkingBudget: 128,
+					includeThoughts: true,
+				},
+			})
+		})
+
+		it("should use 128 as default thinking budget for Gemini 2.5 Pro", () => {
+			const model: ModelInfo = {
+				...baseModel,
+				requiredReasoningBudget: true,
+			}
+
+			expect(
+				getModelParams({
+					modelId: "google/gemini-2.5-pro",
+					format: "openrouter" as const,
+					settings: { modelMaxTokens: 4000 },
+					model,
+				}),
+			).toEqual({
+				format: "openrouter",
+				maxTokens: 4000,
+				temperature: 1.0,
+				reasoningEffort: undefined,
+				reasoningBudget: 128, // Default is 128 for Gemini 2.5 Pro
+				reasoning: {
+					max_tokens: 128,
 				},
 			})
 		})
@@ -474,7 +556,6 @@ describe("getModelParams", () => {
 			})
 
 			expect(result.reasoningEffort).toBeUndefined()
-			expect(result.reasoning).toBeUndefined()
 		})
 
 		it("should handle reasoning effort for openrouter format", () => {
@@ -494,6 +575,78 @@ describe("getModelParams", () => {
 			expect(result.reasoning).toEqual({ effort: "medium" })
 		})
 
+		it("should include 'minimal' effort for openai format", () => {
+			const model: ModelInfo = {
+				...baseModel,
+				// Array capability explicitly includes minimal
+				supportsReasoningEffort: ["minimal", "low", "medium", "high"] as any,
+			}
+
+			const result = getModelParams({
+				...openaiParams,
+				settings: { reasoningEffort: "minimal" as any },
+				model,
+			})
+
+			expect(result.reasoningEffort).toBe("minimal")
+			expect(result.reasoning).toEqual({ reasoning_effort: "minimal" })
+		})
+
+		it("should include 'none' effort for openai format", () => {
+			const model: ModelInfo = {
+				...baseModel,
+				// Array capability explicitly includes none
+				supportsReasoningEffort: ["none", "low", "medium", "high"] as any,
+			}
+
+			const result = getModelParams({
+				...openaiParams,
+				settings: { reasoningEffort: "none" as any },
+				model,
+			})
+
+			expect(result.reasoningEffort).toBe("none")
+			expect(result.reasoning).toEqual({ reasoning_effort: "none" })
+		})
+
+		it("should omit reasoning for 'disable' selection", () => {
+			const model: ModelInfo = {
+				...baseModel,
+				supportsReasoningEffort: true,
+			}
+
+			const result = getModelParams({
+				...openaiParams,
+				settings: { reasoningEffort: "disable" as any },
+				model,
+			})
+
+			expect(result.reasoningEffort).toBeUndefined()
+		})
+
+		it("should include 'minimal' and 'none' for openrouter format", () => {
+			const model: ModelInfo = {
+				...baseModel,
+				// Array capability explicitly includes both
+				supportsReasoningEffort: ["none", "minimal", "low", "medium", "high"] as any,
+			}
+
+			const minimalRes = getModelParams({
+				...openrouterParams,
+				settings: { reasoningEffort: "minimal" as any },
+				model,
+			})
+			expect(minimalRes.reasoningEffort).toBe("minimal")
+			expect(minimalRes.reasoning).toEqual({ effort: "minimal" })
+
+			const noneRes = getModelParams({
+				...openrouterParams,
+				settings: { reasoningEffort: "none" as any },
+				model,
+			})
+			expect(noneRes.reasoningEffort).toBe("none")
+			expect(noneRes.reasoning).toEqual({ effort: "none" })
+		})
 		it("should not use reasoning effort for anthropic format", () => {
 			const model: ModelInfo = {
 				...baseModel,
@@ -514,7 +667,7 @@ describe("getModelParams", () => {
 		it("should use reasoningEffort if supportsReasoningEffort is false but reasoningEffort is set", () => {
 			const model: ModelInfo = {
 				...baseModel,
-				maxTokens: 8000,
+				maxTokens: 3000, // 3000 is 18.75% of 16000, within 20% threshold
 				supportsReasoningEffort: false,
 				reasoningEffort: "medium",
 			}
@@ -525,7 +678,8 @@ describe("getModelParams", () => {
 				model,
 			})
 
-			expect(result.maxTokens).toBe(8000)
+			expect(result.maxTokens).toBe(3000)
+			// Now uses model.maxTokens since it's within 20% threshold
 			expect(result.reasoningEffort).toBe("medium")
 		})
 	})
@@ -544,7 +698,8 @@ describe("getModelParams", () => {
 				model,
 			})
 
-			// Should discard model's maxTokens and use default
+			// For hybrid models (supportsReasoningBudget) in Anthropic contexts,
+			// should discard model's maxTokens and use ANTHROPIC_DEFAULT_MAX_TOKENS
 			expect(result.maxTokens).toBe(ANTHROPIC_DEFAULT_MAX_TOKENS)
 			expect(result.reasoningBudget).toBeUndefined()
 		})
@@ -578,7 +733,7 @@ describe("getModelParams", () => {
 			})
 
 			expect(result.reasoningBudget).toBe(3200) // 80% of 4000
-			expect(result.reasoningEffort).toBeUndefined()
+			expect(result.reasoningEffort).toBeUndefined() // Budget takes precedence
 			expect(result.temperature).toBe(1.0)
 		})
 
@@ -732,8 +887,103 @@ describe("getModelParams", () => {
 				settings: {},
 				model,
 			})
+		})
+	})
 
-			expect(result.reasoning).toBeUndefined()
+	describe("Verbosity settings", () => {
+		it("should include verbosity when specified in settings", () => {
+			const model: ModelInfo = {
+				...baseModel,
+			}
+
+			const result = getModelParams({
+				...openaiParams,
+				settings: { verbosity: "low" },
+				model,
+			})
+
+			expect(result.verbosity).toBe("low")
+		})
+
+		it("should handle medium verbosity", () => {
+			const model: ModelInfo = {
+				...baseModel,
+			}
+
+			const result = getModelParams({
+				...openaiParams,
+				settings: { verbosity: "medium" },
+				model,
+			})
+
+			expect(result.verbosity).toBe("medium")
+		})
+
+		it("should handle high verbosity", () => {
+			const model: ModelInfo = {
+				...baseModel,
+			}
+
+			const result = getModelParams({
+				...openaiParams,
+				settings: { verbosity: "high" },
+				model,
+			})
+
+			expect(result.verbosity).toBe("high")
+		})
+
+		it("should return undefined verbosity when not specified", () => {
+			const model: ModelInfo = {
+				...baseModel,
+			}
+
+			const result = getModelParams({
+				...openaiParams,
+				settings: {},
+				model,
+			})
+
+			expect(result.verbosity).toBeUndefined()
+		})
+
+		it("should include verbosity alongside reasoning settings", () => {
+			const model: ModelInfo = {
+				...baseModel,
+				supportsReasoningEffort: true,
+			}
+
+			const result = getModelParams({
+				...openaiParams,
+				settings: {
+					reasoningEffort: "high",
+					verbosity: "low",
+				},
+				model,
+			})
+
+			expect(result.reasoningEffort).toBe("high")
+			expect(result.verbosity).toBe("low")
+			expect(result.reasoning).toEqual({ reasoning_effort: "high" })
+		})
+
+		it("should include verbosity with reasoning budget models", () => {
+			const model: ModelInfo = {
+				...baseModel,
+				supportsReasoningBudget: true,
+			}
+
+			const result = getModelParams({
+				...anthropicParams,
+				settings: {
+					enableReasoningEffort: true,
+					verbosity: "high",
+				},
+				model,
+			})
+
+			expect(result.verbosity).toBe("high")
+			expect(result.reasoningBudget).toBe(8192) // Default thinking tokens
 		})
 	})
 })

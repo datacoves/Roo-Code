@@ -43,25 +43,73 @@ export const clineAsks = [
 export const clineAskSchema = z.enum(clineAsks)
 
 export type ClineAsk = z.infer<typeof clineAskSchema>
-
 /**
- * BlockingAsk
+ * IdleAsk
+ *
+ * Asks that put the task into an "idle" state.
  */
 
-export const blockingAsks: ClineAsk[] = [
-	"api_req_failed",
-	"mistake_limit_reached",
+export const idleAsks = [
 	"completion_result",
-	"resume_task",
+	"api_req_failed",
 	"resume_completed_task",
-	"command_output",
+	"mistake_limit_reached",
 	"auto_approval_max_req_reached",
-] as const
+] as const satisfies readonly ClineAsk[]
 
-export type BlockingAsk = (typeof blockingAsks)[number]
+export type IdleAsk = (typeof idleAsks)[number]
 
-export function isBlockingAsk(ask: ClineAsk): ask is BlockingAsk {
-	return blockingAsks.includes(ask)
+export function isIdleAsk(ask: ClineAsk): ask is IdleAsk {
+	return (idleAsks as readonly ClineAsk[]).includes(ask)
+}
+
+/**
+ * ResumableAsk
+ *
+ * Asks that put the task into an "resumable" state.
+ */
+
+export const resumableAsks = ["resume_task"] as const satisfies readonly ClineAsk[]
+
+export type ResumableAsk = (typeof resumableAsks)[number]
+
+export function isResumableAsk(ask: ClineAsk): ask is ResumableAsk {
+	return (resumableAsks as readonly ClineAsk[]).includes(ask)
+}
+
+/**
+ * InteractiveAsk
+ *
+ * Asks that put the task into an "user interaction required" state.
+ */
+
+export const interactiveAsks = [
+	"followup",
+	"command",
+	"tool",
+	"browser_action_launch",
+	"use_mcp_server",
+] as const satisfies readonly ClineAsk[]
+
+export type InteractiveAsk = (typeof interactiveAsks)[number]
+
+export function isInteractiveAsk(ask: ClineAsk): ask is InteractiveAsk {
+	return (interactiveAsks as readonly ClineAsk[]).includes(ask)
+}
+
+/**
+ * NonBlockingAsk
+ *
+ * Asks that are not associated with an actual approval, and are only used
+ * to update chat messages.
+ */
+
+export const nonBlockingAsks = ["command_output"] as const satisfies readonly ClineAsk[]
+
+export type NonBlockingAsk = (typeof nonBlockingAsks)[number]
+
+export function isNonBlockingAsk(ask: ClineAsk): ask is NonBlockingAsk {
+	return (nonBlockingAsks as readonly ClineAsk[]).includes(ask)
 }
 
 /**
@@ -81,6 +129,7 @@ export function isBlockingAsk(ask: ClineAsk): ask is BlockingAsk {
  * - `api_req_finished`: Indicates an API request has completed successfully
  * - `api_req_retried`: Indicates an API request is being retried after a failure
  * - `api_req_retry_delayed`: Indicates an API request retry has been delayed
+ * - `api_req_rate_limit_wait`: Indicates a configured rate-limit wait (not an error)
  * - `api_req_deleted`: Indicates an API request has been deleted/cancelled
  * - `text`: General text message or assistant response
  * - `reasoning`: Assistant's reasoning or thought process (often hidden from user)
@@ -107,8 +156,10 @@ export const clineSays = [
 	"api_req_finished",
 	"api_req_retried",
 	"api_req_retry_delayed",
+	"api_req_rate_limit_wait",
 	"api_req_deleted",
 	"text",
+	"image",
 	"reasoning",
 	"completion_result",
 	"user_feedback",
@@ -117,6 +168,7 @@ export const clineSays = [
 	"shell_integration_warning",
 	"browser_action",
 	"browser_action_result",
+	"browser_session_status",
 	"mcp_server_request_started",
 	"mcp_server_response",
 	"subtask_result",
@@ -125,6 +177,7 @@ export const clineSays = [
 	"diff_error",
 	"condense_context",
 	"condense_context_error",
+	"sliding_window_truncation",
 	"codebase_search_result",
 	"user_edit_todos",
 ] as const
@@ -146,21 +199,63 @@ export type ToolProgressStatus = z.infer<typeof toolProgressStatusSchema>
 
 /**
  * ContextCondense
+ *
+ * Data associated with a successful context condensation event.
+ * This is attached to messages with `say: "condense_context"` when
+ * the condensation operation completes successfully.
+ *
+ * @property cost - The API cost incurred for the condensation operation
+ * @property prevContextTokens - Token count before condensation
+ * @property newContextTokens - Token count after condensation
+ * @property summary - The condensed summary that replaced the original context
+ * @property condenseId - Optional unique identifier for this condensation operation
  */
-
 export const contextCondenseSchema = z.object({
 	cost: z.number(),
 	prevContextTokens: z.number(),
 	newContextTokens: z.number(),
 	summary: z.string(),
+	condenseId: z.string().optional(),
 })
 
 export type ContextCondense = z.infer<typeof contextCondenseSchema>
 
 /**
- * ClineMessage
+ * ContextTruncation
+ *
+ * Data associated with a sliding window truncation event.
+ * This is attached to messages with `say: "sliding_window_truncation"` when
+ * messages are removed from the conversation history to stay within token limits.
+ *
+ * Unlike condensation, truncation simply removes older messages without
+ * summarizing them. This is a faster but less context-preserving approach.
+ *
+ * @property truncationId - Unique identifier for this truncation operation
+ * @property messagesRemoved - Number of conversation messages that were removed
+ * @property prevContextTokens - Token count before truncation occurred
+ * @property newContextTokens - Token count after truncation occurred
  */
+export const contextTruncationSchema = z.object({
+	truncationId: z.string(),
+	messagesRemoved: z.number(),
+	prevContextTokens: z.number(),
+	newContextTokens: z.number(),
+})
 
+export type ContextTruncation = z.infer<typeof contextTruncationSchema>
+
+/**
+ * ClineMessage
+ *
+ * The main message type used for communication between the extension and webview.
+ * Messages can either be "ask" (requiring user response) or "say" (informational).
+ *
+ * Context Management Fields:
+ * - `contextCondense`: Present when `say: "condense_context"` and condensation succeeded
+ * - `contextTruncation`: Present when `say: "sliding_window_truncation"` and truncation occurred
+ *
+ * Note: These fields are mutually exclusive - a message will have at most one of them.
+ */
 export const clineMessageSchema = z.object({
 	ts: z.number(),
 	type: z.union([z.literal("ask"), z.literal("say")]),
@@ -173,9 +268,19 @@ export const clineMessageSchema = z.object({
 	conversationHistoryIndex: z.number().optional(),
 	checkpoint: z.record(z.string(), z.unknown()).optional(),
 	progressStatus: toolProgressStatusSchema.optional(),
+	/**
+	 * Data for successful context condensation.
+	 * Present when `say: "condense_context"` and `partial: false`.
+	 */
 	contextCondense: contextCondenseSchema.optional(),
+	/**
+	 * Data for sliding window truncation.
+	 * Present when `say: "sliding_window_truncation"`.
+	 */
+	contextTruncation: contextTruncationSchema.optional(),
 	isProtected: z.boolean().optional(),
 	apiProtocol: z.union([z.literal("openai"), z.literal("anthropic")]).optional(),
+	isAnswered: z.boolean().optional(),
 })
 
 export type ClineMessage = z.infer<typeof clineMessageSchema>
@@ -199,14 +304,11 @@ export type TokenUsage = z.infer<typeof tokenUsageSchema>
  * QueuedMessage
  */
 
-/**
- * Represents a message that is queued to be sent when sending is enabled
- */
-export interface QueuedMessage {
-	/** Unique identifier for the queued message */
-	id: string
-	/** The text content of the message */
-	text: string
-	/** Array of image data URLs attached to the message */
-	images: string[]
-}
+export const queuedMessageSchema = z.object({
+	timestamp: z.number(),
+	id: z.string(),
+	text: z.string(),
+	images: z.array(z.string()).optional(),
+})
+
+export type QueuedMessage = z.infer<typeof queuedMessageSchema>

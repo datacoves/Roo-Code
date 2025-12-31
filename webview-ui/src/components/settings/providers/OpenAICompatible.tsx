@@ -28,6 +28,7 @@ type OpenAICompatibleProps = {
 	setApiConfigurationField: (field: keyof ProviderSettings, value: ProviderSettings[keyof ProviderSettings]) => void
 	organizationAllowList: OrganizationAllowList
 	modelValidationError?: string
+	simplifySettings?: boolean
 }
 
 export const OpenAICompatible = ({
@@ -35,6 +36,7 @@ export const OpenAICompatible = ({
 	setApiConfigurationField,
 	organizationAllowList,
 	modelValidationError,
+	simplifySettings,
 }: OpenAICompatibleProps) => {
 	const { t } = useAppTranslation()
 
@@ -147,6 +149,7 @@ export const OpenAICompatible = ({
 				serviceUrl="https://platform.openai.com"
 				organizationAllowList={organizationAllowList}
 				errorMessage={modelValidationError}
+				simplifySettings={simplifySettings}
 			/>
 			<R1FormatSetting
 				onChange={handleInputChange("openAiR1FormatEnabled", noTransform)}
@@ -390,30 +393,6 @@ export const OpenAICompatible = ({
 					</div>
 					<div className="text-sm text-vscode-descriptionForeground pt-1">
 						{t("settings:providers.customModel.imageSupport.description")}
-					</div>
-				</div>
-
-				<div>
-					<div className="flex items-center gap-1">
-						<Checkbox
-							checked={apiConfiguration?.openAiCustomModelInfo?.supportsComputerUse ?? false}
-							onChange={handleInputChange("openAiCustomModelInfo", (checked) => {
-								return {
-									...(apiConfiguration?.openAiCustomModelInfo || openAiModelInfoSaneDefaults),
-									supportsComputerUse: checked,
-								}
-							})}>
-							<span className="font-medium">{t("settings:providers.customModel.computerUse.label")}</span>
-						</Checkbox>
-						<StandardTooltip content={t("settings:providers.customModel.computerUse.description")}>
-							<i
-								className="codicon codicon-info text-vscode-descriptionForeground"
-								style={{ fontSize: "12px" }}
-							/>
-						</StandardTooltip>
-					</div>
-					<div className="text-sm text-vscode-descriptionForeground pt-1">
-						{t("settings:providers.customModel.computerUse.description")}
 					</div>
 				</div>
 

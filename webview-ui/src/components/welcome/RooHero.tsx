@@ -7,19 +7,19 @@ const RooHero = () => {
 	})
 
 	return (
-		<div className="flex flex-col items-center justify-center pb-4 forced-color-adjust-none">
+		<div className="mb-4 relative forced-color-adjust-none group flex flex-col items-center w-full pt-4">
 			<div
 				style={{
 					backgroundColor: "var(--vscode-foreground)",
-					WebkitMaskImage: `url('${imagesBaseUri}/roo-logo.svg')`,
+					WebkitMaskImage: `url('${imagesBaseUri}/datacoves-logo.svg')`,
 					WebkitMaskRepeat: "no-repeat",
 					WebkitMaskSize: "contain",
-					maskImage: `url('${imagesBaseUri}/roo-logo.svg')`,
+					maskImage: `url('${imagesBaseUri}/datacoves-logo.svg')`,
 					maskRepeat: "no-repeat",
 					maskSize: "contain",
 				}}
-				className="mx-auto">
-				<img src={imagesBaseUri + "/roo-logo.svg"} alt="Roo logo" className="h-8 opacity-0" />
+				className="z-5 mx-auto group-hover:animate-bounce translate-y-0 transition-transform duration-500">
+				<img src={imagesBaseUri + "/datacoves-logo.svg"} alt="Datacoves logo" className="h-12 opacity-0" />
 			</div>
 		</div>
 	)

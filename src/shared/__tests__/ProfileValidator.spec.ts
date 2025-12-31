@@ -1,6 +1,6 @@
 // npx vitest run src/shared/__tests__/ProfileValidator.spec.ts
 
-import { OrganizationAllowList, ProviderSettings } from "@roo-code/types"
+import type { ProviderSettings, OrganizationAllowList } from "@roo-code/types"
 
 import { ProfileValidator } from "../ProfileValidator"
 
@@ -45,20 +45,6 @@ describe("ProfileValidator", () => {
 			}
 
 			expect(ProfileValidator.isProfileAllowed(profile, allowList)).toBe(false)
-		})
-
-		it("should allow human-relay provider regardless of model", () => {
-			const allowList: OrganizationAllowList = {
-				allowAll: false,
-				providers: {
-					"human-relay": { allowAll: false },
-				},
-			}
-			const profile: ProviderSettings = {
-				apiProvider: "human-relay",
-			}
-
-			expect(ProfileValidator.isProfileAllowed(profile, allowList)).toBe(true)
 		})
 
 		it("should allow providers with allowAll=true regardless of model", () => {
@@ -193,6 +179,8 @@ describe("ProfileValidator", () => {
 			"groq",
 			"chutes",
 			"sambanova",
+			"fireworks",
+			"featherless",
 		]
 
 		apiModelProviders.forEach((provider) => {
@@ -223,6 +211,22 @@ describe("ProfileValidator", () => {
 			const profile: ProviderSettings = {
 				apiProvider: "litellm" as any,
 				litellmModelId: "test-model",
+			}
+
+			expect(ProfileValidator.isProfileAllowed(profile, allowList)).toBe(true)
+		})
+
+		// Test for io-intelligence provider which uses ioIntelligenceModelId
+		it(`should extract ioIntelligenceModelId for io-intelligence provider`, () => {
+			const allowList: OrganizationAllowList = {
+				allowAll: false,
+				providers: {
+					"io-intelligence": { allowAll: false, models: ["test-model"] },
+				},
+			}
+			const profile: ProviderSettings = {
+				apiProvider: "io-intelligence" as any,
+				ioIntelligenceModelId: "test-model",
 			}
 
 			expect(ProfileValidator.isProfileAllowed(profile, allowList)).toBe(true)
@@ -283,21 +287,6 @@ describe("ProfileValidator", () => {
 			const profile: ProviderSettings = {
 				apiProvider: "openrouter",
 				openRouterModelId: "openrouter-model",
-			}
-
-			expect(ProfileValidator.isProfileAllowed(profile, allowList)).toBe(true)
-		})
-
-		it("should extract glamaModelId for glama provider", () => {
-			const allowList: OrganizationAllowList = {
-				allowAll: false,
-				providers: {
-					glama: { allowAll: false, models: ["glama-model"] },
-				},
-			}
-			const profile: ProviderSettings = {
-				apiProvider: "glama",
-				glamaModelId: "glama-model",
 			}
 
 			expect(ProfileValidator.isProfileAllowed(profile, allowList)).toBe(true)

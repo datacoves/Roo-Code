@@ -1,5 +1,5 @@
 {
-	"title": "Roo Marketplace",
+	"title": "Copilot Marketplace",
 	"tabs": {
 		"installed": "Đã cài đặt",
 		"settings": "Cài đặt",
@@ -12,6 +12,12 @@
 			"placeholder": "Tìm kiếm các mục marketplace...",
 			"placeholderMcp": "Tìm kiếm MCP...",
 			"placeholderMode": "Tìm kiếm Chế độ..."
+		},
+		"installed": {
+			"label": "Lọc theo trạng thái",
+			"all": "Tất cả các mục",
+			"installed": "Đã cài đặt",
+			"notInstalled": "Chưa cài đặt"
 		},
 		"type": {
 			"label": "Lọc theo loại:",

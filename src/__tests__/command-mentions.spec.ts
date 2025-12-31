@@ -1,4 +1,3 @@
-import { describe, it, expect, beforeEach, vi } from "vitest"
 import { parseMentions } from "../core/mentions"
 import { UrlContentFetcher } from "../services/browser/UrlContentFetcher"
 import { getCommand } from "../services/command/commands"
@@ -28,17 +27,19 @@ describe("Command Mentions", () => {
 
 	// Helper function to call parseMentions with required parameters
 	const callParseMentions = async (text: string) => {
-		return await parseMentions(
+		const result = await parseMentions(
 			text,
 			"/test/cwd", // cwd
 			mockUrlContentFetcher, // urlContentFetcher
 			undefined, // fileContextTracker
 			undefined, // rooIgnoreController
-			true, // showRooIgnoredFiles
+			false, // showRooIgnoredFiles
 			true, // includeDiagnosticMessages
 			50, // maxDiagnosticMessages
 			undefined, // maxReadFileLine
 		)
+		// Return just the text for backward compatibility with existing tests
+		return result.text
 	}
 
 	describe("parseMentions with command support", () => {

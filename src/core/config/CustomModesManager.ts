@@ -40,6 +40,7 @@ interface ExportResult {
 
 interface ImportResult {
 	success: boolean
+	slug?: string
 	error?: string
 }
 
@@ -405,9 +406,13 @@ export class CustomModesManager {
 			// Validate the mode configuration before saving
 			const validationResult = modeConfigSchema.safeParse(config)
 			if (!validationResult.success) {
-				const errors = validationResult.error.errors.map((e) => e.message).join(", ")
-				logger.error(`Invalid mode configuration for ${slug}`, { errors: validationResult.error.errors })
-				throw new Error(`Invalid mode configuration: ${errors}`)
+				const errorMessages = validationResult.error.errors
+					.map((err) => `${err.path.join(".")}: ${err.message}`)
+					.join(", ")
+				const errorMessage = `Invalid mode configuration: ${errorMessages}`
+				logger.error("Mode validation failed", { slug, errors: validationResult.error.errors })
+				vscode.window.showErrorMessage(t("common:customModes.errors.updateFailed", { error: errorMessage }))
+				throw new Error(errorMessage)
 			}
 
 			const isProjectMode = config.source === "project"
@@ -453,6 +458,7 @@ export class CustomModesManager {
 			const errorMessage = error instanceof Error ? error.message : String(error)
 			logger.error("Failed to update custom mode", { slug, error: errorMessage })
 			vscode.window.showErrorMessage(t("common:customModes.errors.updateFailed", { error: errorMessage }))
+			throw error
 		}
 	}
 
@@ -786,7 +792,7 @@ export class CustomModesManager {
 								// This excludes the rules-{slug} folder from the path
 								const relativePath = path.relative(modeRulesDir, filePath)
 								// Normalize path to use forward slashes for cross-platform compatibility
-								const normalizedRelativePath = relativePath.replace(/\\/g, '/')
+								const normalizedRelativePath = relativePath.replace(/\\/g, "/")
 								rulesFiles.push({ relativePath: normalizedRelativePath, content: content.trim() })
 							}
 						}
@@ -985,7 +991,8 @@ export class CustomModesManager {
 			// Refresh the modes after import
 			await this.refreshMergedState()
 
-			return { success: true }
+			// Return the imported mode's slug so the UI can activate it
+			return { success: true, slug: importData.customModes[0]?.slug }
 		} catch (error) {
 			const errorMessage = error instanceof Error ? error.message : String(error)
 			logger.error("Failed to import mode with rules", { error: errorMessage })

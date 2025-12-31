@@ -1,8 +1,4 @@
 {
-	"greeting": "Welcome to Roo Code!",
-	"introduction": "With a range of built-in and extensible Modes, Roo Code lets you plan, architect, code, debug and boost your productivity like never before.",
-	"notice": "To get started, this extension needs an API provider.",
-	"start": "Let's go!",
 	"routers": {
 		"requesty": {
 			"description": "Your optimized LLM router",
@@ -10,18 +6,57 @@
 		},
 		"openrouter": {
 			"description": "A unified interface for LLMs"
+		},
+		"roo": {
+			"description": "The best free models to get started",
+			"incentive": "Try Copilot out for free"
 		}
 	},
-	"chooseProvider": "To do its magic, Roo needs an API key.",
+	"landing": {
+		"greeting": "",
+		"introduction": "Generate, refactor, and debug code with AI assistance. Check out our <docsLink>documentation</docsLink> to learn more.",
+		"features": {
+			"modes": {
+				"title": "Customizable Modes",
+				"description": "Specialized personas with their own behaviors and assigned models"
+			},
+			"orchestration": {
+				"title": "Task Orchestration",
+				"description": "Split tasks into smaller, manageable parts"
+			}
+		},
+		"accountMention": "To get started, create your Datacoves Copilot Cloud account. Get powerful models, web control, analytics, support and more.",
+		"getStarted": "Get started",
+		"noAccount": "or use without an account"
+	},
+	"providerSignup": {
+		"heading": "Choose your provider",
+		"chooseProvider": "Copilot needs an LLM provider to work. Choose one to get started, you can add more later.",
+		"rooCloudProvider": "Datacoves Copilot Cloud Provider",
+		"rooCloudDescription": "The easiest way to start is with the Datacoves Copilot Cloud Provider: a curated mix of free and paid models at a low cost.",
+		"learnMore": "Learn more",
+		"useAnotherProvider": "3rd-party Provider",
+		"useAnotherProviderDescription": "Enter an API key and get going.",
+		"noApiKeys": "Don't want to deal with API keys and separate accounts?",
+		"backToRoo": "Go with the Datacoves Copilot Cloud Provider.",
+		"goBack": "Back",
+		"finish": "Finish"
+	},
+	"waitingForCloud": {
+		"heading": "Logging into Datacoves Copilot Cloud...",
+		"description": "We'll take you to your browser to sign up for Datacoves Copilot Cloud. We'll then bring you back here to finish.",
+		"noPrompt": "If you don't get prompted to open a URL, <clickHere>click here</clickHere>.",
+		"havingTrouble": "If you've completed sign up but are having trouble, <clickHere>click here</clickHere>.",
+		"pasteUrl": "Paste the callback URL shown in your browser:",
+		"docsLink": "Not working? <DocsLink>Check the docs</DocsLink>.",
+		"invalidURL": "That doesn't look like a valid callback URL. Please copy what Datacoves Copilot Cloud is showing in your browser.",
+		"goBack": "Go back"
+	},
 	"startRouter": "We recommend using an LLM Router:",
 	"startCustom": "Or you can bring your provider API key:",
 	"telemetry": {
-		"title": "Help Improve Roo Code",
-		"anonymousTelemetry": "Send anonymous error and usage data to help us fix bugs and improve the extension. No code, prompts, or personal information is ever sent (unless you connect to Roo Code Cloud). See our <privacyLink>privacy policy</privacyLink> for more details.",
-		"changeSettings": "You can always change this at the bottom of the <settingsLink>settings</settingsLink>",
-		"settings": "settings",
-		"allow": "Allow",
-		"deny": "Deny"
+		"helpImprove": "Help Improve Datacoves Copilot",
+		"helpImproveMessage": "Datacoves Copilot collects error and usage data to help us fix bugs and improve the extension. This telemetry does not collect code, prompts or personal information. You can turn this off in <settingsLink>settings</settingsLink>."
 	},
 	"importSettings": "Import Settings"
 }

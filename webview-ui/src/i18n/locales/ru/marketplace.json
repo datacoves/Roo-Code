@@ -1,5 +1,5 @@
 {
-	"title": "Roo Marketplace",
+	"title": "Copilot Marketplace",
 	"tabs": {
 		"installed": "Установлено",
 		"settings": "Настройки",
@@ -12,6 +12,12 @@
 			"placeholder": "Поиск элементов marketplace...",
 			"placeholderMcp": "Поиск MCPs...",
 			"placeholderMode": "Поиск режимов..."
+		},
+		"installed": {
+			"label": "Фильтр по статусу",
+			"all": "Все элементы",
+			"installed": "Установленные",
+			"notInstalled": "Не установленные"
 		},
 		"type": {
 			"label": "Фильтр по типу:",

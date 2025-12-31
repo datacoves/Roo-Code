@@ -2,20 +2,18 @@ import { VSCodeLink } from "@vscode/webview-ui-toolkit/react"
 import { useTranslation } from "react-i18next"
 import { Trans } from "react-i18next"
 
-import { buildDocLink } from "@src/utils/docLinks"
+import { ReplaceAll, Users } from "lucide-react"
 
 const tips = [
 	{
-		icon: "codicon-account",
-		href: buildDocLink("basic-usage/using-modes", "tips"),
+		icon: <Users className="size-4 shrink-0 mt-0.5" />,
 		titleKey: "rooTips.customizableModes.title",
 		descriptionKey: "rooTips.customizableModes.description",
 	},
 	{
-		icon: "codicon-list-tree",
-		href: buildDocLink("features/boomerang-tasks", "tips"),
-		titleKey: "rooTips.boomerangTasks.title",
-		descriptionKey: "rooTips.boomerangTasks.description",
+		icon: <ReplaceAll className="size-4 shrink-0 mt-0.5" />,
+		titleKey: "rooTips.modelAgnostic.title",
+		descriptionKey: "rooTips.modelAgnostic.description",
 	},
 ]
 
@@ -23,30 +21,26 @@ const RooTips = () => {
 	const { t } = useTranslation("chat")
 
 	return (
-		<div>
-			<p className="text-vscode-editor-foreground leading-tight font-vscode-font-family text-center text-balance max-w-[380px] mx-auto my-0">
+		<div className="flex flex-col items-center gap-4 mb-4 w-full text-vscode-descriptionForeground">
+			<p className="my-0 text-center text-base">
 				<Trans
 					i18nKey="chat:about"
 					components={{
 						DocsLink: (
-							<a href={buildDocLink("", "welcome")} target="_blank" rel="noopener noreferrer">
-								the docs
-							</a>
+							<VSCodeLink
+								className="text-muted-foreground underline"
+								href="https://docs.datacoves.com/docs/how-tos/vs-code/datacoves-copilot/v2"
+							/>
 						),
 					}}
 				/>
 			</p>
-			<div className="flex flex-col items-center justify-center px-5 py-2.5 gap-4">
+			<div className="flex flex-col gap-3 mt-2">
 				{tips.map((tip) => (
-					<div
-						key={tip.titleKey}
-						className="flex items-center gap-2 text-vscode-editor-foreground font-vscode max-w-[250px]">
-						<span className={`codicon ${tip.icon}`}></span>
+					<div key={tip.titleKey} className="flex items-start gap-3 leading-relaxed text-base">
+						<span className="mt-0.5">{tip.icon}</span>
 						<span>
-							<VSCodeLink className="forced-color-adjust-none" href={tip.href}>
-								{t(tip.titleKey)}
-							</VSCodeLink>
-							: {t(tip.descriptionKey)}
+							<strong>{t(tip.titleKey)}</strong>: {t(tip.descriptionKey)}
 						</span>
 					</div>
 				))}

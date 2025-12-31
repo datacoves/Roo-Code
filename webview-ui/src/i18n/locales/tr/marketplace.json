@@ -1,5 +1,5 @@
 {
-	"title": "Roo Marketplace",
+	"title": "Copilot Marketplace",
 	"tabs": {
 		"installed": "Yüklü",
 		"settings": "Ayarlar",
@@ -12,6 +12,12 @@
 			"placeholder": "Marketplace öğelerini ara...",
 			"placeholderMcp": "MCP'leri ara...",
 			"placeholderMode": "Modları ara..."
+		},
+		"installed": {
+			"label": "Duruma göre filtrele",
+			"all": "Tüm Öğeler",
+			"installed": "Yüklü",
+			"notInstalled": "Yüklü Değil"
 		},
 		"type": {
 			"label": "Türe göre filtrele:",

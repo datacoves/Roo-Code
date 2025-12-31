@@ -6,6 +6,7 @@ import {
 	GLOBAL_SETTINGS_KEYS,
 	SECRET_STATE_KEYS,
 	GLOBAL_STATE_KEYS,
+	GLOBAL_SECRET_KEYS,
 	type ProviderSettings,
 	type GlobalSettings,
 	type SecretState,
@@ -14,6 +15,7 @@ import {
 	providerSettingsSchema,
 	globalSettingsSchema,
 	isSecretStateKey,
+	isProviderName,
 } from "@roo-code/types"
 import { TelemetryService } from "@roo-code/telemetry"
 
@@ -61,17 +63,99 @@ export class ContextProxy {
 			}
 		}
 
-		const promises = SECRET_STATE_KEYS.map(async (key) => {
-			try {
-				this.secretCache[key] = await this.originalContext.secrets.get(key)
-			} catch (error) {
-				logger.error(`Error loading secret ${key}: ${error instanceof Error ? error.message : String(error)}`)
-			}
-		})
+		const promises = [
+			...SECRET_STATE_KEYS.map(async (key) => {
+				try {
+					this.secretCache[key] = await this.originalContext.secrets.get(key)
+				} catch (error) {
+					logger.error(
+						`Error loading secret ${key}: ${error instanceof Error ? error.message : String(error)}`,
+					)
+				}
+			}),
+			...GLOBAL_SECRET_KEYS.map(async (key) => {
+				try {
+					this.secretCache[key] = await this.originalContext.secrets.get(key)
+				} catch (error) {
+					logger.error(
+						`Error loading global secret ${key}: ${error instanceof Error ? error.message : String(error)}`,
+					)
+				}
+			}),
+		]
 
 		await Promise.all(promises)
 
+		// Migration: Check for old nested image generation settings and migrate them
+		await this.migrateImageGenerationSettings()
+
+		// Migration: Sanitize invalid/removed API providers
+		await this.migrateInvalidApiProvider()
+
 		this._isInitialized = true
+	}
+
+	/**
+	 * Migrates invalid/removed apiProvider values by clearing them from storage.
+	 * This handles cases where a user had a provider selected that was later removed
+	 * from the extension (e.g., "glama").
+	 */
+	private async migrateInvalidApiProvider() {
+		try {
+			const apiProvider = this.stateCache.apiProvider
+			if (apiProvider !== undefined && !isProviderName(apiProvider)) {
+				logger.info(`[ContextProxy] Found invalid provider "${apiProvider}" in storage - clearing it`)
+				// Clear the invalid provider from both cache and storage
+				this.stateCache.apiProvider = undefined
+				await this.originalContext.globalState.update("apiProvider", undefined)
+			}
+		} catch (error) {
+			logger.error(
+				`Error during invalid API provider migration: ${error instanceof Error ? error.message : String(error)}`,
+			)
+		}
+	}
+
+	/**
+	 * Migrates old nested openRouterImageGenerationSettings to the new flattened structure
+	 */
+	private async migrateImageGenerationSettings() {
+		try {
+			// Check if there's an old nested structure
+			const oldNestedSettings = this.originalContext.globalState.get<any>("openRouterImageGenerationSettings")
+
+			if (oldNestedSettings && typeof oldNestedSettings === "object") {
+				logger.info("Migrating old nested image generation settings to flattened structure")
+
+				// Migrate the API key if it exists and we don't already have one
+				if (oldNestedSettings.openRouterApiKey && !this.secretCache.openRouterImageApiKey) {
+					await this.originalContext.secrets.store(
+						"openRouterImageApiKey",
+						oldNestedSettings.openRouterApiKey,
+					)
+					this.secretCache.openRouterImageApiKey = oldNestedSettings.openRouterApiKey
+					logger.info("Migrated openRouterImageApiKey to secrets")
+				}
+
+				// Migrate the selected model if it exists and we don't already have one
+				if (oldNestedSettings.selectedModel && !this.stateCache.openRouterImageGenerationSelectedModel) {
+					await this.originalContext.globalState.update(
+						"openRouterImageGenerationSelectedModel",
+						oldNestedSettings.selectedModel,
+					)
+					this.stateCache.openRouterImageGenerationSelectedModel = oldNestedSettings.selectedModel
+					logger.info("Migrated openRouterImageGenerationSelectedModel to global state")
+				}
+
+				// Clean up the old nested structure
+				await this.originalContext.globalState.update("openRouterImageGenerationSettings", undefined)
+				logger.info("Removed old nested openRouterImageGenerationSettings")
+			}
+		} catch (error) {
+			logger.error(
+				`Error during image generation settings migration: ${error instanceof Error ? error.message : String(error)}`,
+			)
+		}
 	}
 
 	public get extensionUri() {
@@ -152,20 +236,34 @@ export class ContextProxy {
 	 * This is useful when you need to ensure the cache has the latest values
 	 */
 	async refreshSecrets(): Promise<void> {
-		const promises = SECRET_STATE_KEYS.map(async (key) => {
-			try {
-				this.secretCache[key] = await this.originalContext.secrets.get(key)
-			} catch (error) {
-				logger.error(
-					`Error refreshing secret ${key}: ${error instanceof Error ? error.message : String(error)}`,
-				)
-			}
-		})
+		const promises = [
+			...SECRET_STATE_KEYS.map(async (key) => {
+				try {
+					this.secretCache[key] = await this.originalContext.secrets.get(key)
+				} catch (error) {
+					logger.error(
+						`Error refreshing secret ${key}: ${error instanceof Error ? error.message : String(error)}`,
+					)
+				}
+			}),
+			...GLOBAL_SECRET_KEYS.map(async (key) => {
+				try {
+					this.secretCache[key] = await this.originalContext.secrets.get(key)
+				} catch (error) {
+					logger.error(
+						`Error refreshing global secret ${key}: ${error instanceof Error ? error.message : String(error)}`,
+					)
+				}
+			}),
+		]
 		await Promise.all(promises)
 	}
 
 	private getAllSecretState(): SecretState {
-		return Object.fromEntries(SECRET_STATE_KEYS.map((key) => [key, this.getSecret(key)]))
+		return Object.fromEntries([
+			...SECRET_STATE_KEYS.map((key) => [key, this.getSecret(key as SecretStateKey)]),
+			...GLOBAL_SECRET_KEYS.map((key) => [key, this.getSecret(key as SecretStateKey)]),
+		])
 	}
 
 	/**
@@ -193,15 +291,51 @@ export class ContextProxy {
 	public getProviderSettings(): ProviderSettings {
 		const values = this.getValues()
 
+		// Sanitize invalid/removed apiProvider values before parsing
+		// This handles cases where a user had a provider selected that was later removed
+		// from the extension (e.g., "glama"). We sanitize here to avoid repeated
+		// schema validation errors that can cause infinite loops in telemetry.
+		const sanitizedValues = this.sanitizeProviderValues(values)
+
 		try {
-			return providerSettingsSchema.parse(values)
+			return providerSettingsSchema.parse(sanitizedValues)
 		} catch (error) {
 			if (error instanceof ZodError) {
 				TelemetryService.instance.captureSchemaValidationError({ schemaName: "ProviderSettings", error })
 			}
 
-			return PROVIDER_SETTINGS_KEYS.reduce((acc, key) => ({ ...acc, [key]: values[key] }), {} as ProviderSettings)
+			return PROVIDER_SETTINGS_KEYS.reduce(
+				(acc, key) => ({ ...acc, [key]: sanitizedValues[key] }),
+				{} as ProviderSettings,
+			)
 		}
+	}
+
+	/**
+	 * Sanitizes provider values by resetting invalid/removed apiProvider values.
+	 * This prevents schema validation errors for removed providers.
+	 */
+	private sanitizeProviderValues(values: RooCodeSettings): RooCodeSettings {
+		// Remove legacy Claude Code CLI wrapper keys that may still exist in global state.
+		// These keys were used by a removed local CLI runner and are no longer part of ProviderSettings.
+		const legacyKeys = ["claudeCodePath", "claudeCodeMaxOutputTokens"] as const
+
+		let sanitizedValues = values
+		for (const key of legacyKeys) {
+			if (key in sanitizedValues) {
+				const copy = { ...sanitizedValues } as Record<string, unknown>
+				delete copy[key as string]
+				sanitizedValues = copy as RooCodeSettings
+			}
+		}
+
+		if (values.apiProvider !== undefined && !isProviderName(values.apiProvider)) {
+			logger.info(`[ContextProxy] Sanitizing invalid provider "${values.apiProvider}" - resetting to undefined`)
+			// Return a new values object without the invalid apiProvider
+			const { apiProvider, ...restValues } = sanitizedValues
+			return restValues as RooCodeSettings
+		}
+		return sanitizedValues
 	}
 
 	public async setProviderSettings(values: ProviderSettings) {
@@ -232,18 +366,24 @@ export class ContextProxy {
 	 * RooCodeSettings
 	 */
 
-	public setValue<K extends RooCodeSettingsKey>(key: K, value: RooCodeSettings[K]) {
-		return isSecretStateKey(key) ? this.storeSecret(key, value as string) : this.updateGlobalState(key, value)
+	public async setValue<K extends RooCodeSettingsKey>(key: K, value: RooCodeSettings[K]) {
+		return isSecretStateKey(key)
+			? this.storeSecret(key as SecretStateKey, value as string)
+			: this.updateGlobalState(key as GlobalStateKey, value)
 	}
 
 	public getValue<K extends RooCodeSettingsKey>(key: K): RooCodeSettings[K] {
 		return isSecretStateKey(key)
-			? (this.getSecret(key) as RooCodeSettings[K])
-			: (this.getGlobalState(key) as RooCodeSettings[K])
+			? (this.getSecret(key as SecretStateKey) as RooCodeSettings[K])
+			: (this.getGlobalState(key as GlobalStateKey) as RooCodeSettings[K])
 	}
 
 	public getValues(): RooCodeSettings {
-		return { ...this.getAllGlobalState(), ...this.getAllSecretState() }
+		const globalState = this.getAllGlobalState()
+		const secretState = this.getAllSecretState()
+
+		// Simply merge all states - no nested secrets to handle
+		return { ...globalState, ...secretState }
 	}
 
 	public async setValues(values: RooCodeSettings) {
@@ -285,6 +425,7 @@ export class ContextProxy {
 		await Promise.all([
 			...GLOBAL_STATE_KEYS.map((key) => this.originalContext.globalState.update(key, undefined)),
 			...SECRET_STATE_KEYS.map((key) => this.originalContext.secrets.delete(key)),
+			...GLOBAL_SECRET_KEYS.map((key) => this.originalContext.secrets.delete(key)),
 		])
 
 		await this.initialize()

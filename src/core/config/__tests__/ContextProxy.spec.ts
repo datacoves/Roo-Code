@@ -2,7 +2,7 @@
 
 import * as vscode from "vscode"
 
-import { GLOBAL_STATE_KEYS, SECRET_STATE_KEYS } from "@roo-code/types"
+import { GLOBAL_STATE_KEYS, SECRET_STATE_KEYS, GLOBAL_SECRET_KEYS } from "@roo-code/types"
 
 import { ContextProxy } from "../ContextProxy"
 
@@ -70,15 +70,21 @@ describe("ContextProxy", () => {
 
 	describe("constructor", () => {
 		it("should initialize state cache with all global state keys", () => {
-			expect(mockGlobalState.get).toHaveBeenCalledTimes(GLOBAL_STATE_KEYS.length)
+			// +1 for the migration check of old nested settings
+			expect(mockGlobalState.get).toHaveBeenCalledTimes(GLOBAL_STATE_KEYS.length + 1)
 			for (const key of GLOBAL_STATE_KEYS) {
 				expect(mockGlobalState.get).toHaveBeenCalledWith(key)
 			}
+			// Also check for migration call
+			expect(mockGlobalState.get).toHaveBeenCalledWith("openRouterImageGenerationSettings")
 		})
 
 		it("should initialize secret cache with all secret keys", () => {
-			expect(mockSecrets.get).toHaveBeenCalledTimes(SECRET_STATE_KEYS.length)
+			expect(mockSecrets.get).toHaveBeenCalledTimes(SECRET_STATE_KEYS.length + GLOBAL_SECRET_KEYS.length)
 			for (const key of SECRET_STATE_KEYS) {
+				expect(mockSecrets.get).toHaveBeenCalledWith(key)
+			}
+			for (const key of GLOBAL_SECRET_KEYS) {
 				expect(mockSecrets.get).toHaveBeenCalledWith(key)
 			}
 		})
@@ -93,8 +99,8 @@ describe("ContextProxy", () => {
 			const result = proxy.getGlobalState("apiProvider")
 			expect(result).toBe("deepseek")
 
-			// Original context should be called once during updateGlobalState
-			expect(mockGlobalState.get).toHaveBeenCalledTimes(GLOBAL_STATE_KEYS.length) // Only from initialization
+			// Original context should be called once during updateGlobalState (+1 for migration check)
+			expect(mockGlobalState.get).toHaveBeenCalledTimes(GLOBAL_STATE_KEYS.length + 1) // From initialization + migration check
 		})
 
 		it("should handle default values correctly", async () => {
@@ -403,9 +409,12 @@ describe("ContextProxy", () => {
 			for (const key of SECRET_STATE_KEYS) {
 				expect(mockSecrets.delete).toHaveBeenCalledWith(key)
 			}
+			for (const key of GLOBAL_SECRET_KEYS) {
+				expect(mockSecrets.delete).toHaveBeenCalledWith(key)
+			}
 
 			// Total calls should equal the number of secret keys
-			expect(mockSecrets.delete).toHaveBeenCalledTimes(SECRET_STATE_KEYS.length)
+			expect(mockSecrets.delete).toHaveBeenCalledTimes(SECRET_STATE_KEYS.length + GLOBAL_SECRET_KEYS.length)
 		})
 
 		it("should reinitialize caches after reset", async () => {
@@ -417,6 +426,81 @@ describe("ContextProxy", () => {
 
 			// Should reinitialize caches
 			expect(initializeSpy).toHaveBeenCalledTimes(1)
+		})
+	})
+
+	describe("invalid apiProvider migration", () => {
+		it("should clear invalid apiProvider from storage during initialization", async () => {
+			// Reset and create a new proxy with invalid provider in state
+			vi.clearAllMocks()
+			mockGlobalState.get.mockImplementation((key: string) => {
+				if (key === "apiProvider") {
+					return "invalid-removed-provider" // Invalid/removed provider
+				}
+				return undefined
+			})
+
+			const proxyWithInvalidProvider = new ContextProxy(mockContext)
+			await proxyWithInvalidProvider.initialize()
+
+			// Should have cleared the invalid apiProvider
+			expect(mockGlobalState.update).toHaveBeenCalledWith("apiProvider", undefined)
+		})
+
+		it("should not modify valid apiProvider during initialization", async () => {
+			// Reset and create a new proxy with valid provider in state
+			vi.clearAllMocks()
+			mockGlobalState.get.mockImplementation((key: string) => {
+				if (key === "apiProvider") {
+					return "anthropic" // Valid provider
+				}
+				return undefined
+			})
+
+			const proxyWithValidProvider = new ContextProxy(mockContext)
+			await proxyWithValidProvider.initialize()
+
+			// Should NOT have called update for apiProvider (it's valid)
+			const updateCalls = mockGlobalState.update.mock.calls
+			const apiProviderUpdateCalls = updateCalls.filter((call: any[]) => call[0] === "apiProvider")
+			expect(apiProviderUpdateCalls.length).toBe(0)
+		})
+	})
+
+	describe("getProviderSettings", () => {
+		it("should sanitize invalid apiProvider before parsing", async () => {
+			// Set an invalid provider in state
+			await proxy.updateGlobalState("apiProvider", "invalid-removed-provider" as any)
+			await proxy.updateGlobalState("apiModelId", "some-model")
+
+			const settings = proxy.getProviderSettings()
+
+			// The invalid apiProvider should be sanitized (removed)
+			expect(settings.apiProvider).toBeUndefined()
+			// Other settings should still be present
+			expect(settings.apiModelId).toBe("some-model")
+		})
+
+		it("should pass through valid apiProvider", async () => {
+			// Set a valid provider in state
+			await proxy.updateGlobalState("apiProvider", "anthropic")
+			await proxy.updateGlobalState("apiModelId", "claude-3-opus-20240229")
+
+			const settings = proxy.getProviderSettings()
+
+			// Valid provider should be returned
+			expect(settings.apiProvider).toBe("anthropic")
+			expect(settings.apiModelId).toBe("claude-3-opus-20240229")
+		})
+
+		it("should handle undefined apiProvider gracefully", async () => {
+			// Ensure no provider is set
+			await proxy.updateGlobalState("apiProvider", undefined)
+
+			const settings = proxy.getProviderSettings()
+
+			// Should not throw and should return undefined
+			expect(settings.apiProvider).toBeUndefined()
 		})
 	})
 })

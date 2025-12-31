@@ -1,4 +1,4 @@
-import { OrganizationAllowList, ProviderSettings } from "@roo-code/types"
+import type { ProviderSettings, OrganizationAllowList } from "@roo-code/types"
 
 export class ProfileValidator {
 	public static isProfileAllowed(profile: ProviderSettings, allowList: OrganizationAllowList): boolean {
@@ -12,10 +12,6 @@ export class ProfileValidator {
 
 		if (!this.isProviderAllowed(profile.apiProvider, allowList)) {
 			return false
-		}
-
-		if (profile.apiProvider === "human-relay") {
-			return true
 		}
 
 		const modelId = this.getModelIdFromProfile(profile)
@@ -68,6 +64,8 @@ export class ProfileValidator {
 			case "groq":
 			case "sambanova":
 			case "chutes":
+			case "fireworks":
+			case "featherless":
 				return profile.apiModelId
 			case "litellm":
 				return profile.litellmModelId
@@ -80,13 +78,14 @@ export class ProfileValidator {
 				return profile.vsCodeLmModelSelector?.id
 			case "openrouter":
 				return profile.openRouterModelId
-			case "glama":
-				return profile.glamaModelId
 			case "ollama":
 				return profile.ollamaModelId
 			case "requesty":
 				return profile.requestyModelId
-			case "human-relay":
+			case "io-intelligence":
+				return profile.ioIntelligenceModelId
+			case "deepinfra":
+				return profile.deepInfraModelId
 			case "fake-ai":
 			default:
 				return undefined

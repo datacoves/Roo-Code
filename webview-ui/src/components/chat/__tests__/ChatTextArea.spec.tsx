@@ -1,12 +1,11 @@
-import { render, fireEvent, screen } from "@/utils/test-utils"
-
 import { defaultModeSlug } from "@roo/modes"
 
+import { render, fireEvent, screen } from "@src/utils/test-utils"
 import { useExtensionState } from "@src/context/ExtensionStateContext"
 import { vscode } from "@src/utils/vscode"
 import * as pathMentions from "@src/utils/path-mentions"
 
-import ChatTextArea from "../ChatTextArea"
+import { ChatTextArea } from "../ChatTextArea"
 
 vi.mock("@src/utils/vscode", () => ({
 	vscode: {
@@ -1057,55 +1056,153 @@ describe("ChatTextArea", () => {
 			const apiConfigDropdown = getApiConfigDropdown()
 			expect(apiConfigDropdown).toHaveAttribute("disabled")
 		})
-	})
-	describe("edit mode integration", () => {
-		it("should render edit mode UI when isEditMode is true", () => {
-			;(useExtensionState as ReturnType<typeof vi.fn>).mockReturnValue({
-				filePaths: [],
-				openedTabs: [],
-				taskHistory: [],
-				cwd: "/test/workspace",
-				customModes: [],
-				customModePrompts: {},
+
+		describe("enter key behavior", () => {
+			it("should send on Enter and allow newline on Shift+Enter in default mode", () => {
+				const onSend = vi.fn()
+
+				;(useExtensionState as ReturnType<typeof vi.fn>).mockReturnValue({
+					filePaths: [],
+					openedTabs: [],
+					taskHistory: [],
+					cwd: "/test/workspace",
+				})
+
+				const { container } = render(<ChatTextArea {...defaultProps} onSend={onSend} />)
+
+				const textarea = container.querySelector("textarea")!
+
+				fireEvent.keyDown(textarea, { key: "Enter" })
+				expect(onSend).toHaveBeenCalledTimes(1)
+
+				const shiftEnterEvent = new KeyboardEvent("keydown", { key: "Enter", shiftKey: true, bubbles: true })
+				fireEvent(textarea, shiftEnterEvent)
+				expect(onSend).toHaveBeenCalledTimes(1)
+				expect(shiftEnterEvent.defaultPrevented).toBe(false)
 			})
 
-			render(<ChatTextArea {...defaultProps} isEditMode={true} />)
+			it("should treat Ctrl/Cmd/Shift+Enter as send and plain Enter as newline in newline mode", () => {
+				const onSend = vi.fn()
 
-			// The edit mode UI should be rendered
-			// We can verify this by checking for the presence of elements that are unique to edit mode
-			const cancelButton = screen.getByRole("button", { name: /cancel/i })
-			expect(cancelButton).toBeInTheDocument()
+				;(useExtensionState as ReturnType<typeof vi.fn>).mockReturnValue({
+					filePaths: [],
+					openedTabs: [],
+					taskHistory: [],
+					cwd: "/test/workspace",
+					enterBehavior: "newline",
+				})
 
-			// Should show save button instead of send button
-			const saveButton = screen.getByRole("button", { name: /save/i })
-			expect(saveButton).toBeInTheDocument()
+				const { container } = render(<ChatTextArea {...defaultProps} onSend={onSend} />)
 
-			// Should not show send button in edit mode
-			const sendButton = screen.queryByRole("button", { name: /send.*message/i })
-			expect(sendButton).not.toBeInTheDocument()
+				const textarea = container.querySelector("textarea")!
+
+				const plainEnterEvent = new KeyboardEvent("keydown", { key: "Enter", bubbles: true, cancelable: true })
+				fireEvent(textarea, plainEnterEvent)
+				expect(onSend).not.toHaveBeenCalled()
+				expect(plainEnterEvent.defaultPrevented).toBe(false)
+
+				const ctrlEnterEvent = new KeyboardEvent("keydown", {
+					key: "Enter",
+					ctrlKey: true,
+					bubbles: true,
+					cancelable: true,
+				})
+				fireEvent(textarea, ctrlEnterEvent)
+				expect(onSend).toHaveBeenCalledTimes(1)
+				expect(ctrlEnterEvent.defaultPrevented).toBe(true)
+
+				const shiftEnterEvent = new KeyboardEvent("keydown", {
+					key: "Enter",
+					shiftKey: true,
+					bubbles: true,
+					cancelable: true,
+				})
+				fireEvent(textarea, shiftEnterEvent)
+				expect(onSend).toHaveBeenCalledTimes(2)
+				expect(shiftEnterEvent.defaultPrevented).toBe(true)
+			})
 		})
+	})
 
-		it("should not render edit mode UI when isEditMode is false", () => {
-			;(useExtensionState as ReturnType<typeof vi.fn>).mockReturnValue({
-				filePaths: [],
-				openedTabs: [],
-				taskHistory: [],
-				cwd: "/test/workspace",
-			})
+	describe("send button visibility", () => {
+		it("should show send button when there are images but no text", () => {
+			const { container } = render(
+				<ChatTextArea
+					{...defaultProps}
+					inputValue=""
+					selectedImages={["data:image/png;base64,test1", "data:image/png;base64,test2"]}
+				/>,
+			)
 
-			render(<ChatTextArea {...defaultProps} isEditMode={false} />)
+			// Find the send button by looking for the button with SendHorizontal icon
+			const buttons = container.querySelectorAll("button")
+			const sendButton = Array.from(buttons).find(
+				(button) => button.querySelector(".lucide-send-horizontal") !== null,
+			)
 
-			// The edit mode UI should not be rendered
-			const cancelButton = screen.queryByRole("button", { name: /cancel/i })
-			expect(cancelButton).not.toBeInTheDocument()
-
-			// Should show send button when not in edit mode
-			const sendButton = screen.getByRole("button", { name: /send.*message/i })
 			expect(sendButton).toBeInTheDocument()
 
-			// Should not show save button when not in edit mode
-			const saveButton = screen.queryByRole("button", { name: /save/i })
-			expect(saveButton).not.toBeInTheDocument()
+			// Check that the button is visible (has opacity-100 class when content exists)
+			expect(sendButton).toHaveClass("opacity-100")
+			expect(sendButton).toHaveClass("pointer-events-auto")
+			expect(sendButton).not.toHaveClass("opacity-0")
+			expect(sendButton).not.toHaveClass("pointer-events-none")
+		})
+
+		it("should hide send button when there is no text and no images", () => {
+			const { container } = render(<ChatTextArea {...defaultProps} inputValue="" selectedImages={[]} />)
+
+			// Find the send button by looking for the button with SendHorizontal icon
+			const buttons = container.querySelectorAll("button")
+			const sendButton = Array.from(buttons).find(
+				(button) => button.querySelector(".lucide-send-horizontal") !== null,
+			)
+
+			expect(sendButton).toBeInTheDocument()
+
+			// Check that the button is hidden (has opacity-0 class when no content)
+			expect(sendButton).toHaveClass("opacity-0")
+			expect(sendButton).toHaveClass("pointer-events-none")
+			expect(sendButton).not.toHaveClass("opacity-100")
+			expect(sendButton).not.toHaveClass("pointer-events-auto")
+		})
+
+		it("should show send button when there is text but no images", () => {
+			const { container } = render(<ChatTextArea {...defaultProps} inputValue="Some text" selectedImages={[]} />)
+
+			// Find the send button by looking for the button with SendHorizontal icon
+			const buttons = container.querySelectorAll("button")
+			const sendButton = Array.from(buttons).find(
+				(button) => button.querySelector(".lucide-send-horizontal") !== null,
+			)
+
+			expect(sendButton).toBeInTheDocument()
+
+			// Check that the button is visible
+			expect(sendButton).toHaveClass("opacity-100")
+			expect(sendButton).toHaveClass("pointer-events-auto")
+		})
+
+		it("should show send button when there is both text and images", () => {
+			const { container } = render(
+				<ChatTextArea
+					{...defaultProps}
+					inputValue="Some text"
+					selectedImages={["data:image/png;base64,test1"]}
+				/>,
+			)
+
+			// Find the send button by looking for the button with SendHorizontal icon
+			const buttons = container.querySelectorAll("button")
+			const sendButton = Array.from(buttons).find(
+				(button) => button.querySelector(".lucide-send-horizontal") !== null,
+			)
+
+			expect(sendButton).toBeInTheDocument()
+
+			// Check that the button is visible
+			expect(sendButton).toHaveClass("opacity-100")
+			expect(sendButton).toHaveClass("pointer-events-auto")
 		})
 	})
 })

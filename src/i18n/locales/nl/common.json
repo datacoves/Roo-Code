@@ -1,6 +1,6 @@
 {
 	"extension": {
-		"name": "Roo Code",
+		"name": "Datacoves Copilot",
 		"description": "Een compleet ontwikkelteam van AI-agenten in je editor."
 	},
 	"number_format": {
@@ -29,6 +29,13 @@
 		"checkpoint_timeout": "Time-out bij het herstellen van checkpoint.",
 		"checkpoint_failed": "Herstellen van checkpoint mislukt.",
 		"git_not_installed": "Git is vereist voor de checkpoint-functie. Installeer Git om checkpoints in te schakelen.",
+		"checkpoint_no_first": "Geen eerste checkpoint om mee te vergelijken.",
+		"checkpoint_no_previous": "Geen vorig checkpoint om mee te vergelijken.",
+		"checkpoint_no_changes": "Geen wijzigingen gevonden.",
+		"checkpoint_diff_with_next": "Wijzigingen vergeleken met volgend checkpoint",
+		"checkpoint_diff_since_first": "Wijzigingen sinds eerste checkpoint",
+		"checkpoint_diff_to_current": "Wijzigingen in huidige werkruimte",
+		"nested_git_repos_warning": "Checkpoints zijn uitgeschakeld omdat een geneste git-repository is gedetecteerd op: {{path}}. Om checkpoints te gebruiken, verwijder of verplaats deze geneste git-repository.",
 		"no_workspace": "Open eerst een projectmap",
 		"update_support_prompt": "Bijwerken van ondersteuningsprompt mislukt",
 		"reset_support_prompt": "Resetten van ondersteuningsprompt mislukt",
@@ -61,6 +68,7 @@
 		"no_internet": "Geen internetverbinding. Controleer je netwerkverbinding en probeer opnieuw.",
 		"url_forbidden": "Toegang tot deze website is verboden. De site kan geautomatiseerde toegang blokkeren of authenticatie vereisen.",
 		"url_page_not_found": "De pagina werd niet gevonden. Controleer of de URL correct is.",
+		"url_request_aborted": "Het verzoek om de URL op te halen is afgebroken. Dit kan gebeuren als de site geautomatiseerde toegang blokkeert, authenticatie vereist of als er een netwerkprobleem is. Probeer het opnieuw of controleer of de URL toegankelijk is in een normale browser.",
 		"url_fetch_failed": "Fout bij ophalen van URL-inhoud: {{error}}",
 		"url_fetch_error_with_url": "Fout bij ophalen van inhoud voor {{url}}: {{error}}",
 		"command_timeout": "Time-out bij uitvoeren van commando na {{seconds}} seconden",
@@ -83,13 +91,25 @@
 			"errorOutput": "Foutuitvoer: {{output}}",
 			"processExitedWithError": "Claude Code proces beëindigd met code {{exitCode}}. Foutuitvoer: {{output}}",
 			"stoppedWithReason": "Claude Code gestopt om reden: {{reason}}",
-			"apiKeyModelPlanMismatch": "API keys and subscription plans allow different models. Make sure the selected model is included in your plan.",
-			"notFound": "Claude Code executable '{{claudePath}}' not found.\n\nPlease install Claude Code CLI:\n1. Visit {{installationUrl}} to download Claude Code\n2. Follow the installation instructions for your operating system\n3. Ensure the 'claude' command is available in your PATH\n4. Alternatively, configure a custom path in Roo settings under 'Claude Code Path'\n\nOriginal error: {{originalError}}"
+			"apiKeyModelPlanMismatch": "API keys and subscription plans allow different models. Make sure the selected model is included in your plan."
+		},
+		"message": {
+			"no_active_task_to_delete": "Geen actieve taak om berichten uit te verwijderen",
+			"invalid_timestamp_for_deletion": "Ongeldig bericht tijdstempel voor verwijdering",
+			"cannot_delete_missing_timestamp": "Kan bericht niet verwijderen: tijdstempel ontbreekt",
+			"cannot_delete_invalid_timestamp": "Kan bericht niet verwijderen: ongeldig tijdstempel",
+			"message_not_found": "Bericht met tijdstempel {{messageTs}} niet gevonden",
+			"error_deleting_message": "Fout bij verwijderen van bericht: {{error}}",
+			"error_editing_message": "Fout bij bewerken van bericht: {{error}}"
 		},
 		"gemini": {
 			"generate_stream": "Fout bij het genereren van contextstream door Gemini: {{error}}",
 			"generate_complete_prompt": "Fout bij het voltooien door Gemini: {{error}}",
-			"sources": "Bronnen:"
+			"sources": "Bronnen:",
+			"thinking_complete_no_output": "(Nadenken voltooid, maar er is geen uitvoer gegenereerd.)",
+			"thinking_complete_truncated": "(Nadenken voltooid, maar uitvoer is afgekapt vanwege tokenlimiet.)",
+			"thinking_complete_safety": "(Nadenken voltooid, maar uitvoer is geblokkeerd vanwege veiligheidsinstellingen.)",
+			"thinking_complete_recitation": "(Nadenken voltooid, maar uitvoer is geblokkeerd vanwege recitatiecontrole.)"
 		},
 		"cerebras": {
 			"authenticationFailed": "Cerebras API-authenticatie mislukt. Controleer of je API-sleutel geldig is en niet verlopen.",
@@ -99,12 +119,23 @@
 			"genericError": "Cerebras API-fout ({{status}}): {{message}}",
 			"noResponseBody": "Cerebras API-fout: Geen responslichaam",
 			"completionError": "Cerebras-voltooiingsfout: {{error}}"
-		}
+		},
+		"roo": {
+			"authenticationRequired": "Copilot provider vereist cloud authenticatie. Log in bij Datacoves Copilot Cloud."
+		},
+		"api": {
+			"invalidKeyInvalidChars": "API-sleutel bevat ongeldige karakters."
+		},
+		"manual_url_empty": "Voer een geldige callback-URL in",
+		"manual_url_no_query": "Ongeldige callback-URL: query-parameters ontbreken",
+		"manual_url_missing_params": "Ongeldige callback-URL: vereiste parameters ontbreken (code en state)",
+		"manual_url_auth_failed": "Handmatige URL-authenticatie mislukt",
+		"manual_url_auth_error": "Authenticatie mislukt"
 	},
 	"warnings": {
 		"no_terminal_content": "Geen terminalinhoud geselecteerd",
 		"missing_task_files": "De bestanden van deze taak ontbreken. Wil je deze uit de takenlijst verwijderen?",
-		"auto_import_failed": "Automatisch importeren van RooCode-instellingen mislukt: {{error}}"
+		"auto_import_failed": "Automatisch importeren van Copilot-instellingen mislukt: {{error}}"
 	},
 	"info": {
 		"no_changes": "Geen wijzigingen gevonden.",
@@ -113,7 +144,7 @@
 		"custom_storage_path_set": "Aangepast opslagpad ingesteld: {{path}}",
 		"default_storage_path": "Terug naar standaard opslagpad",
 		"settings_imported": "Instellingen succesvol geïmporteerd.",
-		"auto_import_success": "RooCode-instellingen automatisch geïmporteerd van {{filename}}",
+		"auto_import_success": "Copilot-instellingen automatisch geïmporteerd van {{filename}}",
 		"share_link_copied": "Deellink gekopieerd naar klembord",
 		"image_copied_to_clipboard": "Afbeelding data-URI gekopieerd naar klembord",
 		"image_saved": "Afbeelding opgeslagen naar {{path}}",
@@ -139,25 +170,24 @@
 		"incomplete": "Taak #{{taskNumber}} (Onvolledig)",
 		"no_messages": "Taak #{{taskNumber}} (Geen berichten)"
 	},
+	"interruption": {
+		"responseInterruptedByUser": "Reactie onderbroken door gebruiker",
+		"responseInterruptedByApiError": "Reactie onderbroken door API-fout"
+	},
 	"storage": {
 		"prompt_custom_path": "Voer een aangepast opslagpad voor gespreksgeschiedenis in, laat leeg voor standaardlocatie",
-		"path_placeholder": "D:\\RooCodeStorage",
-		"enter_absolute_path": "Voer een absoluut pad in (bijv. D:\\RooCodeStorage of /home/user/storage)",
+		"path_placeholder": "D:\\CopilotStorage",
+		"enter_absolute_path": "Voer een absoluut pad in (bijv. D:\\CopilotStorage of /home/user/storage)",
 		"enter_valid_path": "Voer een geldig pad in"
 	},
 	"input": {
-		"task_prompt": "Wat moet Roo doen?",
+		"task_prompt": "Wat moet Copilot doen?",
 		"task_placeholder": "Typ hier je taak"
 	},
 	"settings": {
 		"providers": {
 			"groqApiKey": "Groq API-sleutel",
-			"getGroqApiKey": "Groq API-sleutel ophalen",
-			"claudeCode": {
-				"pathLabel": "Claude Code Pad",
-				"description": "Optioneel pad naar je Claude Code CLI. Standaard 'claude' indien niet ingesteld.",
-				"placeholder": "Standaard: claude"
-			}
+			"getGroqApiKey": "Groq API-sleutel ophalen"
 		}
 	},
 	"customModes": {
@@ -184,9 +214,17 @@
 	},
 	"mdm": {
 		"errors": {
-			"cloud_auth_required": "Je organisatie vereist Roo Code Cloud-authenticatie. Log in om door te gaan.",
-			"organization_mismatch": "Je moet geauthenticeerd zijn met het Roo Code Cloud-account van je organisatie.",
+			"cloud_auth_required": "Je organisatie vereist Datacoves Copilot Cloud-authenticatie. Log in om door te gaan.",
+			"organization_mismatch": "Je moet geauthenticeerd zijn met het Datacoves Copilot Cloud-account van je organisatie.",
+			"manual_url_empty": "Voer een geldige callback-URL in",
+			"manual_url_no_query": "Ongeldige callback-URL: query-parameters ontbreken",
+			"manual_url_missing_params": "Ongeldige callback-URL: vereiste parameters ontbreken (code en state)",
+			"manual_url_auth_failed": "Handmatige URL-authenticatie mislukt",
+			"manual_url_auth_error": "Authenticatie mislukt",
 			"verification_failed": "Kan organisatie-authenticatie niet verifiëren."
+		},
+		"info": {
+			"organization_requires_auth": "Je organisatie vereist authenticatie."
 		}
 	},
 	"prompts": {
@@ -201,5 +239,9 @@
 		"preventCompletionWithOpenTodos": {
 			"description": "Voorkom taakafronding wanneer er onvolledige todos in de todolijst staan"
 		}
+	},
+	"docsLink": {
+		"label": "Docs",
+		"url": "https://docs.roocode.com"
 	}
 }

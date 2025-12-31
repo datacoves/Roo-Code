@@ -1,5 +1,16 @@
+// Mock TelemetryService - must come before other imports
+const mockCaptureException = vi.hoisted(() => vi.fn())
+vi.mock("@roo-code/telemetry", () => ({
+	TelemetryService: {
+		instance: {
+			captureException: mockCaptureException,
+		},
+	},
+}))
+
 // Mock Mistral client - must come before other imports
 const mockCreate = vi.fn()
+const mockComplete = vi.fn()
 vi.mock("@mistralai/mistralai", () => {
 	return {
 		Mistral: vi.fn().mockImplementation(() => ({
@@ -21,15 +32,28 @@ vi.mock("@mistralai/mistralai", () => {
 					}
 					return stream
 				}),
+				complete: mockComplete.mockImplementation(async (_options) => {
+					return {
+						choices: [
+							{
+								message: {
+									content: "Test response",
+								},
+							},
+						],
+					}
+				}),
 			},
 		})),
 	}
 })
 
 import type { Anthropic } from "@anthropic-ai/sdk"
+import type OpenAI from "openai"
 import { MistralHandler } from "../mistral"
 import type { ApiHandlerOptions } from "../../../shared/api"
-import type { ApiStreamTextChunk } from "../../transform/stream"
+import type { ApiHandlerCreateMessageMetadata } from "../../index"
+import type { ApiStreamTextChunk, ApiStreamReasoningChunk, ApiStreamToolCallPartialChunk } from "../../transform/stream"
 
 describe("MistralHandler", () => {
 	let handler: MistralHandler
@@ -44,6 +68,8 @@ describe("MistralHandler", () => {
 		}
 		handler = new MistralHandler(mockOptions)
 		mockCreate.mockClear()
+		mockComplete.mockClear()
+		mockCaptureException.mockClear()
 	})
 
 	describe("constructor", () => {
@@ -121,6 +147,348 @@ describe("MistralHandler", () => {
 		it("should handle errors gracefully", async () => {
 			mockCreate.mockRejectedValueOnce(new Error("API Error"))
 			await expect(handler.createMessage(systemPrompt, messages).next()).rejects.toThrow("API Error")
+		})
+
+		it("should handle thinking content as reasoning chunks", async () => {
+			// Mock stream with thinking content matching new SDK structure
+			mockCreate.mockImplementationOnce(async (_options) => {
+				const stream = {
+					[Symbol.asyncIterator]: async function* () {
+						yield {
+							data: {
+								choices: [
+									{
+										delta: {
+											content: [
+												{
+													type: "thinking",
+													thinking: [{ type: "text", text: "Let me think about this..." }],
+												},
+												{ type: "text", text: "Here's the answer" },
+											],
+										},
+										index: 0,
+									},
+								],
+							},
+						}
+					},
+				}
+				return stream
+			})
+
+			const iterator = handler.createMessage(systemPrompt, messages)
+			const results: (ApiStreamTextChunk | ApiStreamReasoningChunk)[] = []
+
+			for await (const chunk of iterator) {
+				if ("text" in chunk) {
+					results.push(chunk as ApiStreamTextChunk | ApiStreamReasoningChunk)
+				}
+			}
+
+			expect(results).toHaveLength(2)
+			expect(results[0]).toEqual({ type: "reasoning", text: "Let me think about this..." })
+			expect(results[1]).toEqual({ type: "text", text: "Here's the answer" })
+		})
+
+		it("should handle mixed content arrays correctly", async () => {
+			// Mock stream with mixed content matching new SDK structure
+			mockCreate.mockImplementationOnce(async (_options) => {
+				const stream = {
+					[Symbol.asyncIterator]: async function* () {
+						yield {
+							data: {
+								choices: [
+									{
+										delta: {
+											content: [
+												{ type: "text", text: "First text" },
+												{
+													type: "thinking",
+													thinking: [{ type: "text", text: "Some reasoning" }],
+												},
+												{ type: "text", text: "Second text" },
+											],
+										},
+										index: 0,
+									},
+								],
+							},
+						}
+					},
+				}
+				return stream
+			})
+
+			const iterator = handler.createMessage(systemPrompt, messages)
+			const results: (ApiStreamTextChunk | ApiStreamReasoningChunk)[] = []
+
+			for await (const chunk of iterator) {
+				if ("text" in chunk) {
+					results.push(chunk as ApiStreamTextChunk | ApiStreamReasoningChunk)
+				}
+			}
+
+			expect(results).toHaveLength(3)
+			expect(results[0]).toEqual({ type: "text", text: "First text" })
+			expect(results[1]).toEqual({ type: "reasoning", text: "Some reasoning" })
+			expect(results[2]).toEqual({ type: "text", text: "Second text" })
+		})
+	})
+
+	describe("native tool calling", () => {
+		const systemPrompt = "You are a helpful assistant."
+		const messages: Anthropic.Messages.MessageParam[] = [
+			{
+				role: "user",
+				content: [{ type: "text", text: "What's the weather?" }],
+			},
+		]
+
+		const mockTools: OpenAI.Chat.ChatCompletionTool[] = [
+			{
+				type: "function",
+				function: {
+					name: "get_weather",
+					description: "Get the current weather",
+					parameters: {
+						type: "object",
+						properties: {
+							location: { type: "string" },
+						},
+						required: ["location"],
+					},
+				},
+			},
+		]
+
+		it("should include tools in request by default (native is default)", async () => {
+			const metadata: ApiHandlerCreateMessageMetadata = {
+				taskId: "test-task",
+				tools: mockTools,
+			}
+
+			const iterator = handler.createMessage(systemPrompt, messages, metadata)
+			await iterator.next()
+
+			expect(mockCreate).toHaveBeenCalledWith(
+				expect.objectContaining({
+					tools: expect.arrayContaining([
+						expect.objectContaining({
+							type: "function",
+							function: expect.objectContaining({
+								name: "get_weather",
+								description: "Get the current weather",
+								parameters: expect.any(Object),
+							}),
+						}),
+					]),
+					toolChoice: "any",
+				}),
+			)
+		})
+
+		it("should not include tools when toolProtocol is xml", async () => {
+			const metadata: ApiHandlerCreateMessageMetadata = {
+				taskId: "test-task",
+				tools: mockTools,
+				toolProtocol: "xml",
+			}
+
+			const iterator = handler.createMessage(systemPrompt, messages, metadata)
+			await iterator.next()
+
+			expect(mockCreate).toHaveBeenCalledWith(
+				expect.not.objectContaining({
+					tools: expect.anything(),
+				}),
+			)
+		})
+
+		it("should handle tool calls in streaming response", async () => {
+			// Mock stream with tool calls
+			mockCreate.mockImplementationOnce(async (_options) => {
+				const stream = {
+					[Symbol.asyncIterator]: async function* () {
+						yield {
+							data: {
+								choices: [
+									{
+										delta: {
+											toolCalls: [
+												{
+													id: "call_123",
+													type: "function",
+													function: {
+														name: "get_weather",
+														arguments: '{"location":"New York"}',
+													},
+												},
+											],
+										},
+										index: 0,
+									},
+								],
+							},
+						}
+					},
+				}
+				return stream
+			})
+
+			const metadata: ApiHandlerCreateMessageMetadata = {
+				taskId: "test-task",
+				tools: mockTools,
+			}
+
+			const iterator = handler.createMessage(systemPrompt, messages, metadata)
+			const results: ApiStreamToolCallPartialChunk[] = []
+
+			for await (const chunk of iterator) {
+				if (chunk.type === "tool_call_partial") {
+					results.push(chunk)
+				}
+			}
+
+			expect(results).toHaveLength(1)
+			expect(results[0]).toEqual({
+				type: "tool_call_partial",
+				index: 0,
+				id: "call_123",
+				name: "get_weather",
+				arguments: '{"location":"New York"}',
+			})
+		})
+
+		it("should handle multiple tool calls in a single response", async () => {
+			// Mock stream with multiple tool calls
+			mockCreate.mockImplementationOnce(async (_options) => {
+				const stream = {
+					[Symbol.asyncIterator]: async function* () {
+						yield {
+							data: {
+								choices: [
+									{
+										delta: {
+											toolCalls: [
+												{
+													id: "call_1",
+													type: "function",
+													function: {
+														name: "get_weather",
+														arguments: '{"location":"NYC"}',
+													},
+												},
+												{
+													id: "call_2",
+													type: "function",
+													function: {
+														name: "get_weather",
+														arguments: '{"location":"LA"}',
+													},
+												},
+											],
+										},
+										index: 0,
+									},
+								],
+							},
+						}
+					},
+				}
+				return stream
+			})
+
+			const metadata: ApiHandlerCreateMessageMetadata = {
+				taskId: "test-task",
+				tools: mockTools,
+			}
+
+			const iterator = handler.createMessage(systemPrompt, messages, metadata)
+			const results: ApiStreamToolCallPartialChunk[] = []
+
+			for await (const chunk of iterator) {
+				if (chunk.type === "tool_call_partial") {
+					results.push(chunk)
+				}
+			}
+
+			expect(results).toHaveLength(2)
+			expect(results[0]).toEqual({
+				type: "tool_call_partial",
+				index: 0,
+				id: "call_1",
+				name: "get_weather",
+				arguments: '{"location":"NYC"}',
+			})
+			expect(results[1]).toEqual({
+				type: "tool_call_partial",
+				index: 1,
+				id: "call_2",
+				name: "get_weather",
+				arguments: '{"location":"LA"}',
+			})
+		})
+
+		it("should always set toolChoice to 'any' when tools are provided", async () => {
+			// Even if tool_choice is provided in metadata, we override it to "any"
+			const metadata: ApiHandlerCreateMessageMetadata = {
+				taskId: "test-task",
+				tools: mockTools,
+				tool_choice: "auto", // This should be ignored
+			}
+
+			const iterator = handler.createMessage(systemPrompt, messages, metadata)
+			await iterator.next()
+
+			expect(mockCreate).toHaveBeenCalledWith(
+				expect.objectContaining({
+					toolChoice: "any",
+				}),
+			)
+		})
+	})
+
+	describe("completePrompt", () => {
+		it("should complete prompt successfully", async () => {
+			const prompt = "Test prompt"
+			const result = await handler.completePrompt(prompt)
+
+			expect(mockComplete).toHaveBeenCalledWith({
+				model: mockOptions.apiModelId,
+				messages: [{ role: "user", content: prompt }],
+				temperature: 0,
+			})
+
+			expect(result).toBe("Test response")
+		})
+
+		it("should filter out thinking content in completePrompt", async () => {
+			mockComplete.mockImplementationOnce(async (_options) => {
+				return {
+					choices: [
+						{
+							message: {
+								content: [
+									{ type: "thinking", text: "Let me think..." },
+									{ type: "text", text: "Answer part 1" },
+									{ type: "text", text: "Answer part 2" },
+								],
+							},
+						},
+					],
+				}
+			})
+
+			const prompt = "Test prompt"
+			const result = await handler.completePrompt(prompt)
+
+			expect(result).toBe("Answer part 1Answer part 2")
+		})
+
+		it("should handle errors in completePrompt", async () => {
+			mockComplete.mockRejectedValueOnce(new Error("API Error"))
+			await expect(handler.completePrompt("Test prompt")).rejects.toThrow("Mistral completion error: API Error")
 		})
 	})
 })

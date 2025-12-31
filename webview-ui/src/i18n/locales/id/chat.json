@@ -1,14 +1,17 @@
 {
-	"greeting": "Selamat datang di Roo Code",
+	"greeting": "Selamat datang di Datacoves Copilot",
 	"task": {
 		"title": "Tugas",
+		"expand": "Perluas tugas",
+		"collapse": "Ciutkan tugas",
 		"seeMore": "Lihat lebih banyak",
 		"seeLess": "Lihat lebih sedikit",
-		"tokens": "Token:",
-		"cache": "Cache:",
-		"apiCost": "Biaya API:",
+		"tokens": "Token",
+		"cache": "Cache",
+		"apiCost": "Biaya API",
+		"size": "Ukuran",
 		"condenseContext": "Kondensasi konteks secara cerdas",
-		"contextWindow": "Panjang Konteks:",
+		"contextWindow": "Panjang Konteks",
 		"closeAndStart": "Tutup tugas dan mulai yang baru",
 		"export": "Ekspor riwayat tugas",
 		"share": "Bagikan tugas",
@@ -18,10 +21,14 @@
 		"sharePublicly": "Bagikan secara publik",
 		"sharePubliclyDescription": "Siapa pun dengan tautan dapat mengakses",
 		"connectToCloud": "Hubungkan ke Cloud",
-		"connectToCloudDescription": "Masuk ke Roo Code Cloud untuk berbagi tugas",
+		"connectToCloudDescription": "Masuk ke Datacoves Copilot Cloud untuk berbagi tugas",
 		"sharingDisabledByOrganization": "Berbagi dinonaktifkan oleh organisasi",
 		"shareSuccessOrganization": "Tautan organisasi disalin ke clipboard",
-		"shareSuccessPublic": "Tautan publik disalin ke clipboard"
+		"shareSuccessPublic": "Tautan publik disalin ke clipboard",
+		"openInCloud": "Buka tugas di Datacoves Copilot Cloud",
+		"openInCloudIntro": "Terus pantau atau berinteraksi dengan Copilot dari mana saja. Pindai, klik atau salin untuk membuka.",
+		"openApiHistory": "Buka Riwayat API",
+		"openUiHistory": "Buka Riwayat UI"
 	},
 	"history": {
 		"title": "Riwayat"
@@ -70,8 +77,8 @@
 		}
 	},
 	"runCommand": {
-		"title": "Jalankan Perintah",
-		"tooltip": "Eksekusi perintah ini"
+		"title": "Perintah",
+		"tooltip": "Jalankan perintah ini"
 	},
 	"proceedWhileRunning": {
 		"title": "Lanjutkan Saat Berjalan",
@@ -94,24 +101,17 @@
 		"tooltip": "Batalkan operasi saat ini"
 	},
 	"scrollToBottom": "Gulir ke bawah chat",
-	"about": "Buat, refaktor, dan debug kode dengan bantuan AI.<br />Lihat <DocsLink>dokumentasi</DocsLink> kami untuk mempelajari lebih lanjut.",
-	"onboarding": "Daftar tugas di workspace ini kosong.",
+	"about": "Datacoves Copilot adalah seluruh tim pengembang AI di editor Anda.",
+	"docs": "Lihat <DocsLink>dokumentasi</DocsLink> kami untuk mempelajari lebih lanjut.",
+	"onboarding": "Daftar tugas Anda di ruang kerja ini kosong.",
 	"rooTips": {
-		"boomerangTasks": {
-			"title": "Orkestrasi Tugas",
-			"description": "Bagi tugas menjadi bagian-bagian kecil yang dapat dikelola"
-		},
-		"stickyModels": {
-			"title": "Model Sticky",
-			"description": "Setiap mode mengingat model terakhir yang kamu gunakan"
-		},
-		"tools": {
-			"title": "Tools",
-			"description": "Izinkan AI menyelesaikan masalah dengan browsing web, menjalankan perintah, dan lainnya"
-		},
 		"customizableModes": {
-			"title": "Mode yang Dapat Disesuaikan",
-			"description": "Persona khusus dengan perilaku dan model yang ditugaskan sendiri"
+			"title": "Mode yang dapat disesuaikan",
+			"description": "Persona khusus yang tetap mengerjakan tugas dan memberikan hasil."
+		},
+		"modelAgnostic": {
+			"title": "Bawa model Anda sendiri",
+			"description": "Gunakan kunci penyedia Anda sendiri atau bahkan jalankan inferensi lokal — tanpa markup, tanpa lock-in, tanpa batasan"
 		}
 	},
 	"selectMode": "Pilih mode untuk interaksi",
@@ -122,19 +122,20 @@
 		"title": "Mode",
 		"marketplace": "Marketplace Mode",
 		"settings": "Pengaturan Mode",
-		"description": "Persona khusus yang menyesuaikan perilaku Roo.",
+		"description": "Persona khusus yang menyesuaikan perilaku Copilot.",
 		"searchPlaceholder": "Cari mode...",
 		"noResults": "Tidak ada hasil yang ditemukan"
 	},
 	"addImages": "Tambahkan gambar ke pesan",
 	"sendMessage": "Kirim pesan",
+	"pressToSend": "Tekan {{keyCombination}} untuk mengirim",
 	"stopTts": "Hentikan text-to-speech",
 	"typeMessage": "Ketik pesan...",
 	"typeTask": "Bangun, cari, tanya sesuatu",
 	"addContext": "@ untuk menambah konteks, / untuk perintah",
 	"dragFiles": "tahan shift untuk drag file",
 	"dragFilesImages": "tahan shift untuk drag file/gambar",
-	"errorReadingFile": "Error membaca file:",
+	"errorReadingFile": "Error membaca file",
 	"noValidImages": "Tidak ada gambar valid yang diproses",
 	"separator": "Pemisah",
 	"edit": "Edit...",
@@ -145,13 +146,31 @@
 		"failed": "Permintaan API Gagal",
 		"streaming": "Permintaan API...",
 		"cancelled": "Permintaan API Dibatalkan",
-		"streamingFailed": "Streaming API Gagal"
+		"streamingFailed": "Streaming API Gagal",
+		"rateLimitWait": "Pembatasan rate",
+		"errorTitle": "Kesalahan Penyedia {{code}}",
+		"errorMessage": {
+			"docs": "Dokumentasi",
+			"goToSettings": "Pengaturan",
+			"400": "Penyedia tidak dapat memproses permintaan seperti yang dibuat. Hentikan tugas dan coba pendekatan berbeda.",
+			"401": "Tidak dapat mengautentikasi dengan penyedia. Harap periksa konfigurasi kunci API Anda.",
+			"402": "Tampaknya Anda telah kehabisan dana/kredit di akun Anda. Pergi ke penyedia Anda dan tambahkan lebih banyak untuk melanjutkan.",
+			"403": "Tidak sah. Kunci API Anda valid, tetapi penyedia menolak untuk menyelesaikan permintaan ini.",
+			"429": "Terlalu banyak permintaan. Anda dibatasi tingkat oleh penyedia. Harap tunggu sebentar sebelum panggilan API berikutnya Anda.",
+			"500": "Kesalahan server penyedia. Ada yang salah di sisi penyedia, tidak ada yang salah dengan permintaan Anda.",
+			"unknown": "Kesalahan API yang tidak diketahui. Harap hubungi dukungan Datacoves Copilot.",
+			"connection": "Kesalahan koneksi. Pastikan Anda memiliki koneksi internet yang berfungsi.",
+			"claudeCodeNotAuthenticated": "Anda perlu masuk untuk menggunakan Claude Code. Buka Pengaturan dan klik \"Masuk ke Claude Code\" untuk mengautentikasi."
+		}
 	},
 	"checkpoint": {
 		"regular": "Checkpoint",
 		"initializingWarning": "Masih menginisialisasi checkpoint... Jika ini terlalu lama, kamu bisa menonaktifkan checkpoint di <settingsLink>pengaturan</settingsLink> dan restart tugas.",
 		"menu": {
 			"viewDiff": "Lihat Diff",
+			"more": "Opsi lainnya",
+			"viewDiffFromInit": "Lihat Semua Perubahan",
+			"viewDiffWithCurrent": "Lihat Perubahan Sejak Checkpoint Ini",
 			"restore": "Pulihkan Checkpoint",
 			"restoreFiles": "Pulihkan File",
 			"restoreFilesDescription": "Mengembalikan file proyek kamu ke snapshot yang diambil pada titik ini.",
@@ -163,89 +182,104 @@
 		},
 		"current": "Saat Ini"
 	},
-	"contextCondense": {
-		"title": "Konteks Dikondensasi",
-		"condensing": "Mengondensasi konteks...",
-		"errorHeader": "Gagal mengondensasi konteks",
-		"tokens": "token"
+	"contextManagement": {
+		"tokens": "token",
+		"condensation": {
+			"title": "Konteks Dikondensasi",
+			"inProgress": "Mengondensasi konteks...",
+			"errorHeader": "Gagal mengondensasi konteks"
+		},
+		"truncation": {
+			"title": "Konteks Dipotong",
+			"inProgress": "Memotong konteks...",
+			"messagesRemoved": "{{count}} pesan dihapus",
+			"messagesRemoved_other": "{{count}} pesan dihapus",
+			"description": "Pesan lama telah dihapus dari percakapan untuk tetap dalam batas jendela konteks. Ini adalah pendekatan yang cepat tetapi kurang mempertahankan konteks dibandingkan dengan kondensasi."
+		}
 	},
 	"instructions": {
-		"wantsToFetch": "Roo ingin mengambil instruksi detail untuk membantu tugas saat ini"
+		"wantsToFetch": "Copilot ingin mengambil instruksi detail untuk membantu tugas saat ini"
 	},
 	"fileOperations": {
-		"wantsToRead": "Roo ingin membaca file ini:",
-		"wantsToReadMultiple": "Roo ingin membaca beberapa file:",
-		"wantsToReadAndXMore": "Roo ingin membaca file ini dan {{count}} lainnya:",
-		"wantsToReadOutsideWorkspace": "Roo ingin membaca file ini di luar workspace:",
-		"didRead": "Roo membaca file ini:",
-		"wantsToEdit": "Roo ingin mengedit file ini:",
-		"wantsToEditOutsideWorkspace": "Roo ingin mengedit file ini di luar workspace:",
-		"wantsToEditProtected": "Roo ingin mengedit file konfigurasi yang dilindungi:",
-		"wantsToApplyBatchChanges": "Roo ingin menerapkan perubahan ke beberapa file:",
-		"wantsToCreate": "Roo ingin membuat file baru:",
-		"wantsToSearchReplace": "Roo ingin mencari dan mengganti di file ini:",
-		"didSearchReplace": "Roo melakukan pencarian dan penggantian pada file ini:",
-		"wantsToInsert": "Roo ingin menyisipkan konten ke file ini:",
-		"wantsToInsertWithLineNumber": "Roo ingin menyisipkan konten ke file ini di baris {{lineNumber}}:",
-		"wantsToInsertAtEnd": "Roo ingin menambahkan konten ke akhir file ini:"
+		"wantsToRead": "Copilot ingin membaca file ini",
+		"wantsToReadMultiple": "Copilot ingin membaca beberapa file",
+		"wantsToReadAndXMore": "Copilot ingin membaca file ini dan {{count}} lainnya",
+		"wantsToReadOutsideWorkspace": "Copilot ingin membaca file ini di luar workspace",
+		"didRead": "Copilot membaca file ini",
+		"wantsToEdit": "Copilot ingin mengedit file ini",
+		"wantsToEditOutsideWorkspace": "Copilot ingin mengedit file ini di luar workspace",
+		"wantsToEditProtected": "Copilot ingin mengedit file konfigurasi yang dilindungi",
+		"wantsToApplyBatchChanges": "Copilot ingin menerapkan perubahan ke beberapa file",
+		"wantsToGenerateImage": "Copilot ingin menghasilkan gambar",
+		"wantsToGenerateImageOutsideWorkspace": "Copilot ingin menghasilkan gambar di luar workspace",
+		"wantsToGenerateImageProtected": "Copilot ingin menghasilkan gambar di lokasi yang dilindungi",
+		"didGenerateImage": "Copilot telah menghasilkan gambar",
+		"wantsToCreate": "Copilot ingin membuat file baru",
+		"wantsToSearchReplace": "Copilot ingin mencari dan mengganti di file ini",
+		"didSearchReplace": "Copilot melakukan pencarian dan penggantian pada file ini",
+		"wantsToInsert": "Copilot ingin menyisipkan konten ke file ini",
+		"wantsToInsertWithLineNumber": "Copilot ingin menyisipkan konten ke file ini di baris {{lineNumber}}",
+		"wantsToInsertAtEnd": "Copilot ingin menambahkan konten ke akhir file ini"
 	},
 	"directoryOperations": {
-		"wantsToViewTopLevel": "Roo ingin melihat file tingkat atas di direktori ini:",
-		"didViewTopLevel": "Roo melihat file tingkat atas di direktori ini:",
-		"wantsToViewRecursive": "Roo ingin melihat semua file secara rekursif di direktori ini:",
-		"didViewRecursive": "Roo melihat semua file secara rekursif di direktori ini:",
-		"wantsToViewDefinitions": "Roo ingin melihat nama definisi source code yang digunakan di direktori ini:",
-		"didViewDefinitions": "Roo melihat nama definisi source code yang digunakan di direktori ini:",
-		"wantsToSearch": "Roo ingin mencari direktori ini untuk <code>{{regex}}</code>:",
-		"didSearch": "Roo mencari direktori ini untuk <code>{{regex}}</code>:",
-		"wantsToSearchOutsideWorkspace": "Roo ingin mencari direktori ini (di luar workspace) untuk <code>{{regex}}</code>:",
-		"didSearchOutsideWorkspace": "Roo mencari direktori ini (di luar workspace) untuk <code>{{regex}}</code>:",
-		"wantsToViewTopLevelOutsideWorkspace": "Roo ingin melihat file tingkat atas di direktori ini (di luar workspace):",
-		"didViewTopLevelOutsideWorkspace": "Roo melihat file tingkat atas di direktori ini (di luar workspace):",
-		"wantsToViewRecursiveOutsideWorkspace": "Roo ingin melihat semua file secara rekursif di direktori ini (di luar workspace):",
-		"didViewRecursiveOutsideWorkspace": "Roo melihat semua file secara rekursif di direktori ini (di luar workspace):",
-		"wantsToViewDefinitionsOutsideWorkspace": "Roo ingin melihat nama definisi source code yang digunakan di direktori ini (di luar workspace):",
-		"didViewDefinitionsOutsideWorkspace": "Roo melihat nama definisi source code yang digunakan di direktori ini (di luar workspace):"
+		"wantsToViewTopLevel": "Copilot ingin melihat file tingkat atas di direktori ini",
+		"didViewTopLevel": "Copilot melihat file tingkat atas di direktori ini",
+		"wantsToViewRecursive": "Copilot ingin melihat semua file secara rekursif di direktori ini",
+		"didViewRecursive": "Copilot melihat semua file secara rekursif di direktori ini",
+		"wantsToSearch": "Copilot ingin mencari direktori ini untuk <code>{{regex}}</code>",
+		"didSearch": "Copilot mencari direktori ini untuk <code>{{regex}}</code>",
+		"wantsToSearchOutsideWorkspace": "Copilot ingin mencari direktori ini (di luar workspace) untuk <code>{{regex}}</code>",
+		"didSearchOutsideWorkspace": "Copilot mencari direktori ini (di luar workspace) untuk <code>{{regex}}</code>",
+		"wantsToViewTopLevelOutsideWorkspace": "Copilot ingin melihat file tingkat atas di direktori ini (di luar workspace)",
+		"didViewTopLevelOutsideWorkspace": "Copilot melihat file tingkat atas di direktori ini (di luar workspace)",
+		"wantsToViewRecursiveOutsideWorkspace": "Copilot ingin melihat semua file secara rekursif di direktori ini (di luar workspace)",
+		"didViewRecursiveOutsideWorkspace": "Copilot melihat semua file secara rekursif di direktori ini (di luar workspace)"
 	},
 	"codebaseSearch": {
-		"wantsToSearch": "Roo ingin mencari codebase untuk <code>{{query}}</code>:",
-		"wantsToSearchWithPath": "Roo ingin mencari codebase untuk <code>{{query}}</code> di <code>{{path}}</code>:",
+		"wantsToSearch": "Copilot ingin mencari codebase untuk <code>{{query}}</code>",
+		"wantsToSearchWithPath": "Copilot ingin mencari codebase untuk <code>{{query}}</code> di <code>{{path}}</code>",
 		"didSearch_one": "Ditemukan 1 hasil",
 		"didSearch_other": "Ditemukan {{count}} hasil",
 		"resultTooltip": "Skor kemiripan: {{score}} (klik untuk membuka file)"
 	},
-	"commandOutput": "Output Perintah",
+	"commandOutput": "Keluaran Perintah",
 	"commandExecution": {
+		"abort": "Batalkan",
 		"running": "Menjalankan",
 		"pid": "PID: {{pid}}",
-		"exited": "Keluar ({{exitCode}})",
-		"manageCommands": "Kelola Izin Perintah",
-		"commandManagementDescription": "Kelola izin perintah: Klik ✓ untuk mengizinkan eksekusi otomatis, ✗ untuk menolak eksekusi. Pola dapat diaktifkan/dinonaktifkan atau dihapus dari daftar. <settingsLink>Lihat semua pengaturan</settingsLink>",
+		"exitStatus": "Keluar dengan status {{exitCode}}",
+		"manageCommands": "Perintah yang disetujui secara otomatis",
 		"addToAllowed": "Tambahkan ke daftar yang diizinkan",
 		"removeFromAllowed": "Hapus dari daftar yang diizinkan",
 		"addToDenied": "Tambahkan ke daftar yang ditolak",
 		"removeFromDenied": "Hapus dari daftar yang ditolak",
 		"abortCommand": "Batalkan eksekusi perintah",
-		"expandOutput": "Perluas output",
-		"collapseOutput": "Ciutkan output",
+		"expandOutput": "Perluas keluaran",
+		"collapseOutput": "Ciutkan keluaran",
 		"expandManagement": "Perluas bagian manajemen perintah",
 		"collapseManagement": "Ciutkan bagian manajemen perintah"
 	},
 	"response": "Respons",
 	"arguments": "Argumen",
+	"text": {
+		"rooSaid": "Copilot berkata"
+	},
+	"feedback": {
+		"youSaid": "Anda bilang"
+	},
 	"mcp": {
-		"wantsToUseTool": "Roo ingin menggunakan tool di server MCP {{serverName}}:",
-		"wantsToAccessResource": "Roo ingin mengakses resource di server MCP {{serverName}}:"
+		"wantsToUseTool": "Copilot ingin menggunakan tool di server MCP {{serverName}}",
+		"wantsToAccessResource": "Copilot ingin mengakses resource di server MCP {{serverName}}"
 	},
 	"modes": {
-		"wantsToSwitch": "Roo ingin beralih ke mode {{mode}}",
-		"wantsToSwitchWithReason": "Roo ingin beralih ke mode {{mode}} karena: {{reason}}",
-		"didSwitch": "Roo beralih ke mode {{mode}}",
-		"didSwitchWithReason": "Roo beralih ke mode {{mode}} karena: {{reason}}"
+		"wantsToSwitch": "Copilot ingin beralih ke mode {{mode}}",
+		"wantsToSwitchWithReason": "Copilot ingin beralih ke mode {{mode}} karena: {{reason}}",
+		"didSwitch": "Copilot beralih ke mode {{mode}}",
+		"didSwitchWithReason": "Copilot beralih ke mode {{mode}} karena: {{reason}}"
 	},
 	"subtasks": {
-		"wantsToCreate": "Roo ingin membuat subtugas baru dalam mode {{mode}}:",
-		"wantsToFinish": "Roo ingin menyelesaikan subtugas ini",
+		"wantsToCreate": "Copilot ingin membuat subtugas baru dalam mode {{mode}}",
+		"wantsToFinish": "Copilot ingin menyelesaikan subtugas ini",
 		"newTaskContent": "Instruksi Subtugas",
 		"completionContent": "Subtugas Selesai",
 		"resultContent": "Hasil Subtugas",
@@ -253,34 +287,71 @@
 		"completionInstructions": "Subtugas selesai! Kamu bisa meninjau hasilnya dan menyarankan koreksi atau langkah selanjutnya. Jika semuanya terlihat baik, konfirmasi untuk mengembalikan hasil ke tugas induk."
 	},
 	"questions": {
-		"hasQuestion": "Roo punya pertanyaan:"
+		"hasQuestion": "Copilot punya pertanyaan"
 	},
 	"taskCompleted": "Tugas Selesai",
 	"error": "Error",
+	"modelResponseIncomplete": "Respons Model Tidak Lengkap",
+	"modelResponseErrors": {
+		"noToolsUsed": "Model gagal menggunakan alat apa pun dalam responsnya. Ini biasanya terjadi ketika model hanya memberikan teks/penalaran tanpa memanggil alat yang diperlukan untuk menyelesaikan tugas.",
+		"noToolsUsedDetails": "Model memberikan teks/penalaran tetapi tidak memanggil alat yang diperlukan. Ini biasanya menunjukkan bahwa model salah memahami tugas atau mengalami kesulitan menentukan alat mana yang akan digunakan. Model telah secara otomatis diminta untuk mencoba lagi dengan penggunaan alat yang tepat.",
+		"noAssistantMessages": "Model tidak memberikan konten respons apa pun. Ini mungkin menunjukkan masalah dengan API atau output model.",
+		"noAssistantMessagesDetails": "Model bahasa mengembalikan respons kosong tanpa teks atau panggilan alat apa pun. Ini dapat terjadi karena masalah API, pembatasan laju, atau masalah khusus model. Model telah secara otomatis diminta untuk mencoba lagi."
+	},
 	"diffError": {
 		"title": "Edit Tidak Berhasil"
 	},
-	"troubleMessage": "Roo mengalami masalah...",
+	"troubleMessage": "Copilot mengalami masalah...",
+	"errorDetails": {
+		"link": "Details",
+		"title": "Detail Kesalahan",
+		"copyToClipboard": "Salin ke Clipboard",
+		"copied": "Disalin!",
+		"diagnostics": "Dapatkan informasi kesalahan terperinci"
+	},
 	"powershell": {
 		"issues": "Sepertinya kamu mengalami masalah Windows PowerShell, silakan lihat ini"
 	},
 	"autoApprove": {
-		"title": "Auto-approve:",
-		"none": "Tidak Ada",
-		"description": "Auto-approve memungkinkan Roo Code melakukan aksi tanpa meminta izin. Hanya aktifkan untuk aksi yang benar-benar kamu percayai. Konfigurasi lebih detail tersedia di <settingsLink>Pengaturan</settingsLink>.",
-		"selectOptionsFirst": "Pilih setidaknya satu opsi di bawah untuk mengaktifkan persetujuan otomatis",
+		"tooltipManage": "Kelola pengaturan persetujuan otomatis",
+		"tooltipStatus": "Persetujuan otomatis diaktifkan untuk: {{toggles}}",
+		"title": "Setujui Otomatis",
+		"toggle": "Beralih persetujuan otomatis",
+		"all": "Semua",
+		"none": "Tidak ada",
+		"description": "Jalankan tindakan ini tanpa meminta izin. Hanya aktifkan untuk tindakan yang Anda percayai sepenuhnya.",
+		"selectOptionsFirst": "Pilih setidaknya satu opsi di bawah ini untuk mengaktifkan persetujuan otomatis",
 		"toggleAriaLabel": "Beralih persetujuan otomatis",
-		"disabledAriaLabel": "Persetujuan otomatis dinonaktifkan - pilih opsi terlebih dahulu"
+		"disabledAriaLabel": "Persetujuan otomatis dinonaktifkan - pilih opsi terlebih dahulu",
+		"triggerLabelOff": "Persetujuan otomatis mati",
+		"triggerLabelOffShort": "Mati",
+		"triggerLabel_zero": "0 disetujui otomatis",
+		"triggerLabel_one": "1 disetujui otomatis",
+		"triggerLabel_other": "{{count}} disetujui otomatis",
+		"triggerLabelAll": "YOLO"
 	},
 	"announcement": {
-		"title": "🎉 Roo Code {{version}} Dirilis",
-		"description": "Roo Code {{version}} menghadirkan fitur-fitur baru yang kuat dan peningkatan signifikan untuk meningkatkan alur kerja pengembangan Anda.",
-		"whatsNew": "Yang Baru",
-		"feature1": "<bold>Antrian Pesan</bold>: Antrikan beberapa pesan saat Roo sedang bekerja, memungkinkan Anda melanjutkan perencanaan alur kerja tanpa gangguan.",
-		"feature2": "<bold>Perintah Slash Kustom</bold>: Buat perintah slash yang dipersonalisasi untuk akses cepat ke prompt dan alur kerja yang sering digunakan, dengan manajemen UI lengkap.",
-		"feature3": "<bold>Alat Gemini yang Ditingkatkan</bold>: Kemampuan konteks URL baru dan dasar pencarian Google memberikan model Gemini informasi web real-time dan kemampuan penelitian yang ditingkatkan.",
-		"hideButton": "Sembunyikan pengumuman",
-		"detailsDiscussLinks": "Dapatkan detail lebih lanjut dan bergabung dalam diskusi di <discordLink>Discord</discordLink> dan <redditLink>Reddit</redditLink> 🚀"
+		"title": "Datacoves Copilot {{version}} Dirilis",
+		"support": "Dukung Datacoves Copilot dengan memberi kami bintang di <githubLink>GitHub</githubLink>.",
+		"stealthModel": {
+			"feature": "<bold>Model stealth GRATIS waktu terbatas</bold> - Code Supernova: Sekarang diupgrade dengan <bold>jendela konteks 1M token</bold>! Model coding agentik serbaguna yang mendukung input gambar, tersedia melalui Datacoves Copilot Cloud.",
+			"note": "(Catatan: prompt dan completion dicatat oleh pembuat model dan digunakan untuk meningkatkan model)",
+			"connectButton": "Hubungkan ke Datacoves Copilot Cloud",
+			"selectModel": "Pilih <code>roo/code-supernova</code> dari penyedia Datacoves Copilot Cloud di Pengaturan untuk memulai.",
+			"goToSettingsButton": "Pergi ke Pengaturan"
+		},
+		"release": {
+			"heading": "Yang Baru:",
+			"skills": "Copilot sekarang mendukung <skillsLink>Agent Skills</skillsLink> - paket yang dapat digunakan kembali dari prompt, alat, dan sumber daya untuk memperluas kemampuan Copilot.",
+			"nativeToolCalling": "Pemanggilan alat native sekarang diperlukan untuk semua tugas baru. <blogLink>Pelajari lebih lanjut</blogLink> tentang motivasi dan apa yang harus dilakukan jika mengalami masalah."
+		},
+		"cloudAgents": {
+			"heading": "Baru di Cloud:",
+			"specialized": "Memperkenalkan <bold>Explainer</bold>, <bold>Planner</bold>, dan <bold>Coder</bold> - tiga agen cloud khusus untuk meningkatkan alur kerja Anda.",
+			"description": "Agen bekerja bersama di cloud dan dapat dipicu dari web atau melalui Slack.",
+			"tryButton": "Coba Agen Cloud"
+		},
+		"careers": "Juga, <careersLink>kami sedang merekrut!</careersLink>"
 	},
 	"reasoning": {
 		"thinking": "Berpikir",
@@ -288,11 +359,11 @@
 	},
 	"followUpSuggest": {
 		"copyToInput": "Salin ke input (sama dengan shift + klik)",
-		"autoSelectCountdown": "Pemilihan otomatis dalam {{count}}dtk",
-		"countdownDisplay": "{{count}}dtk"
+		"timerPrefix": "Persetujuan otomatis diaktifkan. Memilih dalam {{seconds}}s…"
 	},
 	"browser": {
-		"rooWantsToUse": "Roo ingin menggunakan browser:",
+		"session": "Sesi Browser",
+		"rooWantsToUse": "Copilot ingin menggunakan browser",
 		"consoleLogs": "Log Konsol",
 		"noNewLogs": "(Tidak ada log baru)",
 		"screenshot": "Screenshot browser",
@@ -304,12 +375,26 @@
 		},
 		"sessionStarted": "Sesi Browser Dimulai",
 		"actions": {
-			"title": "Aksi Browse: ",
+			"title": "Aksi Browser: ",
+			"launched": "Browser diluncurkan",
 			"launch": "Luncurkan browser di {{url}}",
+			"clicked": "Diklik ({{coordinate}})",
 			"click": "Klik ({{coordinate}})",
+			"typed": "Diketik: {{text}}",
 			"type": "Ketik \"{{text}}\"",
+			"pressed": "Ditekan: {{key}}",
+			"press": "Tekan {{key}}",
+			"scrolledDown": "Digulir ke bawah",
 			"scrollDown": "Gulir ke bawah",
+			"scrolledUp": "Digulir ke atas",
 			"scrollUp": "Gulir ke atas",
+			"hovered": "Diarahkan ({{coordinate}})",
+			"hover": "Arahkan ({{coordinate}})",
+			"resized": "Ukuran diubah ke: {{size}}",
+			"resize": "Ubah ukuran ke {{size}}",
+			"screenshotSaved": "Screenshot disimpan",
+			"screenshot": "Simpan screenshot ke {{path}}",
+			"closed": "Browser ditutup",
 			"close": "Tutup browser"
 		}
 	},
@@ -317,8 +402,6 @@
 		"tooltips": {
 			"expand": "Perluas blok kode",
 			"collapse": "Tutup blok kode",
-			"enable_wrap": "Aktifkan word wrap",
-			"disable_wrap": "Nonaktifkan word wrap",
 			"copy_code": "Salin kode"
 		}
 	},
@@ -326,19 +409,19 @@
 	"profileViolationWarning": "Profil saat ini tidak kompatibel dengan pengaturan organisasi kamu",
 	"shellIntegration": {
 		"title": "Peringatan Eksekusi Perintah",
-		"description": "Perintah kamu dijalankan tanpa integrasi shell terminal VSCode. Untuk menekan peringatan ini kamu bisa menonaktifkan integrasi shell di bagian <strong>Terminal</strong> dari <settingsLink>pengaturan Roo Code</settingsLink> atau troubleshoot integrasi terminal VSCode menggunakan link di bawah.",
+		"description": "Perintah kamu dijalankan tanpa integrasi shell terminal VSCode. Untuk menekan peringatan ini kamu bisa menonaktifkan integrasi shell di bagian <strong>Terminal</strong> dari <settingsLink>pengaturan Datacoves Copilot</settingsLink> atau troubleshoot integrasi terminal VSCode menggunakan link di bawah.",
 		"troubleshooting": "Klik di sini untuk dokumentasi integrasi shell."
 	},
 	"ask": {
 		"autoApprovedRequestLimitReached": {
 			"title": "Batas Permintaan yang Disetujui Otomatis Tercapai",
-			"description": "Roo telah mencapai batas {{count}} permintaan API yang disetujui otomatis. Apakah kamu ingin mengatur ulang hitungan dan melanjutkan tugas?",
-			"button": "Atur Ulang dan Lanjutkan"
+			"description": "Copilot telah mencapai batas {{count}} permintaan API yang disetujui otomatis. Apakah Anda ingin mengatur ulang hitungan dan melanjutkan tugas?",
+			"button": "Setel Ulang dan Lanjutkan"
 		},
 		"autoApprovedCostLimitReached": {
-			"description": "Roo telah mencapai batas biaya yang disetujui secara otomatis sebesar ${{count}}. Apakah Anda ingin mengatur ulang biaya dan melanjutkan tugas ini?",
-			"button": "Reset dan Lanjutkan",
-			"title": "Batas Biaya Otomatis-Disetujui Tercapai"
+			"title": "Batas Biaya yang Disetujui Otomatis Tercapai",
+			"description": "Copilot telah mencapai batas biaya yang disetujui otomatis sebesar ${{count}}. Apakah Anda ingin mengatur ulang biaya dan melanjutkan tugas?",
+			"button": "Setel Ulang dan Lanjutkan"
 		}
 	},
 	"indexingStatus": {
@@ -352,9 +435,9 @@
 		"ariaLabel": "Versi {{version}} - Klik untuk melihat catatan rilis"
 	},
 	"rooCloudCTA": {
-		"title": "Roo Code Cloud segera hadir!",
+		"title": "Datacoves Copilot Cloud sedang berkembang!",
 		"description": "Jalankan agen jarak jauh di cloud, akses tugas Anda dari mana saja, berkolaborasi dengan orang lain, dan banyak lagi.",
-		"joinWaitlist": "Bergabunglah dengan daftar tunggu untuk mendapatkan akses awal."
+		"joinWaitlist": "Daftar untuk mendapatkan pembaruan terbaru."
 	},
 	"editMessage": {
 		"placeholder": "Edit pesan Anda..."
@@ -365,7 +448,9 @@
 	"slashCommands": {
 		"tooltip": "Kelola perintah slash",
 		"title": "Perintah Slash",
-		"description": "Buat perintah slash kustom untuk akses cepat ke prompt dan alur kerja yang sering digunakan. <DocsLink>Dokumentasi</DocsLink>",
+		"description": "Gunakan perintah slash bawaan atau buat kustom untuk akses cepat ke prompt dan alur kerja yang sering digunakan. <DocsLink>Dokumentasi</DocsLink>",
+		"manageCommands": "Kelola perintah slash di pengaturan",
+		"builtInCommands": "Perintah Bawaan",
 		"globalCommands": "Perintah Global",
 		"workspaceCommands": "Perintah Workspace",
 		"globalCommand": "Perintah global",
@@ -380,8 +465,25 @@
 			"confirm": "Hapus"
 		}
 	},
+	"contextMenu": {
+		"noResults": "Tidak ada hasil",
+		"problems": "Masalah",
+		"terminal": "Terminal",
+		"url": "Tempel URL untuk mengambil konten"
+	},
 	"queuedMessages": {
-		"title": "Pesan Antrian:",
+		"title": "Pesan Antrian",
 		"clickToEdit": "Klik untuk mengedit pesan"
+	},
+	"slashCommand": {
+		"wantsToRun": "Copilot ingin menjalankan perintah slash",
+		"didRun": "Copilot telah menjalankan perintah slash"
+	},
+	"todo": {
+		"partial": "{{completed}} dari {{total}} to-do selesai",
+		"complete": "{{total}} to-do selesai",
+		"updated": "Memperbarui daftar to-do",
+		"completed": "Selesai",
+		"started": "Dimulai"
 	}
 }

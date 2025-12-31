@@ -7,7 +7,6 @@ import { isBinaryFile } from "isbinaryfile"
 import { mentionRegexGlobal, commandRegexGlobal, unescapeSpaces } from "../../shared/context-mentions"
 
 import { getCommitInfo, getWorkingState } from "../../utils/git"
-import { getWorkspacePath } from "../../utils/path"
 
 import { openFile } from "../../integrations/misc/open-file"
 import { extractTextFromFile } from "../../integrations/misc/extract-text"
@@ -35,6 +34,9 @@ function getUrlErrorMessage(error: unknown): string {
 	if (errorMessage.includes("net::ERR_INTERNET_DISCONNECTED")) {
 		return t("common:errors.no_internet")
 	}
+	if (errorMessage.includes("net::ERR_ABORTED")) {
+		return t("common:errors.url_request_aborted")
+	}
 	if (errorMessage.includes("403") || errorMessage.includes("Forbidden")) {
 		return t("common:errors.url_forbidden")
 	}
@@ -46,13 +48,8 @@ function getUrlErrorMessage(error: unknown): string {
 	return t("common:errors.url_fetch_failed", { error: errorMessage })
 }
 
-export async function openMention(mention?: string): Promise<void> {
+export async function openMention(cwd: string, mention?: string): Promise<void> {
 	if (!mention) {
-		return
-	}
-
-	const cwd = getWorkspacePath()
-	if (!cwd) {
 		return
 	}
 
@@ -74,19 +71,25 @@ export async function openMention(mention?: string): Promise<void> {
 	}
 }
 
+export interface ParseMentionsResult {
+	text: string
+	mode?: string // Mode from the first slash command that has one
+}
+
 export async function parseMentions(
 	text: string,
 	cwd: string,
 	urlContentFetcher: UrlContentFetcher,
 	fileContextTracker?: FileContextTracker,
 	rooIgnoreController?: RooIgnoreController,
-	showRooIgnoredFiles: boolean = true,
+	showRooIgnoredFiles: boolean = false,
 	includeDiagnosticMessages: boolean = true,
 	maxDiagnosticMessages: number = 50,
 	maxReadFileLine?: number,
-): Promise<string> {
+): Promise<ParseMentionsResult> {
 	const mentions: Set<string> = new Set()
 	const validCommands: Map<string, Command> = new Map()
+	let commandMode: string | undefined // Track mode from the first slash command that has one
 
 	// First pass: check which command mentions exist and cache the results
 	const commandMatches = Array.from(text.matchAll(commandRegexGlobal))
@@ -104,10 +107,14 @@ export async function parseMentions(
 		}),
 	)
 
-	// Store valid commands for later use
+	// Store valid commands for later use and capture the first mode found
 	for (const { commandName, command } of commandExistenceChecks) {
 		if (command) {
 			validCommands.set(commandName, command)
+			// Capture the mode from the first command that has one
+			if (!commandMode && command.mode) {
+				commandMode = command.mode
+			}
 		}
 	}
 
@@ -260,14 +267,14 @@ export async function parseMentions(
 		}
 	}
 
-	return parsedText
+	return { text: parsedText, mode: commandMode }
 }
 
 async function getFileOrFolderContent(
 	mentionPath: string,
 	cwd: string,
 	rooIgnoreController?: any,
-	showRooIgnoredFiles: boolean = true,
+	showRooIgnoredFiles: boolean = false,
 	maxReadFileLine?: number,
 ): Promise<string> {
 	const unescapedPath = unescapeSpaces(mentionPath)
@@ -413,3 +420,4 @@ export async function getLatestTerminalOutput(): Promise<string> {
 
 // Export processUserContentMentions from its own file
 export { processUserContentMentions } from "./processUserContentMentions"
+export type { ProcessUserContentMentionsResult } from "./processUserContentMentions"

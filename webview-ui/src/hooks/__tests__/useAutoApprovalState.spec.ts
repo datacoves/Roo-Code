@@ -12,9 +12,7 @@ describe("useAutoApprovalState", () => {
 				alwaysAllowMcp: false,
 				alwaysAllowModeSwitch: false,
 				alwaysAllowSubtasks: false,
-				alwaysApproveResubmit: false,
 				alwaysAllowFollowupQuestions: false,
-				alwaysAllowUpdateTodoList: false,
 			}
 
 			const { result } = renderHook(() => useAutoApprovalState(toggles, true))
@@ -31,9 +29,7 @@ describe("useAutoApprovalState", () => {
 				alwaysAllowMcp: undefined,
 				alwaysAllowModeSwitch: undefined,
 				alwaysAllowSubtasks: undefined,
-				alwaysApproveResubmit: undefined,
 				alwaysAllowFollowupQuestions: undefined,
-				alwaysAllowUpdateTodoList: undefined,
 			}
 
 			const { result } = renderHook(() => useAutoApprovalState(toggles, true))
@@ -50,9 +46,7 @@ describe("useAutoApprovalState", () => {
 				alwaysAllowMcp: false,
 				alwaysAllowModeSwitch: false,
 				alwaysAllowSubtasks: false,
-				alwaysApproveResubmit: false,
 				alwaysAllowFollowupQuestions: false,
-				alwaysAllowUpdateTodoList: false,
 			}
 
 			const { result } = renderHook(() => useAutoApprovalState(toggles, true))
@@ -69,9 +63,7 @@ describe("useAutoApprovalState", () => {
 				alwaysAllowMcp: false,
 				alwaysAllowModeSwitch: false,
 				alwaysAllowSubtasks: false,
-				alwaysApproveResubmit: false,
 				alwaysAllowFollowupQuestions: false,
-				alwaysAllowUpdateTodoList: false,
 			}
 
 			const { result } = renderHook(() => useAutoApprovalState(toggles, true))
@@ -88,9 +80,7 @@ describe("useAutoApprovalState", () => {
 				alwaysAllowMcp: true,
 				alwaysAllowModeSwitch: true,
 				alwaysAllowSubtasks: true,
-				alwaysApproveResubmit: true,
 				alwaysAllowFollowupQuestions: true,
-				alwaysAllowUpdateTodoList: true,
 			}
 
 			const { result } = renderHook(() => useAutoApprovalState(toggles, true))
@@ -124,7 +114,7 @@ describe("useAutoApprovalState", () => {
 			expect(result.current.effectiveAutoApprovalEnabled).toBe(false)
 		})
 
-		it("should return false when autoApprovalEnabled is true but no toggles are enabled", () => {
+		it("should return true when autoApprovalEnabled is true but no toggles are enabled", () => {
 			const toggles = {
 				alwaysAllowReadOnly: false,
 				alwaysAllowWrite: false,
@@ -133,14 +123,12 @@ describe("useAutoApprovalState", () => {
 				alwaysAllowMcp: false,
 				alwaysAllowModeSwitch: false,
 				alwaysAllowSubtasks: false,
-				alwaysApproveResubmit: false,
 				alwaysAllowFollowupQuestions: false,
-				alwaysAllowUpdateTodoList: false,
 			}
 
 			const { result } = renderHook(() => useAutoApprovalState(toggles, true))
 
-			expect(result.current.effectiveAutoApprovalEnabled).toBe(false)
+			expect(result.current.effectiveAutoApprovalEnabled).toBe(true)
 		})
 
 		it("should return true when autoApprovalEnabled is true and at least one toggle is enabled", () => {
@@ -217,7 +205,7 @@ describe("useAutoApprovalState", () => {
 			rerender({ toggles: newToggles, autoApprovalEnabled: true })
 
 			expect(result.current.hasEnabledOptions).toBe(false)
-			expect(result.current.effectiveAutoApprovalEnabled).toBe(false)
+			expect(result.current.effectiveAutoApprovalEnabled).toBe(true)
 		})
 
 		it("should recompute effectiveAutoApprovalEnabled when autoApprovalEnabled changes", () => {
@@ -263,7 +251,7 @@ describe("useAutoApprovalState", () => {
 			const { result } = renderHook(() => useAutoApprovalState(toggles, true))
 
 			expect(result.current.hasEnabledOptions).toBe(false)
-			expect(result.current.effectiveAutoApprovalEnabled).toBe(false)
+			expect(result.current.effectiveAutoApprovalEnabled).toBe(true)
 		})
 
 		it("should handle mixed truthy/falsy values correctly", () => {

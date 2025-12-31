@@ -1,7 +1,7 @@
 import { useMemo, useState, useCallback, useEffect, useRef } from "react"
 import { VSCodeLink } from "@vscode/webview-ui-toolkit/react"
 import { Trans } from "react-i18next"
-import { ChevronsUpDown, Check, X } from "lucide-react"
+import { ChevronsUpDown, Check, X, Info } from "lucide-react"
 
 import type { ProviderSettings, ModelInfo, OrganizationAllowList } from "@roo-code/types"
 
@@ -28,7 +28,15 @@ import { ApiErrorMessage } from "./ApiErrorMessage"
 
 type ModelIdKey = keyof Pick<
 	ProviderSettings,
-	"glamaModelId" | "openRouterModelId" | "unboundModelId" | "requestyModelId" | "openAiModelId" | "litellmModelId"
+	| "openRouterModelId"
+	| "unboundModelId"
+	| "requestyModelId"
+	| "openAiModelId"
+	| "litellmModelId"
+	| "deepInfraModelId"
+	| "ioIntelligenceModelId"
+	| "vercelAiGatewayModelId"
+	| "apiModelId"
 >
 
 interface ModelPickerProps {
@@ -38,9 +46,15 @@ interface ModelPickerProps {
 	serviceName: string
 	serviceUrl: string
 	apiConfiguration: ProviderSettings
-	setApiConfigurationField: <K extends keyof ProviderSettings>(field: K, value: ProviderSettings[K]) => void
-	organizationAllowList: OrganizationAllowList
+	setApiConfigurationField: <K extends keyof ProviderSettings>(
+		field: K,
+		value: ProviderSettings[K],
+		isUserAction?: boolean,
+	) => void
+	organizationAllowList?: OrganizationAllowList
 	errorMessage?: string
+	simplifySettings?: boolean
+	hidePricing?: boolean
 }
 
 export const ModelPicker = ({
@@ -53,6 +67,8 @@ export const ModelPicker = ({
 	setApiConfigurationField,
 	organizationAllowList,
 	errorMessage,
+	simplifySettings,
+	hidePricing,
 }: ModelPickerProps) => {
 	const { t } = useAppTranslation()
 
@@ -63,13 +79,30 @@ export const ModelPicker = ({
 	const selectTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 	const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
+	const { id: selectedModelId, info: selectedModelInfo } = useSelectedModel(apiConfiguration)
+
 	const modelIds = useMemo(() => {
 		const filteredModels = filterModels(models, apiConfiguration.apiProvider, organizationAllowList)
 
-		return Object.keys(filteredModels ?? {}).sort((a, b) => a.localeCompare(b))
-	}, [models, apiConfiguration.apiProvider, organizationAllowList])
+		// Include the currently selected model even if deprecated (so users can see what they have selected)
+		// But filter out other deprecated models from being newly selectable
+		const availableModels = Object.entries(filteredModels ?? {})
+			.filter(([modelId, modelInfo]) => {
+				// Always include the currently selected model
+				if (modelId === selectedModelId) return true
+				// Filter out deprecated models that aren't currently selected
+				return !modelInfo.deprecated
+			})
+			.reduce(
+				(acc, [modelId, modelInfo]) => {
+					acc[modelId] = modelInfo
+					return acc
+				},
+				{} as Record<string, ModelInfo>,
+			)
 
-	const { id: selectedModelId, info: selectedModelInfo } = useSelectedModel(apiConfiguration)
+		return Object.keys(availableModels).sort((a, b) => a.localeCompare(b))
+	}, [models, apiConfiguration.apiProvider, organizationAllowList, selectedModelId])
 
 	const [searchValue, setSearchValue] = useState("")
 
@@ -116,7 +149,7 @@ export const ModelPicker = ({
 	useEffect(() => {
 		if (!selectedModelId && !isInitialized.current) {
 			const initialValue = modelIds.includes(selectedModelId) ? selectedModelId : defaultModelId
-			setApiConfigurationField(modelIdKey, initialValue)
+			setApiConfigurationField(modelIdKey, initialValue, false) // false = automatic initialization
 		}
 
 		isInitialized.current = true
@@ -149,7 +182,7 @@ export const ModelPicker = ({
 							aria-expanded={open}
 							className="w-full justify-between"
 							data-testid="model-picker-button">
-							<div>{selectedModelId ?? t("settings:common.select")}</div>
+							<div className="truncate">{selectedModelId ?? t("settings:common.select")}</div>
 							<ChevronsUpDown className="opacity-50" />
 						</Button>
 					</PopoverTrigger>
@@ -188,7 +221,9 @@ export const ModelPicker = ({
 											value={model}
 											onSelect={onSelect}
 											data-testid={`model-option-${model}`}>
-											{model}
+											<span className="truncate" title={model}>
+												{model}
+											</span>
 											<Check
 												className={cn(
 													"size-4 p-0.5 ml-auto",
@@ -211,25 +246,43 @@ export const ModelPicker = ({
 				</Popover>
 			</div>
 			{errorMessage && <ApiErrorMessage errorMessage={errorMessage} />}
-			{selectedModelId && selectedModelInfo && (
-				<ModelInfoView
-					apiProvider={apiConfiguration.apiProvider}
-					selectedModelId={selectedModelId}
-					modelInfo={selectedModelInfo}
-					isDescriptionExpanded={isDescriptionExpanded}
-					setIsDescriptionExpanded={setIsDescriptionExpanded}
-				/>
+			{selectedModelInfo?.deprecated && (
+				<ApiErrorMessage errorMessage={t("settings:validation.modelDeprecated")} />
 			)}
-			<div className="text-sm text-vscode-descriptionForeground">
-				<Trans
-					i18nKey="settings:modelPicker.automaticFetch"
-					components={{
-						serviceLink: <VSCodeLink href={serviceUrl} className="text-sm" />,
-						defaultModelLink: <VSCodeLink onClick={() => onSelect(defaultModelId)} className="text-sm" />,
-					}}
-					values={{ serviceName, defaultModelId }}
-				/>
-			</div>
+
+			{simplifySettings ? (
+				<p className="text-xs text-vscode-descriptionForeground m-0">
+					<Info className="size-3 inline mr-1" />
+					{t("settings:modelPicker.simplifiedExplanation")}
+				</p>
+			) : (
+				<div>
+					{selectedModelId && selectedModelInfo && !selectedModelInfo.deprecated && (
+						<ModelInfoView
+							apiProvider={apiConfiguration.apiProvider}
+							selectedModelId={selectedModelId}
+							modelInfo={selectedModelInfo}
+							isDescriptionExpanded={isDescriptionExpanded}
+							setIsDescriptionExpanded={setIsDescriptionExpanded}
+							hidePricing={hidePricing}
+						/>
+					)}
+					{!hidePricing && (
+						<div className="text-sm text-vscode-descriptionForeground">
+							<Trans
+								i18nKey="settings:modelPicker.automaticFetch"
+								components={{
+									serviceLink: <VSCodeLink href={serviceUrl} className="text-sm" />,
+									defaultModelLink: (
+										<VSCodeLink onClick={() => onSelect(defaultModelId)} className="text-sm" />
+									),
+								}}
+								values={{ serviceName, defaultModelId }}
+							/>
+						</div>
+					)}
+				</div>
+			)}
 		</>
 	)
 }

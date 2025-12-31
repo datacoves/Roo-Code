@@ -41,7 +41,7 @@ export const workspace = {
 	getWorkspaceFolder: () => null,
 	onDidChangeWorkspaceFolders: () => mockDisposable,
 	getConfiguration: () => ({
-		get: () => null,
+		get: (key, defaultValue) => defaultValue,
 	}),
 	createFileSystemWatcher: () => ({
 		onDidCreate: () => mockDisposable,
@@ -71,7 +71,7 @@ export const window = {
 	}),
 	createTerminal: () => ({
 		exitStatus: undefined,
-		name: "Roo Code",
+		name: "Datacoves Copilot",
 		processId: Promise.resolve(123),
 		creationOptions: {},
 		state: { isInteractedWith: true },

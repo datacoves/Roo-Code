@@ -7,7 +7,6 @@ import { ContextProxy } from "../../config/ContextProxy"
 import { Task } from "../../task/Task"
 import type { HistoryItem, ProviderName } from "@roo-code/types"
 
-// Mock setup
 vi.mock("vscode", () => ({
 	ExtensionContext: vi.fn(),
 	OutputChannel: vi.fn(),
@@ -27,6 +26,7 @@ vi.mock("vscode", () => ({
 		showInformationMessage: vi.fn(),
 		showWarningMessage: vi.fn(),
 		showErrorMessage: vi.fn(),
+		onDidChangeActiveTextEditor: vi.fn(() => ({ dispose: vi.fn() })),
 	},
 	workspace: {
 		getConfiguration: vi.fn().mockReturnValue({
@@ -53,7 +53,8 @@ vi.mock("vscode", () => ({
 	},
 	version: "1.85.0",
 }))
-// Create a counter for unique task IDs
+
+// Create a counter for unique task IDs.
 let taskIdCounter = 0
 
 vi.mock("../../task/Task", () => ({
@@ -72,24 +73,29 @@ vi.mock("../../task/Task", () => ({
 		setRootTask: vi.fn(),
 		emit: vi.fn(),
 		parentTask: options.parentTask,
+		updateApiConfiguration: vi.fn(),
 	})),
 }))
+
 vi.mock("../../prompts/sections/custom-instructions")
+
 vi.mock("../../../utils/safeWriteJson")
+
 vi.mock("../../../api", () => ({
 	buildApiHandler: vi.fn().mockReturnValue({
 		getModel: vi.fn().mockReturnValue({
 			id: "claude-3-sonnet",
-			info: { supportsComputerUse: false },
 		}),
 	}),
 }))
+
 vi.mock("../../../integrations/workspace/WorkspaceTracker", () => ({
 	default: vi.fn().mockImplementation(() => ({
 		initializeFilePaths: vi.fn(),
 		dispose: vi.fn(),
 	})),
 }))
+
 vi.mock("../../diff/strategies/multi-search-replace", () => ({
 	MultiSearchReplaceDiffStrategy: vi.fn().mockImplementation(() => ({
 		getToolDescription: () => "test",
@@ -97,6 +103,7 @@ vi.mock("../../diff/strategies/multi-search-replace", () => ({
 		applyDiff: vi.fn(),
 	})),
 }))
+
 vi.mock("@roo-code/cloud", () => ({
 	CloudService: {
 		hasInstance: vi.fn().mockReturnValue(true),
@@ -106,8 +113,12 @@ vi.mock("@roo-code/cloud", () => ({
 			}
 		},
 	},
+	BridgeOrchestrator: {
+		isEnabled: vi.fn().mockReturnValue(false),
+	},
 	getRooCodeApiUrl: vi.fn().mockReturnValue("https://app.roocode.com"),
 }))
+
 vi.mock("../../../shared/modes", () => ({
 	modes: [
 		{
@@ -131,20 +142,26 @@ vi.mock("../../../shared/modes", () => ({
 	}),
 	defaultModeSlug: "code",
 }))
+
 vi.mock("../../prompts/system", () => ({
 	SYSTEM_PROMPT: vi.fn().mockResolvedValue("mocked system prompt"),
 	codeMode: "code",
 }))
+
 vi.mock("../../../api/providers/fetchers/modelCache", () => ({
 	getModels: vi.fn().mockResolvedValue({}),
 	flushModels: vi.fn(),
+	getModelsFromCache: vi.fn().mockReturnValue(undefined),
 }))
+
 vi.mock("../../../integrations/misc/extract-text", () => ({
 	extractTextFromFile: vi.fn().mockResolvedValue("Mock file content"),
 }))
+
 vi.mock("p-wait-for", () => ({
 	default: vi.fn().mockImplementation(async () => Promise.resolve()),
 }))
+
 vi.mock("fs/promises", () => ({
 	mkdir: vi.fn().mockResolvedValue(undefined),
 	writeFile: vi.fn().mockResolvedValue(undefined),
@@ -152,6 +169,7 @@ vi.mock("fs/promises", () => ({
 	unlink: vi.fn().mockResolvedValue(undefined),
 	rmdir: vi.fn().mockResolvedValue(undefined),
 }))
+
 vi.mock("@roo-code/telemetry", () => ({
 	TelemetryService: {
 		hasInstance: vi.fn().mockReturnValue(true),
@@ -318,6 +336,7 @@ describe("ClineProvider - Sticky Mode", () => {
 				saveClineMessages: vi.fn(),
 				clineMessages: [],
 				apiConversationHistory: [],
+				updateApiConfiguration: vi.fn(),
 			}
 
 			// Add task to provider stack
@@ -397,7 +416,7 @@ describe("ClineProvider - Sticky Mode", () => {
 		})
 	})
 
-	describe("initClineWithHistoryItem", () => {
+	describe("createTaskWithHistoryItem", () => {
 		it("should restore mode from history item when reopening task", async () => {
 			await provider.resolveWebviewView(mockWebviewView)
 
@@ -419,7 +438,7 @@ describe("ClineProvider - Sticky Mode", () => {
 			const updateGlobalStateSpy = vi.spyOn(provider as any, "updateGlobalState").mockResolvedValue(undefined)
 
 			// Initialize task with history item
-			await provider.initClineWithHistoryItem(historyItem)
+			await provider.createTaskWithHistoryItem(historyItem)
 
 			// Verify mode was restored via updateGlobalState
 			expect(updateGlobalStateSpy).toHaveBeenCalledWith("mode", "architect")
@@ -461,7 +480,7 @@ describe("ClineProvider - Sticky Mode", () => {
 			const handleModeSwitchSpy = vi.spyOn(provider, "handleModeSwitch").mockResolvedValue()
 
 			// Initialize task with history item
-			await provider.initClineWithHistoryItem(historyItem)
+			await provider.createTaskWithHistoryItem(historyItem)
 
 			// Verify mode was not changed (should use current mode)
 			expect(handleModeSwitchSpy).not.toHaveBeenCalled()
@@ -588,15 +607,15 @@ describe("ClineProvider - Sticky Mode", () => {
 			// Initialize subtask with parent's mode
 			taskModes[subtaskId] = "architect"
 
-			// Mock getCurrentCline to return the parent task initially
-			const getCurrentClineMock = vi.spyOn(provider, "getCurrentCline")
-			getCurrentClineMock.mockReturnValue(parentTask as any)
+			// Mock getCurrentTask to return the parent task initially
+			const getCurrentTaskMock = vi.spyOn(provider, "getCurrentTask")
+			getCurrentTaskMock.mockReturnValue(parentTask as any)
 
 			// Add subtask to stack
 			await provider.addClineToStack(subtask)
 
-			// Now mock getCurrentCline to return the subtask (simulating stack behavior)
-			getCurrentClineMock.mockReturnValue(subtask as any)
+			// Now mock getCurrentTask to return the subtask (simulating stack behavior)
+			getCurrentTaskMock.mockReturnValue(subtask as any)
 
 			// Switch subtask to code mode - this should only affect the subtask
 			await provider.handleModeSwitch("code")
@@ -660,7 +679,7 @@ describe("ClineProvider - Sticky Mode", () => {
 			const handleModeSwitchSpy = vi.spyOn(provider, "handleModeSwitch").mockResolvedValue()
 
 			// Initialize task with history item - should not throw
-			await expect(provider.initClineWithHistoryItem(historyItem)).resolves.not.toThrow()
+			await expect(provider.createTaskWithHistoryItem(historyItem)).resolves.not.toThrow()
 
 			// Verify mode switch was not called with null
 			expect(handleModeSwitchSpy).not.toHaveBeenCalledWith(null)
@@ -701,7 +720,7 @@ describe("ClineProvider - Sticky Mode", () => {
 			}
 
 			// Restore the task from history
-			await provider.initClineWithHistoryItem(historyItem)
+			await provider.createTaskWithHistoryItem(historyItem)
 
 			// Verify that the mode was restored
 			const state = await provider.getState()
@@ -746,7 +765,7 @@ describe("ClineProvider - Sticky Mode", () => {
 			const handleModeSwitchSpy = vi.spyOn(provider, "handleModeSwitch").mockResolvedValue()
 
 			// Initialize task with history item - should not throw
-			await expect(provider.initClineWithHistoryItem(historyItem)).resolves.not.toThrow()
+			await expect(provider.createTaskWithHistoryItem(historyItem)).resolves.not.toThrow()
 
 			// Verify mode switch was not called with deleted mode
 			expect(handleModeSwitchSpy).not.toHaveBeenCalledWith("deleted-mode")
@@ -765,6 +784,7 @@ describe("ClineProvider - Sticky Mode", () => {
 				saveClineMessages: vi.fn(),
 				clineMessages: [],
 				apiConversationHistory: [],
+				updateApiConfiguration: vi.fn(),
 			}
 
 			// Add task to provider stack
@@ -831,6 +851,7 @@ describe("ClineProvider - Sticky Mode", () => {
 				}),
 				clineMessages: [],
 				apiConversationHistory: [],
+				updateApiConfiguration: vi.fn(),
 			}
 
 			// Add task to provider stack
@@ -882,6 +903,7 @@ describe("ClineProvider - Sticky Mode", () => {
 				saveClineMessages: vi.fn(),
 				clineMessages: [],
 				apiConversationHistory: [],
+				updateApiConfiguration: vi.fn(),
 			}
 
 			// Add task to provider stack
@@ -916,6 +938,7 @@ describe("ClineProvider - Sticky Mode", () => {
 				saveClineMessages: vi.fn(),
 				clineMessages: [],
 				apiConversationHistory: [],
+				updateApiConfiguration: vi.fn(),
 			}
 
 			// Add task to provider stack
@@ -971,6 +994,7 @@ describe("ClineProvider - Sticky Mode", () => {
 				saveClineMessages: vi.fn(),
 				clineMessages: [],
 				apiConversationHistory: [],
+				updateApiConfiguration: vi.fn(),
 			}
 
 			// Add task to provider stack
@@ -1017,6 +1041,7 @@ describe("ClineProvider - Sticky Mode", () => {
 				saveClineMessages: vi.fn(),
 				clineMessages: [],
 				apiConversationHistory: [],
+				updateApiConfiguration: vi.fn(),
 			}
 
 			const task2 = {
@@ -1026,6 +1051,7 @@ describe("ClineProvider - Sticky Mode", () => {
 				saveClineMessages: vi.fn(),
 				clineMessages: [],
 				apiConversationHistory: [],
+				updateApiConfiguration: vi.fn(),
 			}
 
 			const task3 = {
@@ -1035,6 +1061,7 @@ describe("ClineProvider - Sticky Mode", () => {
 				saveClineMessages: vi.fn(),
 				clineMessages: [],
 				apiConversationHistory: [],
+				updateApiConfiguration: vi.fn(),
 			}
 
 			// Add tasks to provider stack
@@ -1087,17 +1114,17 @@ describe("ClineProvider - Sticky Mode", () => {
 				.spyOn(provider, "updateTaskHistory")
 				.mockImplementation(() => Promise.resolve([]))
 
-			// Mock getCurrentCline to return different tasks
-			const getCurrentClineSpy = vi.spyOn(provider, "getCurrentCline")
+			// Mock getCurrentTask to return different tasks
+			const getCurrentTaskSpy = vi.spyOn(provider, "getCurrentTask")
 
 			// Simulate simultaneous mode switches for different tasks
-			getCurrentClineSpy.mockReturnValue(task1 as any)
+			getCurrentTaskSpy.mockReturnValue(task1 as any)
 			const switch1 = provider.handleModeSwitch("architect")
 
-			getCurrentClineSpy.mockReturnValue(task2 as any)
+			getCurrentTaskSpy.mockReturnValue(task2 as any)
 			const switch2 = provider.handleModeSwitch("debug")
 
-			getCurrentClineSpy.mockReturnValue(task3 as any)
+			getCurrentTaskSpy.mockReturnValue(task3 as any)
 			const switch3 = provider.handleModeSwitch("code")
 
 			await Promise.all([switch1, switch2, switch3])
@@ -1148,7 +1175,7 @@ describe("ClineProvider - Sticky Mode", () => {
 			vi.clearAllMocks()
 
 			// Start initialization
-			const initPromise = provider.initClineWithHistoryItem(historyItem)
+			const initPromise = provider.createTaskWithHistoryItem(historyItem)
 
 			// Try to switch mode during initialization
 			await provider.handleModeSwitch("code")
@@ -1176,6 +1203,7 @@ describe("ClineProvider - Sticky Mode", () => {
 				saveClineMessages: vi.fn(),
 				clineMessages: [],
 				apiConversationHistory: [],
+				updateApiConfiguration: vi.fn(),
 			}))
 
 			// Add all tasks to provider
@@ -1183,13 +1211,13 @@ describe("ClineProvider - Sticky Mode", () => {
 				await provider.addClineToStack(task as any)
 			}
 
-			// Mock getCurrentCline
-			const getCurrentClineSpy = vi.spyOn(provider, "getCurrentCline")
+			// Mock getCurrentTask
+			const getCurrentTaskSpy = vi.spyOn(provider, "getCurrentTask")
 
 			// Rapidly switch between tasks and modes
 			const switches: Promise<void>[] = []
 			tasks.forEach((task, index) => {
-				getCurrentClineSpy.mockReturnValue(task as any)
+				getCurrentTaskSpy.mockReturnValue(task as any)
 				const mode = ["architect", "debug", "code"][index % 3]
 				switches.push(provider.handleModeSwitch(mode as any))
 			})

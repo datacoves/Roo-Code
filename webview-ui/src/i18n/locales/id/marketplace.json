@@ -1,5 +1,5 @@
 {
-	"title": "Roo Marketplace",
+	"title": "Copilot Marketplace",
 	"tabs": {
 		"installed": "Terinstal",
 		"settings": "Pengaturan",
@@ -12,6 +12,12 @@
 			"placeholder": "Cari item marketplace...",
 			"placeholderMcp": "Cari MCP...",
 			"placeholderMode": "Cari Mode..."
+		},
+		"installed": {
+			"label": "Filter berdasarkan status",
+			"all": "Semua Item",
+			"installed": "Terpasang",
+			"notInstalled": "Tidak Terpasang"
 		},
 		"type": {
 			"label": "Filter berdasarkan tipe:",

@@ -1,5 +1,5 @@
 {
-	"title": "Roo Marketplace",
+	"title": "Copilot Marketplace",
 	"tabs": {
 		"installed": "설치됨",
 		"settings": "설정",
@@ -12,6 +12,12 @@
 			"placeholder": "Marketplace 아이템 검색...",
 			"placeholderMcp": "MCP 검색...",
 			"placeholderMode": "모드 검색..."
+		},
+		"installed": {
+			"label": "상태별로 필터링",
+			"all": "모든 항목",
+			"installed": "설치됨",
+			"notInstalled": "설치되지 않음"
 		},
 		"type": {
 			"label": "유형별 필터:",

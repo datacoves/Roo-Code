@@ -1,7 +1,7 @@
 import { HTMLAttributes } from "react"
 import { useAppTranslation } from "@/i18n/TranslationContext"
-import { Download, Upload, TriangleAlert, Bug, Shield } from "lucide-react"
-import { VSCodeCheckbox, VSCodeLink } from "@vscode/webview-ui-toolkit/react"
+import { Download, Upload, TriangleAlert } from "lucide-react"
+import { VSCodeCheckbox } from "@vscode/webview-ui-toolkit/react"
 
 import { Package } from "@roo/package"
 
@@ -34,26 +34,7 @@ export const About = ({ debug, setDebug, className, ...props }: AboutProps) => {
 			</Section>
 
 			<Section className="space-y-0">
-				<h3>{t("settings:about.contact")}</h3>
 				<div className="flex flex-col gap-3">
-					<div className="flex items-start gap-2">
-						<Bug className="size-4 text-vscode-descriptionForeground shrink-0" />
-						<span>
-							{t("settings:about.bugReport.label")}{" "}
-							<VSCodeLink href="https://github.com/RooCodeInc/Roo-Code/issues/new?template=bug_report.yml">
-								{t("settings:about.bugReport.link")}
-							</VSCodeLink>
-						</span>
-					</div>
-					<div className="flex items-start gap-2">
-						<Shield className="size-4 text-vscode-descriptionForeground shrink-0" />
-						<span>
-							{t("settings:about.securityIssue.label")}{" "}
-							<VSCodeLink href="https://github.com/RooCodeInc/Roo-Code/security/policy">
-								{t("settings:about.securityIssue.link")}
-							</VSCodeLink>
-						</span>
-					</div>
 					{setDebug && (
 						<SearchableSetting
 							settingId="about-debug-mode"

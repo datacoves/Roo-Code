@@ -510,26 +510,28 @@ export const ContextManagementSettings = ({
 										{t("settings:contextManagement.condensingThreshold.defaultProfile") ||
 											"Default (applies to all unconfigured profiles)"}
 									</SelectItem>
-									{(listApiConfigMeta || []).map((config) => {
-										const profileThreshold = profileThresholds[config.id]
-										const thresholdDisplay =
-											profileThreshold !== undefined
-												? profileThreshold === -1
-													? ` ${t(
-															"settings:contextManagement.condensingThreshold.usesGlobal",
-															{
-																threshold: autoCondenseContextPercent,
-															},
-														)}`
-													: ` (${profileThreshold}%)`
-												: ""
-										return (
-											<SelectItem key={config.id} value={config.id}>
-												{config.name}
-												{thresholdDisplay}
-											</SelectItem>
-										)
-									})}
+									{(listApiConfigMeta || [])
+										.filter((config) => config.id)
+										.map((config) => {
+											const profileThreshold = profileThresholds[config.id]
+											const thresholdDisplay =
+												profileThreshold !== undefined
+													? profileThreshold === -1
+														? ` ${t(
+																"settings:contextManagement.condensingThreshold.usesGlobal",
+																{
+																	threshold: autoCondenseContextPercent,
+																},
+															)}`
+														: ` (${profileThreshold}%)`
+													: ""
+											return (
+												<SelectItem key={config.id} value={config.id}>
+													{config.name}
+													{thresholdDisplay}
+												</SelectItem>
+											)
+										})}
 								</SelectContent>
 							</Select>
 						</div>

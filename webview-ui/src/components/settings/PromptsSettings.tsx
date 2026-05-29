@@ -182,14 +182,16 @@ const PromptsSettings = ({
 										<SelectItem value="-">
 											{t("prompts:supportPrompts.enhance.useCurrentConfig")}
 										</SelectItem>
-										{(listApiConfigMeta || []).map((config) => (
-											<SelectItem
-												key={config.id}
-												value={config.id}
-												data-testid={`${config.id}-option`}>
-												{config.name}
-											</SelectItem>
-										))}
+										{(listApiConfigMeta || [])
+											.filter((config) => config.id)
+											.map((config) => (
+												<SelectItem
+													key={config.id}
+													value={config.id}
+													data-testid={`${config.id}-option`}>
+													{config.name}
+												</SelectItem>
+											))}
 									</SelectContent>
 								</Select>
 								<div className="text-sm text-vscode-descriptionForeground mt-1">

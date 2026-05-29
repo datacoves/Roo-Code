@@ -51,39 +51,6 @@ vi.mock("vscode", () => ({
 }))
 
 // Mock other dependencies
-vi.mock("../../services/mcp/McpServerManager", () => ({
-	McpServerManager: {
-		getInstance: vi.fn().mockResolvedValue(null),
-	},
-}))
-
-vi.mock("../../integrations/terminal/TerminalRegistry", () => ({
-	TerminalRegistry: {
-		releaseTerminalsForTask: vi.fn(),
-	},
-}))
-
-vi.mock("@roo-code/telemetry", () => ({
-	TelemetryService: {
-		instance: {
-			captureTaskCreated: vi.fn(),
-			captureTaskRestarted: vi.fn(),
-			captureConversationMessage: vi.fn(),
-			captureLlmCompletion: vi.fn(),
-			captureConsecutiveMistakeError: vi.fn(),
-		},
-	},
-}))
-
-// Mock @roo-code/cloud to prevent socket.io-client initialization issues
-vi.mock("@roo-code/cloud", () => ({
-	CloudService: {
-		isEnabled: () => false,
-	},
-	BridgeOrchestrator: {
-		subscribeToTask: vi.fn(),
-	},
-}))
 
 // Mock delay to prevent actual delays
 vi.mock("delay", () => ({
@@ -112,7 +79,7 @@ vi.mock("fs/promises", () => ({
 
 // Mock mentions
 vi.mock("../../mentions", () => ({
-	parseMentions: vi.fn().mockImplementation((text) => Promise.resolve(text)),
+	parseMentions: vi.fn().mockImplementation((text) => Promise.resolve({ text, mode: undefined, contentBlocks: [] })),
 	openMention: vi.fn(),
 	getLatestTerminalOutput: vi.fn(),
 }))
@@ -166,6 +133,7 @@ describe("Task reasoning preservation", () => {
 		// Mock provider with necessary methods
 		mockProvider = {
 			postStateToWebview: vi.fn().mockResolvedValue(undefined),
+			postStateToWebviewWithoutTaskHistory: vi.fn().mockResolvedValue(undefined),
 			getState: vi.fn().mockResolvedValue({
 				mode: "code",
 				experiments: {},

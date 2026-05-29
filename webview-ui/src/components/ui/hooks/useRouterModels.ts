@@ -1,19 +1,20 @@
 import { useQuery } from "@tanstack/react-query"
 
-import { RouterModels } from "@roo/api"
-import { ExtensionMessage } from "@roo/ExtensionMessage"
+import { type RouterModels, type ExtensionMessage } from "@roo-code/types"
 
 import { vscode } from "@src/utils/vscode"
 
 type UseRouterModelsOptions = {
-	provider?: string // single provider filter (e.g. "roo")
+	provider?: string // single provider filter (e.g. "openrouter")
 	enabled?: boolean // gate fetching entirely
 }
 
 const getRouterModels = async (provider?: string) =>
 	new Promise<RouterModels>((resolve, reject) => {
 		const cleanup = () => {
-			window.removeEventListener("message", handler)
+			if (typeof window !== "undefined") {
+				window.removeEventListener("message", handler)
+			}
 		}
 
 		const timeout = setTimeout(() => {

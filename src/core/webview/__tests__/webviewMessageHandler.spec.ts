@@ -5,17 +5,52 @@ import type { Mock } from "vitest"
 // Mock dependencies - must come before imports
 vi.mock("../../../api/providers/fetchers/modelCache")
 
+vi.mock("../../../integrations/openai-codex/oauth", () => ({
+	openAiCodexOAuthManager: {
+		getAccessToken: vi.fn(),
+		getAccountId: vi.fn(),
+	},
+}))
+
+vi.mock("../../../integrations/openai-codex/rate-limits", () => ({
+	fetchOpenAiCodexRateLimitInfo: vi.fn(),
+}))
+
+vi.mock("../../../services/command/commands", () => ({
+	getCommands: vi.fn(),
+}))
+
+vi.mock("@anthropic-ai/vertex-sdk", () => ({
+	AnthropicVertex: vi.fn(),
+}))
+
+vi.mock("google-auth-library", () => ({
+	GoogleAuth: vi.fn(),
+}))
+
+vi.mock("ollama", () => ({
+	Ollama: vi.fn(),
+}))
+
 // Mock the diagnosticsHandler module
 vi.mock("../diagnosticsHandler", () => ({
 	generateErrorDiagnostics: vi.fn().mockResolvedValue({ success: true, filePath: "/tmp/diagnostics.json" }),
 }))
 
+import type { ModelRecord } from "@roo-code/types"
+
 import { webviewMessageHandler } from "../webviewMessageHandler"
 import type { ClineProvider } from "../ClineProvider"
 import { getModels } from "../../../api/providers/fetchers/modelCache"
-import type { ModelRecord } from "../../../shared/api"
+import { getCommands } from "../../../services/command/commands"
+const { openAiCodexOAuthManager } = await import("../../../integrations/openai-codex/oauth")
+const { fetchOpenAiCodexRateLimitInfo } = await import("../../../integrations/openai-codex/rate-limits")
 
 const mockGetModels = getModels as Mock<typeof getModels>
+const mockGetCommands = vi.mocked(getCommands)
+const mockGetAccessToken = vi.mocked(openAiCodexOAuthManager.getAccessToken)
+const mockGetAccountId = vi.mocked(openAiCodexOAuthManager.getAccountId)
+const mockFetchOpenAiCodexRateLimitInfo = vi.mocked(fetchOpenAiCodexRateLimitInfo)
 
 // Mock ClineProvider
 const mockClineProvider = {
@@ -42,6 +77,8 @@ const mockClineProvider = {
 	getCurrentTask: vi.fn(),
 	getTaskWithId: vi.fn(),
 	createTaskWithHistoryItem: vi.fn(),
+	getSkillsManager: vi.fn(),
+	cwd: "/mock/workspace",
 } as unknown as ClineProvider
 
 import { t } from "../../../i18n"
@@ -117,6 +154,15 @@ vi.mock("../../../utils/fs")
 vi.mock("../../../utils/path")
 vi.mock("../../../utils/globalContext")
 
+vi.mock("../../mentions/resolveImageMentions", () => ({
+	resolveImageMentions: vi.fn(async ({ text, images }: { text: string; images?: string[] }) => ({
+		text,
+		images: [...(images ?? []), "data:image/png;base64,from-mention"],
+	})),
+}))
+
+import { resolveImageMentions } from "../../mentions/resolveImageMentions"
+
 describe("webviewMessageHandler - requestLmStudioModels", () => {
 	beforeEach(() => {
 		vi.clearAllMocks()
@@ -156,6 +202,37 @@ describe("webviewMessageHandler - requestLmStudioModels", () => {
 			type: "lmStudioModels",
 			lmStudioModels: mockModels,
 		})
+	})
+})
+
+describe("webviewMessageHandler - image mentions", () => {
+	beforeEach(() => {
+		vi.clearAllMocks()
+		mockClineProvider.getState = vi.fn().mockResolvedValue({
+			maxImageFileSize: 5,
+			maxTotalImageSize: 20,
+		})
+	})
+
+	it("should resolve image mentions for askResponse payloads", async () => {
+		const mockHandleWebviewAskResponse = vi.fn()
+		vi.mocked(mockClineProvider.getCurrentTask).mockReturnValue({
+			cwd: "/mock/workspace",
+			rooIgnoreController: undefined,
+			handleWebviewAskResponse: mockHandleWebviewAskResponse,
+		} as any)
+
+		await webviewMessageHandler(mockClineProvider, {
+			type: "askResponse",
+			askResponse: "messageResponse",
+			text: "See @/img.png",
+			images: [],
+		})
+
+		expect(vi.mocked(resolveImageMentions)).toHaveBeenCalled()
+		expect(mockHandleWebviewAskResponse).toHaveBeenCalledWith("messageResponse", "See @/img.png", [
+			"data:image/png;base64,from-mention",
+		])
 	})
 })
 
@@ -208,7 +285,6 @@ describe("webviewMessageHandler - requestRouterModels", () => {
 			apiConfiguration: {
 				openRouterApiKey: "openrouter-key",
 				requestyApiKey: "requesty-key",
-				unboundApiKey: "unbound-key",
 				litellmApiKey: "litellm-key",
 				litellmBaseUrl: "http://localhost:4000",
 			},
@@ -240,39 +316,30 @@ describe("webviewMessageHandler - requestRouterModels", () => {
 		// Verify getModels was called for each provider
 		expect(mockGetModels).toHaveBeenCalledWith({ provider: "openrouter" })
 		expect(mockGetModels).toHaveBeenCalledWith({ provider: "requesty", apiKey: "requesty-key" })
-		expect(mockGetModels).toHaveBeenCalledWith({ provider: "unbound", apiKey: "unbound-key" })
-		expect(mockGetModels).toHaveBeenCalledWith({ provider: "vercel-ai-gateway" })
-		expect(mockGetModels).toHaveBeenCalledWith({ provider: "deepinfra" })
 		expect(mockGetModels).toHaveBeenCalledWith(
 			expect.objectContaining({
-				provider: "roo",
-				baseUrl: expect.any(String),
+				provider: "unbound",
 			}),
 		)
+		expect(mockGetModels).toHaveBeenCalledWith({ provider: "vercel-ai-gateway" })
 		expect(mockGetModels).toHaveBeenCalledWith({
 			provider: "litellm",
 			apiKey: "litellm-key",
 			baseUrl: "http://localhost:4000",
 		})
-		// Note: huggingface is not fetched in requestRouterModels - it has its own handler
-		// Note: io-intelligence is not fetched because no API key is provided in the mock state
 
 		// Verify response was sent
 		expect(mockClineProvider.postMessageToWebview).toHaveBeenCalledWith({
 			type: "routerModels",
 			routerModels: {
-				deepinfra: mockModels,
 				openrouter: mockModels,
 				requesty: mockModels,
 				unbound: mockModels,
 				litellm: mockModels,
-				roo: mockModels,
-				chutes: mockModels,
 				ollama: {},
 				lmstudio: {},
 				"vercel-ai-gateway": mockModels,
-				huggingface: {},
-				"io-intelligence": {},
+				poe: {},
 			},
 			values: undefined,
 		})
@@ -283,7 +350,6 @@ describe("webviewMessageHandler - requestRouterModels", () => {
 			apiConfiguration: {
 				openRouterApiKey: "openrouter-key",
 				requestyApiKey: "requesty-key",
-				unboundApiKey: "unbound-key",
 				// Missing litellm config
 			},
 		})
@@ -320,7 +386,6 @@ describe("webviewMessageHandler - requestRouterModels", () => {
 			apiConfiguration: {
 				openRouterApiKey: "openrouter-key",
 				requestyApiKey: "requesty-key",
-				unboundApiKey: "unbound-key",
 				// Missing litellm config
 			},
 		})
@@ -352,18 +417,14 @@ describe("webviewMessageHandler - requestRouterModels", () => {
 		expect(mockClineProvider.postMessageToWebview).toHaveBeenCalledWith({
 			type: "routerModels",
 			routerModels: {
-				deepinfra: mockModels,
 				openrouter: mockModels,
 				requesty: mockModels,
 				unbound: mockModels,
-				roo: mockModels,
-				chutes: mockModels,
 				litellm: {},
 				ollama: {},
 				lmstudio: {},
 				"vercel-ai-gateway": mockModels,
-				huggingface: {},
-				"io-intelligence": {},
+				poe: {},
 			},
 			values: undefined,
 		})
@@ -383,11 +444,8 @@ describe("webviewMessageHandler - requestRouterModels", () => {
 		mockGetModels
 			.mockResolvedValueOnce(mockModels) // openrouter
 			.mockRejectedValueOnce(new Error("Requesty API error")) // requesty
-			.mockRejectedValueOnce(new Error("Unbound API error")) // unbound
+			.mockResolvedValueOnce(mockModels) // unbound
 			.mockResolvedValueOnce(mockModels) // vercel-ai-gateway
-			.mockResolvedValueOnce(mockModels) // deepinfra
-			.mockResolvedValueOnce(mockModels) // roo
-			.mockRejectedValueOnce(new Error("Chutes API error")) // chutes
 			.mockRejectedValueOnce(new Error("LiteLLM connection failed")) // litellm
 
 		await webviewMessageHandler(mockClineProvider, {
@@ -405,20 +463,6 @@ describe("webviewMessageHandler - requestRouterModels", () => {
 		expect(mockClineProvider.postMessageToWebview).toHaveBeenCalledWith({
 			type: "singleRouterModelFetchResponse",
 			success: false,
-			error: "Unbound API error",
-			values: { provider: "unbound" },
-		})
-
-		expect(mockClineProvider.postMessageToWebview).toHaveBeenCalledWith({
-			type: "singleRouterModelFetchResponse",
-			success: false,
-			error: "Chutes API error",
-			values: { provider: "chutes" },
-		})
-
-		expect(mockClineProvider.postMessageToWebview).toHaveBeenCalledWith({
-			type: "singleRouterModelFetchResponse",
-			success: false,
 			error: "LiteLLM connection failed",
 			values: { provider: "litellm" },
 		})
@@ -427,18 +471,14 @@ describe("webviewMessageHandler - requestRouterModels", () => {
 		expect(mockClineProvider.postMessageToWebview).toHaveBeenCalledWith({
 			type: "routerModels",
 			routerModels: {
-				deepinfra: mockModels,
 				openrouter: mockModels,
 				requesty: {},
-				unbound: {},
-				roo: mockModels,
-				chutes: {},
+				unbound: mockModels,
 				litellm: {},
 				ollama: {},
 				lmstudio: {},
 				"vercel-ai-gateway": mockModels,
-				huggingface: {},
-				"io-intelligence": {},
+				poe: {},
 			},
 			values: undefined,
 		})
@@ -449,11 +489,8 @@ describe("webviewMessageHandler - requestRouterModels", () => {
 		mockGetModels
 			.mockRejectedValueOnce(new Error("Structured error message")) // openrouter
 			.mockRejectedValueOnce(new Error("Requesty API error")) // requesty
-			.mockRejectedValueOnce(new Error("Unbound API error")) // unbound
+			.mockRejectedValueOnce(new Error("Unbound error")) // unbound
 			.mockRejectedValueOnce(new Error("Vercel AI Gateway error")) // vercel-ai-gateway
-			.mockRejectedValueOnce(new Error("DeepInfra API error")) // deepinfra
-			.mockRejectedValueOnce(new Error("Roo API error")) // roo
-			.mockRejectedValueOnce(new Error("Chutes API error")) // chutes
 			.mockRejectedValueOnce(new Error("LiteLLM connection failed")) // litellm
 
 		await webviewMessageHandler(mockClineProvider, {
@@ -478,15 +515,8 @@ describe("webviewMessageHandler - requestRouterModels", () => {
 		expect(mockClineProvider.postMessageToWebview).toHaveBeenCalledWith({
 			type: "singleRouterModelFetchResponse",
 			success: false,
-			error: "Unbound API error",
+			error: "Unbound error",
 			values: { provider: "unbound" },
-		})
-
-		expect(mockClineProvider.postMessageToWebview).toHaveBeenCalledWith({
-			type: "singleRouterModelFetchResponse",
-			success: false,
-			error: "DeepInfra API error",
-			values: { provider: "deepinfra" },
 		})
 
 		expect(mockClineProvider.postMessageToWebview).toHaveBeenCalledWith({
@@ -494,20 +524,6 @@ describe("webviewMessageHandler - requestRouterModels", () => {
 			success: false,
 			error: "Vercel AI Gateway error",
 			values: { provider: "vercel-ai-gateway" },
-		})
-
-		expect(mockClineProvider.postMessageToWebview).toHaveBeenCalledWith({
-			type: "singleRouterModelFetchResponse",
-			success: false,
-			error: "Roo API error",
-			values: { provider: "roo" },
-		})
-
-		expect(mockClineProvider.postMessageToWebview).toHaveBeenCalledWith({
-			type: "singleRouterModelFetchResponse",
-			success: false,
-			error: "Chutes API error",
-			values: { provider: "chutes" },
 		})
 
 		expect(mockClineProvider.postMessageToWebview).toHaveBeenCalledWith({
@@ -535,6 +551,43 @@ describe("webviewMessageHandler - requestRouterModels", () => {
 			provider: "litellm",
 			apiKey: "litellm-key", // From config
 			baseUrl: "http://localhost:4000", // From config
+		})
+	})
+})
+
+describe("webviewMessageHandler - requestOpenAiCodexRateLimits", () => {
+	beforeEach(() => {
+		vi.clearAllMocks()
+		mockGetAccessToken.mockResolvedValue(null)
+		mockGetAccountId.mockResolvedValue(null)
+	})
+
+	it("posts error when not authenticated", async () => {
+		await webviewMessageHandler(mockClineProvider, { type: "requestOpenAiCodexRateLimits" } as any)
+
+		expect(mockClineProvider.postMessageToWebview).toHaveBeenCalledWith({
+			type: "openAiCodexRateLimits",
+			error: "Not authenticated with OpenAI Codex",
+		})
+	})
+
+	it("posts values when authenticated", async () => {
+		mockGetAccessToken.mockResolvedValue("token")
+		mockGetAccountId.mockResolvedValue("acct_123")
+		mockFetchOpenAiCodexRateLimitInfo.mockResolvedValue({
+			primary: { usedPercent: 10, resetsAt: 1700000000000 },
+			fetchedAt: 1700000000000,
+		})
+
+		await webviewMessageHandler(mockClineProvider, { type: "requestOpenAiCodexRateLimits" } as any)
+
+		expect(mockFetchOpenAiCodexRateLimitInfo).toHaveBeenCalledWith("token", { accountId: "acct_123" })
+		expect(mockClineProvider.postMessageToWebview).toHaveBeenCalledWith({
+			type: "openAiCodexRateLimits",
+			values: {
+				primary: { usedPercent: 10, resetsAt: 1700000000000 },
+				fetchedAt: 1700000000000,
+			},
 		})
 	})
 })
@@ -758,6 +811,182 @@ describe("webviewMessageHandler - mcpEnabled", () => {
 
 		expect((mockClineProvider as any).getMcpHub).toHaveBeenCalledTimes(1)
 		expect(mockClineProvider.postStateToWebview).toHaveBeenCalledTimes(1)
+	})
+})
+
+describe("webviewMessageHandler - requestCommands", () => {
+	beforeEach(() => {
+		vi.clearAllMocks()
+	})
+
+	it("includes skill slug commands and dedupes duplicate skill names while preserving first skill entry", async () => {
+		mockGetCommands.mockResolvedValue([])
+
+		const getTaskMode = vi.fn().mockResolvedValue("code")
+		vi.mocked(mockClineProvider.getCurrentTask).mockReturnValue({
+			cwd: "/mock/workspace",
+			getTaskMode,
+		} as unknown as ReturnType<ClineProvider["getCurrentTask"]>)
+
+		const getSkillsForMode = vi.fn().mockReturnValue([
+			{
+				name: "skill-slug-entry",
+				description: "Primary skill slug",
+				path: "/mock/.roo/skills/skill-slug-entry/SKILL.md",
+				source: "project",
+				modeSlugs: ["code"],
+			},
+			{
+				name: "skill-slug-entry",
+				description: "Duplicate skill slug",
+				path: "/mock/.roo/skills/duplicate-skill/SKILL.md",
+				source: "global",
+				modeSlugs: ["code"],
+			},
+			{
+				name: "another-skill-slug",
+				description: "Another skill-generated command",
+				path: "/mock/.roo/skills/another-skill-slug/SKILL.md",
+				source: "global",
+				modeSlugs: ["code"],
+			},
+		])
+
+		vi.mocked(mockClineProvider.getSkillsManager).mockReturnValue({
+			getSkillsForMode,
+		} as unknown as ReturnType<ClineProvider["getSkillsManager"]>)
+
+		await webviewMessageHandler(mockClineProvider, { type: "requestCommands" })
+
+		const commandMessageCall = vi
+			.mocked(mockClineProvider.postMessageToWebview)
+			.mock.calls.find(([postedMessage]) => postedMessage.type === "commands")
+		expect(commandMessageCall).toBeDefined()
+
+		const commandMessage = commandMessageCall?.[0]
+		expect(commandMessage?.commands).toEqual(
+			expect.arrayContaining([
+				{
+					name: "skill-slug-entry",
+					source: "project",
+					filePath: "/mock/.roo/skills/skill-slug-entry/SKILL.md",
+					description: "Primary skill slug",
+				},
+				{
+					name: "another-skill-slug",
+					source: "global",
+					filePath: "/mock/.roo/skills/another-skill-slug/SKILL.md",
+					description: "Another skill-generated command",
+				},
+			]),
+		)
+
+		expect(commandMessage?.commands?.filter((command) => command.name === "skill-slug-entry")).toHaveLength(1)
+	})
+
+	it("adds skill-backed command entries without overriding existing command names", async () => {
+		mockGetCommands.mockResolvedValue([
+			{
+				name: "deploy",
+				content: "existing command",
+				source: "project",
+				filePath: "/mock/workspace/.roo/commands/deploy.md",
+				description: "Deploy command",
+				argumentHint: "staging | production",
+			},
+		])
+
+		const getTaskMode = vi.fn().mockResolvedValue("code")
+		vi.mocked(mockClineProvider.getCurrentTask).mockReturnValue({
+			cwd: "/mock/workspace",
+			getTaskMode,
+		} as unknown as ReturnType<ClineProvider["getCurrentTask"]>)
+
+		const getSkillsForMode = vi.fn().mockReturnValue([
+			{
+				name: "deploy",
+				description: "Deploy skill",
+				path: "/mock/.roo/skills/deploy/SKILL.md",
+				source: "global",
+				modeSlugs: ["code"],
+			},
+			{
+				name: "skill-only",
+				description: "Skill-generated command",
+				path: "/mock/.roo/skills/skill-only/SKILL.md",
+				source: "project",
+				modeSlugs: ["code"],
+			},
+		])
+
+		vi.mocked(mockClineProvider.getSkillsManager).mockReturnValue({
+			getSkillsForMode,
+		} as unknown as ReturnType<ClineProvider["getSkillsManager"]>)
+
+		await webviewMessageHandler(mockClineProvider, { type: "requestCommands" })
+
+		expect(getSkillsForMode).toHaveBeenCalledWith("code")
+
+		expect(mockClineProvider.postMessageToWebview).toHaveBeenCalledWith({
+			type: "commands",
+			commands: expect.arrayContaining([
+				{
+					name: "deploy",
+					source: "project",
+					filePath: "/mock/workspace/.roo/commands/deploy.md",
+					description: "Deploy command",
+					argumentHint: "staging | production",
+				},
+				{
+					name: "skill-only",
+					source: "project",
+					filePath: "/mock/.roo/skills/skill-only/SKILL.md",
+					description: "Skill-generated command",
+				},
+			]),
+		})
+
+		const commandMessageCall = vi
+			.mocked(mockClineProvider.postMessageToWebview)
+			.mock.calls.find(([postedMessage]) => postedMessage.type === "commands")
+		expect(commandMessageCall).toBeDefined()
+
+		const commandMessage = commandMessageCall?.[0]
+		expect(commandMessage?.commands?.filter((command) => command.name === "deploy")).toHaveLength(1)
+	})
+
+	it("preserves existing behavior when skills manager is unavailable", async () => {
+		mockGetCommands.mockResolvedValue([
+			{
+				name: "build",
+				content: "build command",
+				source: "built-in",
+				filePath: "<built-in:build>",
+				description: "Build command",
+				argumentHint: "target",
+			},
+		])
+
+		vi.mocked(mockClineProvider.getCurrentTask).mockReturnValue({
+			cwd: "/mock/workspace",
+		} as unknown as ReturnType<ClineProvider["getCurrentTask"]>)
+
+		vi.mocked(mockClineProvider.getSkillsManager).mockReturnValue(undefined)
+
+		await webviewMessageHandler(mockClineProvider, { type: "requestCommands" })
+
+		expect(mockClineProvider.postMessageToWebview).toHaveBeenCalledWith({
+			type: "commands",
+			commands: [
+				{
+					name: "build",
+					source: "built-in",
+					filePath: "<built-in:build>",
+					description: "Build command",
+					argumentHint: "target",
+				},
+			],
+		})
 	})
 })
 

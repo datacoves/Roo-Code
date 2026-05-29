@@ -9,23 +9,15 @@ import {
 } from "@google/genai"
 import type { JWTInput } from "google-auth-library"
 
-import {
-	type ModelInfo,
-	type GeminiModelId,
-	geminiDefaultModelId,
-	geminiModels,
-	ApiProviderError,
-} from "@roo-code/types"
-import { TelemetryService } from "@roo-code/telemetry"
+import { type ModelInfo, type GeminiModelId, geminiDefaultModelId, geminiModels } from "@roo-code/types"
+import { safeJsonParse } from "@roo-code/core"
 
 import type { ApiHandlerOptions } from "../../shared/api"
-import { safeJsonParse } from "../../shared/safeJsonParse"
 
 import { convertAnthropicMessageToGemini } from "../transform/gemini-format"
 import { t } from "i18next"
 import type { ApiStream, GroundingSource } from "../transform/stream"
 import { getModelParams } from "../transform/model-params"
-import { handleProviderError } from "./utils/error-handler"
 
 import type { SingleCompletionHandler, ApiHandlerCreateMessageMetadata } from "../index"
 import { BaseProvider } from "./base-provider"
@@ -91,10 +83,10 @@ export class GeminiHandler extends BaseProvider implements SingleCompletionHandl
 			? (this.options.modelMaxTokens ?? maxTokens ?? undefined)
 			: (maxTokens ?? undefined)
 
-		// Only forward encrypted reasoning continuations (thoughtSignature) when we are
-		// using reasoning (thinkingConfig is present). Both effort-based (thinkingLevel)
-		// and budget-based (thinkingBudget) models require this for active loops.
-		const includeThoughtSignatures = Boolean(thinkingConfig)
+		// Gemini 3 validates thought signatures for tool/function calling steps.
+		// We must round-trip the signature when tools are in use, even if the user chose
+		// a minimal thinking level (or thinkingConfig is otherwise absent).
+		const includeThoughtSignatures = Boolean(thinkingConfig) || Boolean(metadata?.tools?.length)
 
 		// The message list can include provider-specific meta entries such as
 		// `{ type: "reasoning", ... }` that are intended only for providers like
@@ -129,29 +121,19 @@ export class GeminiHandler extends BaseProvider implements SingleCompletionHandl
 			.map((message) => convertAnthropicMessageToGemini(message, { includeThoughtSignatures, toolIdToName }))
 			.flat()
 
-		const tools: GenerateContentConfig["tools"] = []
-
-		// Google built-in tools (Grounding, URL Context) are currently mutually exclusive
-		// with function declarations in the Gemini API. If native function calling is
-		// used (Agent tools), we must prioritize it and skip built-in tools to avoid
-		// "Tool use with function calling is unsupported" (HTTP 400) errors.
-		if (metadata?.tools && metadata.tools.length > 0) {
-			tools.push({
-				functionDeclarations: metadata.tools.map((tool) => ({
+		// Tools are always present (minimum ALWAYS_AVAILABLE_TOOLS).
+		// Google built-in tools (Grounding, URL Context) are mutually exclusive
+		// with function declarations in the Gemini API, so we always use
+		// function declarations when tools are provided.
+		const tools: GenerateContentConfig["tools"] = [
+			{
+				functionDeclarations: (metadata?.tools ?? []).map((tool) => ({
 					name: (tool as any).function.name,
 					description: (tool as any).function.description,
 					parametersJsonSchema: (tool as any).function.parameters,
 				})),
-			})
-		} else {
-			if (this.options.enableUrlContext) {
-				tools.push({ urlContext: {} })
-			}
-
-			if (this.options.enableGrounding) {
-				tools.push({ googleSearch: {} })
-			}
-		}
+			},
+		]
 
 		// Determine temperature respecting model capabilities and defaults:
 		// - If supportsTemperature is explicitly false, ignore user overrides
@@ -172,7 +154,19 @@ export class GeminiHandler extends BaseProvider implements SingleCompletionHandl
 			...(tools.length > 0 ? { tools } : {}),
 		}
 
-		if (metadata?.tool_choice) {
+		// Handle allowedFunctionNames for mode-restricted tool access.
+		// When provided, all tool definitions are passed to the model (so it can reference
+		// historical tool calls in conversation), but only the specified tools can be invoked.
+		// This takes precedence over tool_choice to ensure mode restrictions are honored.
+		if (metadata?.allowedFunctionNames && metadata.allowedFunctionNames.length > 0) {
+			config.toolConfig = {
+				functionCallingConfig: {
+					// Use ANY mode to allow calling any of the allowed functions
+					mode: FunctionCallingConfigMode.ANY,
+					allowedFunctionNames: metadata.allowedFunctionNames,
+				},
+			}
+		} else if (metadata?.tool_choice) {
 			const choice = metadata.tool_choice
 			let mode: FunctionCallingConfigMode
 			let allowedFunctionNames: string[] | undefined
@@ -237,9 +231,10 @@ export class GeminiHandler extends BaseProvider implements SingleCompletionHandl
 						}>) {
 							// Capture thought signatures so they can be persisted into API history.
 							const thoughtSignature = part.thoughtSignature
-							// Persist encrypted reasoning when using reasoning. Both effort-based
-							// and budget-based models require this for active loops.
-							if (thinkingConfig && thoughtSignature) {
+							// Persist thought signatures so they can be round-tripped in the next step.
+							// Gemini 3 requires this during tool calling; other Gemini thinking models
+							// benefit from it for continuity.
+							if (includeThoughtSignatures && thoughtSignature) {
 								this.lastThoughtSignature = thoughtSignature
 							}
 
@@ -333,8 +328,6 @@ export class GeminiHandler extends BaseProvider implements SingleCompletionHandl
 			}
 		} catch (error) {
 			const errorMessage = error instanceof Error ? error.message : String(error)
-			const apiError = new ApiProviderError(errorMessage, this.providerName, model, "createMessage")
-			TelemetryService.instance.captureException(apiError)
 
 			if (error instanceof Error) {
 				throw new Error(t("common:errors.gemini.generate_stream", { error: error.message }))
@@ -356,6 +349,13 @@ export class GeminiHandler extends BaseProvider implements SingleCompletionHandl
 			settings: this.options,
 			defaultTemperature: info.defaultTemperature ?? 1,
 		})
+
+		// Gemini models perform better with the edit tool instead of apply_diff.
+		info = {
+			...info,
+			excludedTools: [...new Set([...(info.excludedTools || []), "apply_diff"])],
+			includedTools: [...new Set([...(info.includedTools || []), "edit"])],
+		}
 
 		// The `:thinking` suffix indicates that the model is a "Hybrid"
 		// reasoning model and that reasoning is required to be enabled.
@@ -402,14 +402,6 @@ export class GeminiHandler extends BaseProvider implements SingleCompletionHandl
 		const { id: model, info } = this.getModel()
 
 		try {
-			const tools: GenerateContentConfig["tools"] = []
-			if (this.options.enableUrlContext) {
-				tools.push({ urlContext: {} })
-			}
-			if (this.options.enableGrounding) {
-				tools.push({ googleSearch: {} })
-			}
-
 			const supportsTemperature = info.supportsTemperature !== false
 			const temperatureConfig: number | undefined = supportsTemperature
 				? (this.options.modelTemperature ?? info.defaultTemperature ?? 1)
@@ -420,7 +412,6 @@ export class GeminiHandler extends BaseProvider implements SingleCompletionHandl
 					? { baseUrl: this.options.googleGeminiBaseUrl }
 					: undefined,
 				temperature: temperatureConfig,
-				...(tools.length > 0 ? { tools } : {}),
 			}
 
 			const request = {
@@ -444,8 +435,6 @@ export class GeminiHandler extends BaseProvider implements SingleCompletionHandl
 			return text
 		} catch (error) {
 			const errorMessage = error instanceof Error ? error.message : String(error)
-			const apiError = new ApiProviderError(errorMessage, this.providerName, model, "completePrompt")
-			TelemetryService.instance.captureException(apiError)
 
 			if (error instanceof Error) {
 				throw new Error(t("common:errors.gemini.generate_complete_prompt", { error: error.message }))

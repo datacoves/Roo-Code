@@ -16,26 +16,23 @@
 		"delete": "Görevi sil (Onayı atlamak için Shift + Tıkla)",
 		"condenseContext": "Bağlamı akıllıca yoğunlaştır",
 		"share": "Görevi paylaş",
-		"shareWithOrganization": "Kuruluşla paylaş",
-		"shareWithOrganizationDescription": "Sadece kuruluşunuzun üyeleri erişebilir",
-		"sharePublicly": "Herkese açık paylaş",
-		"sharePubliclyDescription": "Bağlantıya sahip herkes erişebilir",
-		"connectToCloud": "Buluta bağlan",
-		"connectToCloudDescription": "Görevleri paylaşmak için Datacoves Copilot Cloud'a giriş yap",
-		"sharingDisabledByOrganization": "Paylaşım kuruluş tarafından devre dışı bırakıldı",
-		"shareSuccessOrganization": "Organizasyon bağlantısı panoya kopyalandı",
 		"shareSuccessPublic": "Genel bağlantı panoya kopyalandı",
-		"openInCloud": "Görevi Datacoves Copilot Cloud'da aç",
-		"openInCloudIntro": "Copilot'yu her yerden izlemeye veya etkileşime devam et. Açmak için tara, tıkla veya kopyala.",
 		"openApiHistory": "API Geçmişini Aç",
-		"openUiHistory": "UI Geçmişini Aç"
+		"openUiHistory": "UI Geçmişini Aç",
+		"backToParentTask": "Üst görev"
 	},
 	"unpin": "Sabitlemeyi iptal et",
 	"pin": "Sabitle",
+	"fileChangesInConversation": {
+		"header": "Bu sohbette {{count}} dosya değiştirildi"
+	},
 	"tokenProgress": {
 		"availableSpace": "Kullanılabilir alan: {{amount}} token",
 		"tokensUsed": "Kullanılan tokenlar: {{used}} / {{total}}",
-		"reservedForResponse": "Model yanıtı için ayrılan: {{amount}} token"
+		"reservedForResponse": "Model yanıtı için ayrılan: {{amount}} token",
+		"tokensUsedLabel": "Kullanılan tokenlar",
+		"reservedForResponseLabel": "Yanıt için ayrılan",
+		"availableSpaceLabel": "Kullanılabilir alan"
 	},
 	"retry": {
 		"title": "Yeniden Dene",
@@ -82,11 +79,17 @@
 		"title": "Sonlandır",
 		"tooltip": "Mevcut görevi sonlandır"
 	},
+	"stop": {
+		"title": "Durdur",
+		"tooltip": "Mevcut görevi durdur"
+	},
 	"cancel": {
 		"title": "İptal",
 		"tooltip": "Mevcut işlemi iptal et"
 	},
+	"enqueueMessage": "Mesajı kuyruğa ekle (mevcut görev tamamlandıktan sonra gönderilecek)",
 	"scrollToBottom": "Sohbetin altına kaydır",
+	"scrollToLatestCheckpoint": "Önceki checkpoint'e kaydır",
 	"about": "Datacoves Copilot, düzenleyicinizdeki bütün bir yapay zeka geliştirme ekibidir.",
 	"docs": "Daha fazla bilgi için <DocsLink>belgelerimize</DocsLink> göz atın.",
 	"onboarding": "Bu çalışma alanındaki görev listeniz boş.",
@@ -102,6 +105,8 @@
 	},
 	"selectMode": "Etkileşim modunu seçin",
 	"selectApiConfig": "API yapılandırmasını seçin",
+	"lockApiConfigAcrossModes": "Bu çalışma alanındaki tüm modlarda API yapılandırmasını kilitle",
+	"unlockApiConfigAcrossModes": "Bu çalışma alanındaki tüm modlarda API yapılandırması kilitli (kilidi açmak için tıkla)",
 	"enhancePrompt": "Ek bağlamla istemi geliştir",
 	"addImages": "Mesaja resim ekle",
 	"sendMessage": "Mesaj gönder",
@@ -115,7 +120,6 @@
 	"enhancePromptDescription": "'İstemi geliştir' düğmesi, ek bağlam, açıklama veya yeniden ifade sağlayarak isteğinizi iyileştirmeye yardımcı olur. Buraya bir istek yazıp düğmeye tekrar tıklayarak nasıl çalıştığını görebilirsiniz.",
 	"modeSelector": {
 		"title": "Modlar",
-		"marketplace": "Mod Pazaryeri",
 		"settings": "Mod Ayarları",
 		"description": "Copilot'nun davranışını özelleştiren uzmanlaşmış kişilikler.",
 		"searchPlaceholder": "Modları ara...",
@@ -141,15 +145,15 @@
 		"rateLimitWait": "Hız sınırlaması",
 		"errorTitle": "Sağlayıcı Hatası {{code}}",
 		"errorMessage": {
-			"docs": "Belgeler",
-			"goToSettings": "Ayarlar",
 			"400": "Sağlayıcı isteği bu şekilde işleyemedi. Görevi durdur ve farklı bir yaklaşım dene.",
 			"401": "Sağlayıcı ile kimlik doğrulaması yapılamadı. Lütfen API anahtarı yapılandırmanızı kontrol edin.",
 			"402": "Hesabınızda para/kredi bitti gibi görünüyor. Sağlayıcıya git ve devam etmek için daha fazla ekle.",
 			"403": "Yetkisiz. API anahtarınız geçerli ama sağlayıcı bu isteği tamamlamayı reddetti.",
 			"429": "Çok fazla istek. Sağlayıcı tarafından oran sınırlaması uygulanıyor. Lütfen sonraki API çağrısından önce biraz bekle.",
 			"500": "Sağlayıcı sunucu hatası. Sağlayıcı tarafında bir sorun var, isteğinizde sorun yok.",
-			"unknown": "Bilinmeyen API hatası. Lütfen Datacoves Copilot desteğiyle iletişime geç.",
+			"docs": "Belgeler",
+			"goToSettings": "Ayarlar",
+			"unknown": "Unknown API error. Please report this on GitHub.",
 			"connection": "Bağlantı hatası. Çalışan bir internet bağlantınız olduğundan emin olun.",
 			"claudeCodeNotAuthenticated": "Claude Code'u kullanmak için oturum açmanız gerekiyor. Ayarlar'a gidin ve kimlik doğrulaması yapmak için \"Claude Code'da Oturum Aç\" seçeneğine tıklayın."
 		}
@@ -209,7 +213,8 @@
 		"wantsToViewTopLevelOutsideWorkspace": "Copilot bu dizindeki (çalışma alanı dışında) üst düzey dosyaları görüntülemek istiyor",
 		"didViewTopLevelOutsideWorkspace": "Copilot bu dizindeki (çalışma alanı dışında) üst düzey dosyaları görüntüledi",
 		"wantsToViewRecursiveOutsideWorkspace": "Copilot bu dizindeki (çalışma alanı dışında) tüm dosyaları özyinelemeli olarak görüntülemek istiyor",
-		"didViewRecursiveOutsideWorkspace": "Copilot bu dizindeki (çalışma alanı dışında) tüm dosyaları özyinelemeli olarak görüntüledi"
+		"didViewRecursiveOutsideWorkspace": "Copilot bu dizindeki (çalışma alanı dışında) tüm dosyaları özyinelemeli olarak görüntüledi",
+		"wantsToViewMultipleDirectories": "Copilot birden fazla dizini görüntülemek istiyor"
 	},
 	"commandOutput": "Komut Çıktısı",
 	"commandExecution": {
@@ -254,7 +259,8 @@
 		"completionContent": "Alt Görev Tamamlandı",
 		"resultContent": "Alt Görev Sonuçları",
 		"defaultResult": "Lütfen sonraki göreve devam edin.",
-		"completionInstructions": "Alt görev tamamlandı! Sonuçları inceleyebilir ve düzeltmeler veya sonraki adımlar önerebilirsiniz. Her şey iyi görünüyorsa, sonucu üst göreve döndürmek için onaylayın."
+		"completionInstructions": "Alt görev tamamlandı! Sonuçları inceleyebilir ve düzeltmeler veya sonraki adımlar önerebilirsiniz. Her şey iyi görünüyorsa, sonucu üst göreve döndürmek için onaylayın.",
+		"goToSubtask": "Görevi görüntüle"
 	},
 	"questions": {
 		"hasQuestion": "Copilot'nun bir sorusu var"
@@ -272,7 +278,8 @@
 		"title": "Hata Detayları",
 		"copyToClipboard": "Panoya Kopyala",
 		"copied": "Kopyalandı!",
-		"diagnostics": "Ayrıntılı hata bilgisi al"
+		"diagnostics": "Ayrıntılı hata bilgisi al",
+		"proxyProvider": "Proxy tabanlı bir sağlayıcı kullanıyor gibi görünüyorsun. Günlüklerini kontrol ettiğinden ve Copilot'nun isteklerini yeniden yazmadığından emin ol."
 	},
 	"powershell": {
 		"issues": "Windows PowerShell ile ilgili sorunlar yaşıyor gibi görünüyorsunuz, lütfen şu konuya bakın"
@@ -293,7 +300,7 @@
 		"triggerLabel_zero": "0 otomatik onaylandı",
 		"triggerLabel_one": "1 otomatik onaylandı",
 		"triggerLabel_other": "{{count}} otomatik onaylandı",
-		"triggerLabelAll": "YOLO"
+		"triggerLabelAll": "BRRR"
 	},
 	"reasoning": {
 		"thinking": "Düşünüyor",
@@ -314,6 +321,10 @@
 			"description": "Bağlam penceresi sınırında kalmak için eski mesajlar konuşmadan kaldırıldı. Bu, yoğunlaştırmaya kıyasla hızlı ancak daha az bağlam koruyucu bir yaklaşımdır."
 		}
 	},
+	"skill": {
+		"wantsToLoad": "Copilot bir beceri yüklemek istiyor",
+		"didLoad": "Copilot bir beceri yükledi"
+	},
 	"followUpSuggest": {
 		"copyToInput": "Giriş alanına kopyala (veya Shift + tıklama)",
 		"timerPrefix": "Otomatik onay etkinleştirildi. {{seconds}}s içinde seçim yapılıyor…"
@@ -321,62 +332,30 @@
 	"announcement": {
 		"title": "Datacoves Copilot {{version}} Yayınlandı",
 		"support": "<githubLink>GitHub</githubLink>'da yıldız vererek Datacoves Copilot'u destekle.",
-		"stealthModel": {
-			"feature": "<bold>Sınırlı süre ÜCRETSİZ gizli model</bold> - Code Supernova: Artık <bold>1M token bağlam penceresi</bold> ile yükseltildi! Görüntü girişlerini destekleyen çok amaçlı acentik kodlama modeli, Datacoves Copilot Cloud üzerinden kullanılabilir.",
-			"note": "(Not: istemler ve tamamlamalar model yaratıcısı tarafından kaydedilir ve modeli geliştirmek için kullanılır)",
-			"connectButton": "Datacoves Copilot Cloud'a bağlan",
-			"selectModel": "Başlamak için Ayarlar'da Datacoves Copilot Cloud sağlayıcısından <code>roo/code-supernova</code>'yı seçin.",
-			"goToSettingsButton": "Ayarlar'a Git"
+		"finalRelease": {
+			"title": "Son Datacoves Copilot sürümü",
+			"intro": "Bu, Datacoves Copilot'un son sürümüdür. <announcementLink>Birkaç hafta önce duyurduğumuz gibi</announcementLink>, odağımızı yazılım geliştirmenin geleceği olduğuna inandığımız bulut ajan platformumuz <roomoteLink>Roomote</roomoteLink>'a kaydırmaya karar verdik. Geçtiğimiz yaklaşık bir yıl boyunca verdiğiniz destek için çok teşekkür ederiz.",
+			"continuity": "Bu eklenti süresiz olarak çalışmaya devam etmelidir, ancak hata düzeltmeleri, yeni özellikler veya model güncellemeleri almayacaktır.",
+			"alternatives": "Bir eklenti kullanmak istiyorsanız, topluluk tarafından geliştirilen bir Datacoves Copilot fork'u olan <zooCodeLink>ZooCode</zooCodeLink>'a ve Datacoves Copilot'un başlangıç noktası olan <clineLink>Cline</clineLink>'a göz atmanızı öneririz.",
+			"signoff": "Mutlu kodlamalar!"
 		},
 		"release": {
 			"heading": "Yenilikler:",
-			"skills": "Copilot artık <skillsLink>Agent Skills</skillsLink>'i destekliyor - Copilot'nun yeteneklerini genişletmek için yeniden kullanılabilir istem, araç ve kaynak paketleri.",
-			"nativeToolCalling": "Tüm yeni görevler için artık yerel araç çağrısı gereklidir. <blogLink>Daha fazla bilgi edinin</blogLink> motivasyon ve sorunlarla karşılaşırsanız ne yapacağınız hakkında."
+			"gpt55": "OpenAI Codex üzerinden GPT-5.5: En son modeli doğrudan Datacoves Copilot'dan kullanabilmen için OpenAI Codex sağlayıcısına GPT-5.5 desteği eklendi.",
+			"claudeOpus47": "Vertex AI'da Claude Opus 4.7: Anthropic'in en yeni amiral gemisi akıl yürütme modeli olan Claude Opus 4.7 Vertex AI sağlayıcısına eklendi.",
+			"checkpointNav": "Önceki Checkpoint Navigasyonu: Sohbetten önceki checkpoint'lere geri atlayabilmen için kontroller eklendi ve tam i18n desteği sunuluyor."
 		},
 		"cloudAgents": {
 			"heading": "Cloud'daki yenilikler:",
 			"specialized": "<bold>Explainer</bold>, <bold>Planner</bold> ve <bold>Coder</bold> tanıtımı - iş akışlarını geliştirmek için üç özel bulut ajanı.",
 			"description": "Ajanlar bulutta birlikte çalışır ve web'den veya Slack üzerinden tetiklenebilir.",
 			"tryButton": "Bulut Ajanlarını Dene"
-		},
-		"careers": "Ayrıca, <careersLink>işe alım yapıyoruz!</careersLink>"
-	},
-	"browser": {
-		"session": "Tarayıcı Oturumu",
-		"rooWantsToUse": "Copilot tarayıcıyı kullanmak istiyor",
-		"consoleLogs": "Konsol Kayıtları",
-		"noNewLogs": "(Yeni kayıt yok)",
-		"screenshot": "Tarayıcı ekran görüntüsü",
-		"cursor": "imleç",
-		"navigation": {
-			"step": "Adım {{current}} / {{total}}",
-			"previous": "Önceki",
-			"next": "Sonraki"
-		},
-		"sessionStarted": "Tarayıcı Oturumu Başlatıldı",
-		"actions": {
-			"title": "Tarayıcı Eylemi: ",
-			"launched": "Tarayıcı başlatıldı",
-			"launch": "{{url}} adresinde tarayıcı başlat",
-			"clicked": "Tıklandı ({{coordinate}})",
-			"click": "Tıkla ({{coordinate}})",
-			"typed": "Yazıldı: {{text}}",
-			"type": "Yaz \"{{text}}\"",
-			"pressed": "Basıldı: {{key}}",
-			"press": "{{key}} tuşuna bas",
-			"scrolledDown": "Aşağı kaydırıldı",
-			"scrollDown": "Aşağı kaydır",
-			"scrolledUp": "Yukarı kaydırıldı",
-			"scrollUp": "Yukarı kaydır",
-			"hovered": "Üzerine gelinildi ({{coordinate}})",
-			"hover": "Üzerine gel ({{coordinate}})",
-			"resized": "Boyut değiştirildi: {{size}}",
-			"resize": "Boyutu değiştir {{size}}",
-			"screenshotSaved": "Ekran görüntüsü kaydedildi",
-			"screenshot": "Ekran görüntüsünü {{path}} yoluna kaydet",
-			"closed": "Tarayıcı kapatıldı",
-			"close": "Tarayıcıyı kapat"
 		}
+	},
+	"costs": {
+		"totalWithSubtasks": "Toplam Maliyet (alt görevler dahil): ${{cost}}",
+		"total": "Toplam Maliyet: ${{cost}}",
+		"includesSubtasks": "Alt görev maliyetlerini içerir"
 	},
 	"codeblock": {
 		"tooltips": {
@@ -385,7 +364,6 @@
 			"copy_code": "Kodu kopyala"
 		}
 	},
-	"systemPromptWarning": "UYARI: Özel sistem komut geçersiz kılma aktif. Bu işlevselliği ciddi şekilde bozabilir ve öngörülemeyen davranışlara neden olabilir.",
 	"profileViolationWarning": "Geçerli profil kuruluşunuzun ayarlarıyla uyumlu değil",
 	"shellIntegration": {
 		"title": "Komut Çalıştırma Uyarısı",
@@ -419,20 +397,32 @@
 			"title": "Tümünü Reddet"
 		}
 	},
+	"list-batch": {
+		"approve": {
+			"title": "Tümünü Onayla"
+		},
+		"deny": {
+			"title": "Tümünü Reddet"
+		}
+	},
+	"edit-batch": {
+		"approve": {
+			"title": "Tümünü Kaydet"
+		},
+		"deny": {
+			"title": "Tümünü Reddet"
+		}
+	},
 	"indexingStatus": {
 		"ready": "İndeks hazır",
 		"indexing": "İndeksleniyor {{percentage}}%",
 		"indexed": "İndekslendi",
 		"error": "İndeks hatası",
-		"status": "İndeks durumu"
+		"status": "İndeks durumu",
+		"stopping": "İndeksleme durduruluyor..."
 	},
 	"versionIndicator": {
 		"ariaLabel": "Sürüm {{version}} - Sürüm notlarını görüntülemek için tıklayın"
-	},
-	"rooCloudCTA": {
-		"title": "Datacoves Copilot Cloud gelişiyor!",
-		"description": "Bulutta uzak ajanlar çalıştırın, görevlerinize her yerden erişin, başkalarıyla işbirliği yapın ve daha fazlası.",
-		"joinWaitlist": "En son güncellemeleri almak için kaydolun."
 	},
 	"editMessage": {
 		"placeholder": "Mesajını düzenle..."
@@ -480,5 +470,23 @@
 		"updated": "Yapılacaklar listesi güncellendi",
 		"completed": "Tamamlandı",
 		"started": "Başladı"
+	},
+	"tooManyTools": {
+		"title": "Çok fazla araç etkinleştirildi",
+		"toolsPart_one": "{{count}} araç",
+		"toolsPart_other": "{{count}} araç",
+		"serversPart_one": "{{count}} MCP sunucusu",
+		"serversPart_other": "{{count}} MCP sunucusu",
+		"messageTemplate": "{{servers}} üzerinden {{tools}} etkinleştirilmiş durumda. Bu kadar fazlası modeli kafası karışabilir ve hatalara neden olabilir. {{threshold}} altında tutmaya çalış.",
+		"openMcpSettings": "MCP Ayarlarını Aç"
+	},
+	"readCommandOutput": {
+		"title": "Copilot read command output"
+	},
+	"retiredProvider": {
+		"title": "Sağlayıcı artık desteklenmiyor",
+		"message": "This provider is no longer supported. Please select a different provider in your API profile settings.",
+		"openSettings": "Ayarları aç",
+		"rooMessage": "As part of our decision to sunset the Datacoves Copilot extension, we also ended the Datacoves Copilot Router, which only existed to support the extension. Sorry about the hassle."
 	}
 }

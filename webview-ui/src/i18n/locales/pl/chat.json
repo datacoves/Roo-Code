@@ -16,26 +16,23 @@
 		"delete": "Usuń zadanie (Shift + Kliknięcie, aby pominąć potwierdzenie)",
 		"condenseContext": "Inteligentnie skondensuj kontekst",
 		"share": "Udostępnij zadanie",
-		"shareWithOrganization": "Udostępnij organizacji",
-		"shareWithOrganizationDescription": "Tylko członkowie twojej organizacji mogą uzyskać dostęp",
-		"sharePublicly": "Udostępnij publicznie",
-		"sharePubliclyDescription": "Każdy z linkiem może uzyskać dostęp",
-		"connectToCloud": "Połącz z chmurą",
-		"connectToCloudDescription": "Zaloguj się do Datacoves Copilot Cloud, aby udostępniać zadania",
-		"sharingDisabledByOrganization": "Udostępnianie wyłączone przez organizację",
-		"shareSuccessOrganization": "Link organizacji skopiowany do schowka",
 		"shareSuccessPublic": "Link publiczny skopiowany do schowka",
-		"openInCloud": "Otwórz zadanie w Datacoves Copilot Cloud",
-		"openInCloudIntro": "Kontynuuj monitorowanie lub interakcję z Copilot z dowolnego miejsca. Zeskanuj, kliknij lub skopiuj, aby otworzyć.",
 		"openApiHistory": "Otwórz historię API",
-		"openUiHistory": "Otwórz historię UI"
+		"openUiHistory": "Otwórz historię UI",
+		"backToParentTask": "Zadanie nadrzędne"
 	},
 	"unpin": "Odepnij",
 	"pin": "Przypnij",
+	"fileChangesInConversation": {
+		"header": "{{count}} plik(ów) zmienionych w tej rozmowie"
+	},
 	"tokenProgress": {
 		"availableSpace": "Dostępne miejsce: {{amount}} tokenów",
 		"tokensUsed": "Wykorzystane tokeny: {{used}} z {{total}}",
-		"reservedForResponse": "Zarezerwowane dla odpowiedzi modelu: {{amount}} tokenów"
+		"reservedForResponse": "Zarezerwowane dla odpowiedzi modelu: {{amount}} tokenów",
+		"tokensUsedLabel": "Wykorzystane tokeny",
+		"reservedForResponseLabel": "Zarezerwowane dla odpowiedzi",
+		"availableSpaceLabel": "Dostępne miejsce"
 	},
 	"retry": {
 		"title": "Ponów",
@@ -82,11 +79,17 @@
 		"title": "Zakończ",
 		"tooltip": "Zakończ bieżące zadanie"
 	},
+	"stop": {
+		"title": "Zatrzymaj",
+		"tooltip": "Zatrzymaj bieżące zadanie"
+	},
 	"cancel": {
 		"title": "Anuluj",
 		"tooltip": "Anuluj bieżącą operację"
 	},
+	"enqueueMessage": "Dodaj wiadomość do kolejki (zostanie wysłana po zakończeniu bieżącego zadania)",
 	"scrollToBottom": "Przewiń do dołu czatu",
+	"scrollToLatestCheckpoint": "Przewiń do poprzedniego punktu kontrolnego",
 	"about": "Datacoves Copilot to cały zespół deweloperów AI w Twoim edytorze.",
 	"docs": "Sprawdź naszą <DocsLink>dokumentację</DocsLink>, aby dowiedzieć się więcej.",
 	"onboarding": "Twoja lista zadań w tym obszarze roboczym jest pusta.",
@@ -102,6 +105,8 @@
 	},
 	"selectMode": "Wybierz tryb interakcji",
 	"selectApiConfig": "Wybierz konfigurację API",
+	"lockApiConfigAcrossModes": "Zablokuj konfigurację API dla wszystkich trybów w tym obszarze roboczym",
+	"unlockApiConfigAcrossModes": "Konfiguracja API jest zablokowana dla wszystkich trybów w tym obszarze roboczym (kliknij, aby odblokować)",
 	"enhancePrompt": "Ulepsz podpowiedź dodatkowym kontekstem",
 	"addImages": "Dodaj obrazy do wiadomości",
 	"sendMessage": "Wyślij wiadomość",
@@ -115,7 +120,6 @@
 	"enhancePromptDescription": "Przycisk 'Ulepsz podpowiedź' pomaga ulepszyć Twoją prośbę, dostarczając dodatkowy kontekst, wyjaśnienia lub przeformułowania. Spróbuj wpisać prośbę tutaj i kliknij przycisk ponownie, aby zobaczyć, jak to działa.",
 	"modeSelector": {
 		"title": "Tryby",
-		"marketplace": "Marketplace Trybów",
 		"settings": "Ustawienia Trybów",
 		"description": "Wyspecjalizowane persony, które dostosowują zachowanie Copilot.",
 		"searchPlaceholder": "Szukaj trybów...",
@@ -141,15 +145,15 @@
 		"rateLimitWait": "Ograniczenie szybkości",
 		"errorTitle": "Błąd dostawcy {{code}}",
 		"errorMessage": {
-			"docs": "Dokumentacja",
-			"goToSettings": "Ustawienia",
 			"400": "Dostawca nie mógł przetworzyć żądania. Zatrzymaj zadanie i spróbuj innego podejścia.",
 			"401": "Nie można uwierzytelnić u dostawcy. Sprawdź konfigurację klucza API.",
 			"402": "Wygląda na to, że wyczerpałeś środki/kredyty na swoim koncie. Przejdź do dostawcy i dodaj więcej, aby kontynuować.",
 			"403": "Brak autoryzacji. Twój klucz API jest ważny, ale dostawca odmówił ukończenia tego żądania.",
 			"429": "Zbyt wiele żądań. Dostawca ogranicza Ci szybkość żądań. Poczekaj chwilę przed następnym wywołaniem API.",
 			"500": "Błąd serwera dostawcy. Po stronie dostawcy coś się nie powiodło, w Twoim żądaniu nie ma nic złego.",
-			"unknown": "Nieznany błąd API. Skontaktuj się z pomocą techniczną Datacoves Copilot.",
+			"docs": "Dokumentacja",
+			"goToSettings": "Ustawienia",
+			"unknown": "Unknown API error. Please report this on GitHub.",
 			"connection": "Błąd połączenia. Upewnij się, że masz działające połączenie internetowe.",
 			"claudeCodeNotAuthenticated": "Musisz się zalogować, aby korzystać z Claude Code. Przejdź do Ustawień i kliknij \"Zaloguj się do Claude Code\", aby się uwierzytelnić."
 		}
@@ -209,7 +213,8 @@
 		"wantsToViewTopLevelOutsideWorkspace": "Copilot chce zobaczyć pliki najwyższego poziomu w tym katalogu (poza obszarem roboczym)",
 		"didViewTopLevelOutsideWorkspace": "Copilot zobaczył pliki najwyższego poziomu w tym katalogu (poza obszarem roboczym)",
 		"wantsToViewRecursiveOutsideWorkspace": "Copilot chce rekurencyjnie zobaczyć wszystkie pliki w tym katalogu (poza obszarem roboczym)",
-		"didViewRecursiveOutsideWorkspace": "Copilot rekurencyjnie zobaczył wszystkie pliki w tym katalogu (poza obszarem roboczym)"
+		"didViewRecursiveOutsideWorkspace": "Copilot rekurencyjnie zobaczył wszystkie pliki w tym katalogu (poza obszarem roboczym)",
+		"wantsToViewMultipleDirectories": "Copilot chce wyświetlić wiele katalogów"
 	},
 	"commandOutput": "Wyjście polecenia",
 	"commandExecution": {
@@ -253,7 +258,8 @@
 		"completionContent": "Podzadanie zakończone",
 		"resultContent": "Wyniki podzadania",
 		"defaultResult": "Proszę kontynuować następne zadanie.",
-		"completionInstructions": "Podzadanie zakończone! Możesz przejrzeć wyniki i zasugerować poprawki lub następne kroki. Jeśli wszystko wygląda dobrze, potwierdź, aby zwrócić wynik do zadania nadrzędnego."
+		"completionInstructions": "Podzadanie zakończone! Możesz przejrzeć wyniki i zasugerować poprawki lub następne kroki. Jeśli wszystko wygląda dobrze, potwierdź, aby zwrócić wynik do zadania nadrzędnego.",
+		"goToSubtask": "Wyświetl zadanie"
 	},
 	"questions": {
 		"hasQuestion": "Copilot ma pytanie"
@@ -271,7 +277,8 @@
 		"title": "Szczegóły błędu",
 		"copyToClipboard": "Kopiuj do schowka",
 		"copied": "Skopiowano!",
-		"diagnostics": "Uzyskaj szczegółowe informacje o błędzie"
+		"diagnostics": "Uzyskaj szczegółowe informacje o błędzie",
+		"proxyProvider": "Wygląda na to, że używasz dostawcy opartego na proxy. Pamiętaj, aby sprawdzić jego dzienniki i upewnić się, że nie przepisuje żądań Copilot."
 	},
 	"powershell": {
 		"issues": "Wygląda na to, że masz problemy z Windows PowerShell, proszę zapoznaj się z tym"
@@ -292,7 +299,7 @@
 		"triggerLabel_zero": "0 automatycznie zatwierdzone",
 		"triggerLabel_one": "1 automatycznie zatwierdzony",
 		"triggerLabel_other": "{{count}} automatycznie zatwierdzonych",
-		"triggerLabelAll": "YOLO"
+		"triggerLabelAll": "BRRR"
 	},
 	"reasoning": {
 		"thinking": "Myślenie",
@@ -313,6 +320,10 @@
 			"description": "Starsze wiadomości zostały usunięte z konwersacji, aby pozostać w granicach okna kontekstu. To szybsze, ale mniej zachowujące kontekst podejście w porównaniu z kondensacją."
 		}
 	},
+	"skill": {
+		"wantsToLoad": "Copilot chce załadować umiejętność",
+		"didLoad": "Copilot załadował umiejętność"
+	},
 	"followUpSuggest": {
 		"copyToInput": "Kopiuj do pola wprowadzania (lub Shift + kliknięcie)",
 		"timerPrefix": "Automatyczne zatwierdzanie włączone. Zaznaczanie za {{seconds}}s…"
@@ -320,62 +331,30 @@
 	"announcement": {
 		"title": "Datacoves Copilot {{version}} wydany",
 		"support": "Wesprzyj Datacoves Copilot, dając nam gwiazdkę na <githubLink>GitHub</githubLink>.",
-		"stealthModel": {
-			"feature": "<bold>Darmowy model stealth na ograniczony czas</bold> - Code Supernova: Teraz ulepszony z <bold>oknem kontekstu 1M tokenów</bold>! Wszechstronny model kodowania agentowego, który obsługuje wprowadzanie obrazów, dostępny przez Datacoves Copilot Cloud.",
-			"note": "(Uwaga: prompty i uzupełnienia są rejestrowane przez twórcę modelu i używane do jego ulepszania)",
-			"connectButton": "Połącz z Datacoves Copilot Cloud",
-			"selectModel": "Wybierz <code>roo/code-supernova</code> od dostawcy Datacoves Copilot Cloud w Ustawieniach, aby rozpocząć.",
-			"goToSettingsButton": "Przejdź do Ustawień"
+		"finalRelease": {
+			"title": "Ostatnie wydanie Datacoves Copilot",
+			"intro": "To jest ostatnie wydanie Datacoves Copilot. <announcementLink>Jak ogłosiliśmy kilka tygodni temu</announcementLink>, zdecydowaliśmy się skupić na <roomoteLink>Roomote</roomoteLink>, naszej platformie agentów w chmurze, którą uważamy za przyszłość tworzenia oprogramowania. Bardzo dziękujemy za wsparcie przez ostatni mniej więcej rok.",
+			"continuity": "To rozszerzenie powinno nadal działać bezterminowo, ale nie będzie otrzymywać poprawek błędów, nowych funkcji ani aktualizacji modeli.",
+			"alternatives": "Jeśli chcesz korzystać z rozszerzenia, polecamy sprawdzić <zooCodeLink>ZooCode</zooCodeLink> (fork Datacoves Copilot tworzony przez społeczność) oraz <clineLink>Cline</clineLink> (miejsce, od którego Datacoves Copilot pierwotnie się zaczęło).",
+			"signoff": "Miłego kodowania!"
 		},
 		"release": {
 			"heading": "Co nowego:",
-			"skills": "Copilot obsługuje teraz <skillsLink>Agent Skills</skillsLink> - pakiety narzędzi, podpowiedzi i zasobów do rozszerzenia możliwości Copilot.",
-			"nativeToolCalling": "Natywne wywoływanie narzędzi jest teraz wymagane dla wszystkich nowych zadań. <blogLink>Dowiedz się więcej</blogLink> o motywacji i co robić, jeśli napotkasz problemy."
+			"gpt55": "GPT-5.5 przez OpenAI Codex: Dodano obsługę GPT-5.5 w dostawcy OpenAI Codex, żebyś mógł korzystać z najnowszego modelu bezpośrednio z Datacoves Copilot.",
+			"claudeOpus47": "Claude Opus 4.7 w Vertex AI: Dodano Claude Opus 4.7 do dostawcy Vertex AI - najnowszy flagowy model rozumowania od Anthropic.",
+			"checkpointNav": "Nawigacja po poprzednich checkpointach: Dodano kontrolki w czacie, żebyś mógł cofać się do wcześniejszych checkpointów, z pełną obsługą i18n."
 		},
 		"cloudAgents": {
 			"heading": "Nowości w chmurze:",
 			"specialized": "Przedstawiamy <bold>Explainer</bold>, <bold>Planner</bold> i <bold>Coder</bold> - trzech wyspecjalizowanych agentów chmurowych, aby ulepszyć Twoje przepływy pracy.",
 			"description": "Agenci pracują razem w chmurze i mogą być uruchamiani z sieci lub przez Slack.",
 			"tryButton": "Wypróbuj agentów chmurowych"
-		},
-		"careers": "Dodatkowo, <careersLink>zatrudniamy!</careersLink>"
-	},
-	"browser": {
-		"session": "Sesja przeglądarki",
-		"rooWantsToUse": "Copilot chce użyć przeglądarki",
-		"consoleLogs": "Logi konsoli",
-		"noNewLogs": "(Brak nowych logów)",
-		"screenshot": "Zrzut ekranu przeglądarki",
-		"cursor": "kursor",
-		"navigation": {
-			"step": "Krok {{current}} z {{total}}",
-			"previous": "Poprzedni",
-			"next": "Następny"
-		},
-		"sessionStarted": "Sesja przeglądarki rozpoczęta",
-		"actions": {
-			"title": "Akcja przeglądarki: ",
-			"launched": "Przeglądarka uruchomiona",
-			"launch": "Uruchom przeglądarkę na {{url}}",
-			"clicked": "Kliknięto ({{coordinate}})",
-			"click": "Kliknij ({{coordinate}})",
-			"typed": "Wpisano: {{text}}",
-			"type": "Wpisz \"{{text}}\"",
-			"pressed": "Naciśnięto: {{key}}",
-			"press": "Naciśnij {{key}}",
-			"scrolledDown": "Przewinięto w dół",
-			"scrollDown": "Przewiń w dół",
-			"scrolledUp": "Przewinięto w górę",
-			"scrollUp": "Przewiń w górę",
-			"hovered": "Najechano ({{coordinate}})",
-			"hover": "Najedź ({{coordinate}})",
-			"resized": "Zmieniono rozmiar na: {{size}}",
-			"resize": "Zmień rozmiar na {{size}}",
-			"screenshotSaved": "Zrzut ekranu zapisany",
-			"screenshot": "Zapisz zrzut ekranu do {{path}}",
-			"closed": "Przeglądarka zamknięta",
-			"close": "Zamknij przeglądarkę"
 		}
+	},
+	"costs": {
+		"totalWithSubtasks": "Całkowity koszt (w tym podzadania): ${{cost}}",
+		"total": "Całkowity koszt: ${{cost}}",
+		"includesSubtasks": "Zawiera koszty podzadań"
 	},
 	"codeblock": {
 		"tooltips": {
@@ -384,7 +363,6 @@
 			"copy_code": "Kopiuj kod"
 		}
 	},
-	"systemPromptWarning": "OSTRZEŻENIE: Aktywne niestandardowe zastąpienie instrukcji systemowych. Może to poważnie zakłócić funkcjonalność i powodować nieprzewidywalne zachowanie.",
 	"profileViolationWarning": "Bieżący profil nie jest kompatybilny z ustawieniami Twojej organizacji",
 	"shellIntegration": {
 		"title": "Ostrzeżenie wykonania polecenia",
@@ -418,20 +396,32 @@
 			"title": "Odrzuć wszystko"
 		}
 	},
+	"list-batch": {
+		"approve": {
+			"title": "Zatwierdź wszystko"
+		},
+		"deny": {
+			"title": "Odrzuć wszystko"
+		}
+	},
+	"edit-batch": {
+		"approve": {
+			"title": "Zapisz wszystko"
+		},
+		"deny": {
+			"title": "Odrzuć wszystko"
+		}
+	},
 	"indexingStatus": {
 		"ready": "Indeks gotowy",
 		"indexing": "Indeksowanie {{percentage}}%",
 		"indexed": "Zaindeksowane",
 		"error": "Błąd indeksu",
-		"status": "Status indeksu"
+		"status": "Status indeksu",
+		"stopping": "Zatrzymywanie indeksowania..."
 	},
 	"versionIndicator": {
 		"ariaLabel": "Wersja {{version}} - Kliknij, aby wyświetlić informacje o wydaniu"
-	},
-	"rooCloudCTA": {
-		"title": "Datacoves Copilot Cloud się rozwija!",
-		"description": "Uruchamiaj zdalne agenty w chmurze, uzyskuj dostęp do swoich zadań z dowolnego miejsca, współpracuj z innymi i wiele więcej.",
-		"joinWaitlist": "Zarejestruj się, aby otrzymywać najnowsze aktualizacje."
 	},
 	"editMessage": {
 		"placeholder": "Edytuj swoją wiadomość..."
@@ -479,5 +469,23 @@
 		"updated": "Zaktualizowano listę zadań do wykonania",
 		"completed": "Ukończono",
 		"started": "Rozpoczęto"
+	},
+	"tooManyTools": {
+		"title": "Włączono zbyt wiele narzędzi",
+		"toolsPart_one": "{{count}} narzędzie",
+		"toolsPart_other": "{{count}} narzędzi",
+		"serversPart_one": "{{count}} serwer MCP",
+		"serversPart_other": "{{count}} serwerów MCP",
+		"messageTemplate": "Masz {{tools}} włączonych przez {{servers}}. Taka duża liczba może zamieszać model i prowadzić do błędów. Staraj się, aby była poniżej {{threshold}}.",
+		"openMcpSettings": "Otwórz ustawienia MCP"
+	},
+	"readCommandOutput": {
+		"title": "Copilot read command output"
+	},
+	"retiredProvider": {
+		"title": "Dostawca nie jest już obsługiwany",
+		"message": "This provider is no longer supported. Please select a different provider in your API profile settings.",
+		"openSettings": "Otwórz ustawienia",
+		"rooMessage": "As part of our decision to sunset the Datacoves Copilot extension, we also ended the Datacoves Copilot Router, which only existed to support the extension. Sorry about the hassle."
 	}
 }

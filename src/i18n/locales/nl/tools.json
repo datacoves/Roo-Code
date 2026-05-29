@@ -23,9 +23,6 @@
 		"noImageGenerated": "Er is geen afbeelding gegenereerd in het antwoord",
 		"invalidImageData": "Ongeldige afbeeldingsgegevens in het antwoord",
 		"invalidImageFormat": "Ongeldig afbeeldingsformaat ontvangen",
-		"unknownError": "Er is een onbekende fout opgetreden",
-		"roo": {
-			"authRequired": "Datacoves Copilot Cloud-authenticatie is vereist voor het genereren van afbeeldingen. Log in bij Datacoves Copilot Cloud."
-		}
+		"unknownError": "Er is een onbekende fout opgetreden"
 	}
 }

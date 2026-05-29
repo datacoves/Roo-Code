@@ -6,47 +6,34 @@
 		},
 		"openrouter": {
 			"description": "Un'interfaccia unificata per gli LLM"
-		},
-		"roo": {
-			"description": "I migliori modelli gratuiti per iniziare",
-			"incentive": "Prova Copilot gratuitamente"
 		}
 	},
 	"landing": {
 		"greeting": "Benvenuto in Datacoves Copilot!",
 		"introduction": "Con una gamma di Modalità integrate ed estensibili, Datacoves Copilot ti permette di pianificare, architettare, codificare, debuggare e aumentare la tua produttività come mai prima d'ora.",
-		"accountMention": "Per iniziare, crea il tuo account Datacoves Copilot Cloud. Ottieni modelli potenti, controllo web, analitiche, supporto e altro ancora.",
-		"getStarted": "Inizia",
-		"noAccount": "o usa senza account"
+		"getStarted": "Get Started",
+		"features": {
+			"modes": {
+				"title": "Customizable Modes",
+				"description": "Specialized personas with their own behaviors and assigned models"
+			},
+			"orchestration": {
+				"title": "Task Orchestration",
+				"description": "Split tasks into smaller, manageable parts"
+			}
+		}
 	},
 	"providerSignup": {
 		"heading": "Scegli il tuo provider",
 		"chooseProvider": "Copilot ha bisogno di un provider LLM per funzionare. Scegline uno per iniziare, puoi aggiungerne altri in seguito.",
-		"rooCloudProvider": "Provider Datacoves Copilot Cloud",
-		"rooCloudDescription": "Il modo più semplice per iniziare è con il Provider Datacoves Copilot Cloud: un mix curato di modelli gratuiti e a pagamento a basso costo.",
 		"learnMore": "Scopri di più",
 		"useAnotherProvider": "Provider di terze parti",
 		"useAnotherProviderDescription": "Inserisci una chiave API e inizia.",
 		"noApiKeys": "Non vuoi affrontare le chiavi API e gli account separati?",
-		"backToRoo": "Scegli il Provider Datacoves Copilot Cloud.",
 		"goBack": "Indietro",
 		"finish": "Fine"
 	},
-	"waitingForCloud": {
-		"heading": "Accesso a Datacoves Copilot Cloud...",
-		"description": "Ti porteremo al tuo browser per registrarti a Datacoves Copilot Cloud. Poi ti riporteremo qui per terminare.",
-		"noPrompt": "Se non ti viene chiesto di aprire un URL, <clickHere>clicca qui</clickHere>.",
-		"havingTrouble": "Se hai completato la registrazione ma hai problemi, <clickHere>clicca qui</clickHere>.",
-		"pasteUrl": "Incolla l'URL di callback dal tuo browser:",
-		"docsLink": "Non funziona? <DocsLink>Consulta la documentazione</DocsLink>.",
-		"invalidURL": "Non sembra un URL di callback valido. Per favore copia quello che Datacoves Copilot Cloud sta mostrando nel tuo browser.",
-		"goBack": "Indietro"
-	},
 	"startRouter": "Ti consigliamo di usare un router LLM:",
 	"startCustom": "Oppure puoi portare la tua chiave API:",
-	"telemetry": {
-		"helpImprove": "Aiuta a migliorare Datacoves Copilot",
-		"helpImproveMessage": "Datacoves Copilot raccoglie dati di errore e utilizzo per aiutarci a correggere i bug e migliorare l'estensione. Questa telemetria non raccoglie codice, prompt o informazioni personali. Puoi disabilitare questa funzione in <settingsLink>impostazioni</settingsLink>."
-	},
 	"importSettings": "Importa impostazioni"
 }

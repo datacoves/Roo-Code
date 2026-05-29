@@ -114,9 +114,18 @@ export function convertToVsCodeLmMessages(
 					{ nonToolMessages: [], toolMessages: [] },
 				)
 
-				// Process tool messages first then non-tool messages
+				// Process non-tool messages first, then tool messages
+				// Tool calls must come at the end so they are properly followed by user message with tool results
 				const contentParts = [
-					// Convert tool messages to ToolCallParts first
+					// Convert non-tool messages to TextParts first
+					...nonToolMessages.map((part) => {
+						if (part.type === "image") {
+							return new vscode.LanguageModelTextPart("[Image generation not supported by VSCode LM API]")
+						}
+						return new vscode.LanguageModelTextPart(part.text)
+					}),
+
+					// Convert tool messages to ToolCallParts after text
 					...toolMessages.map(
 						(toolMessage) =>
 							new vscode.LanguageModelToolCallPart(
@@ -125,14 +134,6 @@ export function convertToVsCodeLmMessages(
 								asObjectSafe(toolMessage.input),
 							),
 					),
-
-					// Convert non-tool messages to TextParts after tool messages
-					...nonToolMessages.map((part) => {
-						if (part.type === "image") {
-							return new vscode.LanguageModelTextPart("[Image generation not supported by VSCode LM API]")
-						}
-						return new vscode.LanguageModelTextPart(part.text)
-					}),
 				]
 
 				// Add the assistant message to the list of messages
@@ -183,7 +184,10 @@ export function extractTextCountFromMessage(message: vscode.LanguageModelChatMes
 					try {
 						text += JSON.stringify(item.input)
 					} catch (error) {
-						console.error("Datacoves Copilot <Language Model API>: Failed to stringify tool call input:", error)
+						console.error(
+							"Datacoves Copilot <Language Model API>: Failed to stringify tool call input:",
+							error,
+						)
 					}
 				}
 			}

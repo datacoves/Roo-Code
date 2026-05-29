@@ -16,22 +16,16 @@
 		"export": "Export task history",
 		"share": "Share task",
 		"delete": "Delete Task (Shift + Click to skip confirmation)",
-		"shareWithOrganization": "Share with Organization",
-		"shareWithOrganizationDescription": "Only members of your organization can access",
-		"sharePublicly": "Share Publicly",
-		"sharePubliclyDescription": "Anyone with the link can access",
-		"connectToCloud": "Connect to Cloud",
-		"connectToCloudDescription": "Sign in to Datacoves Copilot Cloud to share tasks",
-		"sharingDisabledByOrganization": "Sharing disabled by organization",
-		"shareSuccessOrganization": "Organization link copied to clipboard",
 		"shareSuccessPublic": "Public link copied to clipboard",
-		"openInCloud": "Open task in Datacoves Copilot Cloud",
-		"openInCloudIntro": "Keep monitoring or interacting with Copilot from anywhere. Scan, click or copy to open.",
 		"openApiHistory": "Open API History",
-		"openUiHistory": "Open UI History"
+		"openUiHistory": "Open UI History",
+		"backToParentTask": "Parent task"
 	},
 	"unpin": "Unpin",
 	"pin": "Pin",
+	"fileChangesInConversation": {
+		"header": "{{count}} file(s) changed in this conversation"
+	},
 	"retry": {
 		"title": "Retry",
 		"tooltip": "Try the operation again"
@@ -51,20 +45,39 @@
 	"tokenProgress": {
 		"availableSpace": "Available space: {{amount}} tokens",
 		"tokensUsed": "Tokens used: {{used}} of {{total}}",
-		"reservedForResponse": "Reserved for model response: {{amount}} tokens"
+		"reservedForResponse": "Reserved for model response: {{amount}} tokens",
+		"tokensUsedLabel": "Tokens used",
+		"reservedForResponseLabel": "Reserved for response",
+		"availableSpaceLabel": "Available space"
 	},
 	"reject": {
-		"title": "Reject",
-		"tooltip": "Reject this action"
+		"title": "Deny",
+		"tooltip": "Prevent this action from occurring"
 	},
-	"completeSubtaskAndReturn": "Complete Subtask and Return",
+	"completeSubtaskAndReturn": "Complete subtask and keep going",
 	"approve": {
 		"title": "Approve",
-		"tooltip": "Approve this action"
+		"tooltip": "Allow this action to happen"
 	},
 	"read-batch": {
 		"approve": {
 			"title": "Approve All"
+		},
+		"deny": {
+			"title": "Deny All"
+		}
+	},
+	"list-batch": {
+		"approve": {
+			"title": "Approve All"
+		},
+		"deny": {
+			"title": "Deny All"
+		}
+	},
+	"edit-batch": {
+		"approve": {
+			"title": "Save All"
 		},
 		"deny": {
 			"title": "Deny All"
@@ -75,48 +88,55 @@
 		"tooltip": "Execute this command"
 	},
 	"proceedWhileRunning": {
-		"title": "Proceed While Running",
-		"tooltip": "Continue despite warnings"
+		"title": "Continue While Running",
+		"tooltip": "Keep going despite warnings"
 	},
 	"killCommand": {
 		"title": "Kill Command",
 		"tooltip": "Kill the current command"
 	},
 	"resumeTask": {
-		"title": "Resume Task",
-		"tooltip": "Continue the current task"
+		"title": "Continue",
+		"tooltip": "Resume the current task"
 	},
 	"terminate": {
-		"title": "Terminate",
-		"tooltip": "End the current task"
+		"title": "New task",
+		"tooltip": "Start a new task"
 	},
 	"cancel": {
 		"title": "Cancel",
 		"tooltip": "Cancel the current operation"
 	},
+	"stop": {
+		"title": "Stop",
+		"tooltip": "Stop the current task"
+	},
+	"enqueueMessage": "Add message to queue (will be sent after current task completes)",
 	"editMessage": {
 		"placeholder": "Edit your message..."
 	},
 	"scrollToBottom": "Scroll to bottom of chat",
-	"about": "Generate, refactor, and debug code with AI assistance. Check out our <DocsLink>documentation</DocsLink> to learn more.",
+	"scrollToLatestCheckpoint": "Scroll to previous checkpoint",
+	"about": "Copilot is a whole AI dev team in your editor",
 	"docs": "Check our <DocsLink>docs</DocsLink> to get started",
 	"onboarding": "What would you like to do?",
 	"rooTips": {
 		"customizableModes": {
-			"title": "Customizable Modes",
-			"description": "Specialized personas with their own behaviors and assigned models"
+			"title": "Customizable modes that don't swerve",
+			"description": "Specialized personas that stay on-task and deliver."
 		},
 		"modelAgnostic": {
-			"title": "Task Orchestration",
-			"description": "Split tasks into smaller, manageable parts"
+			"title": "Bring your own model, no markup or lock-in",
+			"description": "Use your own provider key or even run local inference — Copilot doesn't charge for it"
 		}
 	},
 	"selectMode": "Select mode for interaction",
 	"selectApiConfig": "Select API configuration",
+	"lockApiConfigAcrossModes": "Lock API configuration across all modes in this workspace",
+	"unlockApiConfigAcrossModes": "API configuration is locked across all modes in this workspace (click to unlock)",
 	"enhancePrompt": "Enhance prompt with additional context",
 	"modeSelector": {
 		"title": "Modes",
-		"marketplace": "Mode Marketplace",
 		"settings": "Mode Settings",
 		"description": "Specialized personas that tailor Copilot's behavior.",
 		"searchPlaceholder": "Search modes...",
@@ -147,16 +167,16 @@
 		"rateLimitWait": "Rate limiting",
 		"errorTitle": "Provider Error {{code}}",
 		"errorMessage": {
-			"docs": "Docs",
-			"goToSettings": "Settings",
 			"400": "The provider couldn't process the request as made. Stop the task and try a different approach.",
 			"401": "Couldn't authenticate with provider. Please check your API key configuration.",
 			"402": "You seem to have run out of funds/credits in your account. Go to your provider and add more to continue.",
 			"403": "Unauthorized. Your API key is valid, but the provider refused to complete this request.",
 			"429": "Too many requests. You're being rate-limited by the provider. Please wait a bit before your next API call.",
 			"500": "Provider server error. Something is wrong on the provider side, there's nothing wrong with your request.",
+			"docs": "Docs",
+			"goToSettings": "Settings",
 			"connection": "Connection error. Make sure you have a working internet connection.",
-			"unknown": "Unknown API error. Please contact Datacoves Copilot support.",
+			"unknown": "Unknown API error. Please report this on GitHub.",
 			"claudeCodeNotAuthenticated": "You need to sign in to use Claude Code. Go to Settings and click \"Sign in to Claude Code\" to authenticate."
 		}
 	},
@@ -194,8 +214,9 @@
 			"description": "Older messages were removed from the conversation to stay within the context window limit. This is a fast but less context-preserving approach compared to condensation."
 		}
 	},
-	"instructions": {
-		"wantsToFetch": "Copilot wants to fetch detailed instructions to assist with the current task"
+	"skill": {
+		"wantsToLoad": "Copilot wants to load a skill",
+		"didLoad": "Copilot loaded a skill"
 	},
 	"fileOperations": {
 		"wantsToRead": "Copilot wants to read this file",
@@ -225,6 +246,7 @@
 		"didViewRecursive": "Copilot recursively viewed all files in this directory",
 		"wantsToViewRecursiveOutsideWorkspace": "Copilot wants to recursively view all files in this directory (outside workspace)",
 		"didViewRecursiveOutsideWorkspace": "Copilot recursively viewed all files in this directory (outside workspace)",
+		"wantsToViewMultipleDirectories": "Copilot wants to view multiple directories",
 		"wantsToSearch": "Copilot wants to search this directory for <code>{{regex}}</code>",
 		"didSearch": "Copilot searched this directory for <code>{{regex}}</code>",
 		"wantsToSearchOutsideWorkspace": "Copilot wants to search this directory (outside workspace) for <code>{{regex}}</code>",
@@ -274,12 +296,12 @@
 	},
 	"subtasks": {
 		"wantsToCreate": "Copilot wants to create a new subtask in {{mode}} mode",
-		"wantsToFinish": "Copilot wants to finish this subtask",
+		"wantsToFinish": "Copilot wants to mark this as completed",
 		"newTaskContent": "Subtask Instructions",
-		"completionContent": "Subtask Completed",
-		"resultContent": "Subtask Results",
+		"resultContent": "Subtask completed",
 		"defaultResult": "Please continue to the next task.",
-		"completionInstructions": "Subtask completed! You can review the results and suggest any corrections or next steps. If everything looks good, confirm to return the result to the parent task."
+		"completionInstructions": "You can review the results and suggest any corrections or next steps. If everything looks good, confirm to return the result to the parent task.",
+		"goToSubtask": "View task"
 	},
 	"questions": {
 		"hasQuestion": "Copilot has a question"
@@ -298,7 +320,8 @@
 		"title": "Error Details",
 		"copyToClipboard": "Copy basic error info",
 		"copied": "Copied!",
-		"diagnostics": "Get detailed error info"
+		"diagnostics": "Get detailed error info",
+		"proxyProvider": "You seem to be using a proxy-based provider. Make sure to check its logs and to ensure it's not rewriting Copilot's requests."
 	},
 	"diffError": {
 		"title": "Edit Unsuccessful"
@@ -322,30 +345,30 @@
 		"triggerLabel_zero": "0 auto-approve",
 		"triggerLabel_one": "1 auto-approved",
 		"triggerLabel_other": "{{count}} auto-approved",
-		"triggerLabelAll": "YOLO"
+		"triggerLabelAll": "BRRR"
 	},
 	"announcement": {
 		"title": "Datacoves Copilot {{version}} Released",
 		"support": "Please support Datacoves Copilot by starring us on <githubLink>GitHub</githubLink>.",
-		"stealthModel": {
-			"feature": "<bold>Limited-time FREE stealth model</bold> - Code Supernova: Now upgraded with a <bold>1M token context window</bold>! A versatile agentic coding model that supports image inputs, accessible through Datacoves Copilot Cloud.",
-			"note": "(Note: prompts and completions are logged by the model creator and used to improve the model)",
-			"connectButton": "Connect to Datacoves Copilot Cloud",
-			"selectModel": "Select <code>roo/code-supernova</code> from the Datacoves Copilot Cloud provider in Settings to get started.",
-			"goToSettingsButton": "Go to Settings"
+		"finalRelease": {
+			"title": "The last Datacoves Copilot release",
+			"intro": "This is the last Datacoves Copilot release. <announcementLink>As we announced a few weeks ago</announcementLink>, we've decided to shift our focus to <roomoteLink>Roomote</roomoteLink>, our cloud agent platform, which we believe to be the future of software development. Thank you so much for your support throughout the past year or so.",
+			"continuity": "This extension should continue to work indefinitely, but it won't receive bug fixes, new features, or model updates.",
+			"alternatives": "If you want to use an extension, we recommend checking out <zooCodeLink>ZooCode</zooCodeLink> (a Datacoves Copilot fork by the community) and <clineLink>Cline</clineLink> (where Datacoves Copilot originally started).",
+			"signoff": "Happy coding!"
 		},
 		"release": {
 			"heading": "What's New:",
-			"skills": "Copilot now supports <skillsLink>Agent Skills</skillsLink> - reusable packages of prompts, tools, and resources to extend Copilot's capabilities.",
-			"nativeToolCalling": "Native tool calling is now required for all new tasks. <blogLink>Read more</blogLink> about the motivation and what to do if you're encountering issues."
+			"gpt55": "GPT-5.5 via OpenAI Codex: Added GPT-5.5 support in the OpenAI Codex provider so you can use the latest model straight from Datacoves Copilot.",
+			"claudeOpus47": "Claude Opus 4.7 on Vertex AI: Added Claude Opus 4.7 to the Vertex AI provider for Anthropic's newest flagship reasoning model.",
+			"checkpointNav": "Previous Checkpoint Navigation: Added controls in chat to jump back through prior checkpoints, with full i18n support."
 		},
 		"cloudAgents": {
 			"heading": "New in the Cloud:",
 			"specialized": "Introducing <bold>Explainer</bold>, <bold>Planner</bold>, and <bold>Coder</bold> - three specialized cloud agents to enhance your workflows.",
 			"description": "The agents work together in the cloud and can be triggered from the web or through Slack.",
 			"tryButton": "Try Cloud Agents"
-		},
-		"careers": "Also, <careersLink>we're hiring!</careersLink>"
+		}
 	},
 	"reasoning": {
 		"thinking": "Thinking",
@@ -355,42 +378,10 @@
 		"copyToInput": "Copy to input (same as shift + click)",
 		"timerPrefix": "Auto-approve enabled. Selecting in {{seconds}}s…"
 	},
-	"browser": {
-		"session": "Browser Session",
-		"rooWantsToUse": "Copilot wants to use the browser",
-		"consoleLogs": "Console Logs",
-		"noNewLogs": "(No new logs)",
-		"screenshot": "Browser screenshot",
-		"cursor": "cursor",
-		"navigation": {
-			"step": "Step {{current}} of {{total}}",
-			"previous": "Previous",
-			"next": "Next"
-		},
-		"sessionStarted": "Browser Session Started",
-		"actions": {
-			"title": "Browser Action: ",
-			"launched": "Launched browser",
-			"launch": "Launch browser at {{url}}",
-			"clicked": "Clicked at: {{coordinate}}",
-			"click": "Click ({{coordinate}})",
-			"typed": "Typed: {{text}}",
-			"type": "Type \"{{text}}\"",
-			"pressed": "Pressed key: {{key}}",
-			"press": "Press {{key}}",
-			"scrolledDown": "Scrolled down",
-			"scrollDown": "Scroll down",
-			"scrolledUp": "Scrolled up",
-			"scrollUp": "Scroll up",
-			"hovered": "Hovered at: {{coordinate}}",
-			"hover": "Hover ({{coordinate}})",
-			"resized": "Resized to: {{size}}",
-			"resize": "Resize to {{size}}",
-			"screenshotSaved": "Screenshot saved",
-			"screenshot": "Save screenshot to {{path}}",
-			"closed": "Closed browser",
-			"close": "Close browser"
-		}
+	"costs": {
+		"totalWithSubtasks": "Total Cost (including subtasks): ${{cost}}",
+		"total": "Total Cost: ${{cost}}",
+		"includesSubtasks": "Includes subtask costs"
 	},
 	"codeblock": {
 		"tooltips": {
@@ -399,7 +390,6 @@
 			"copy_code": "Copy code"
 		}
 	},
-	"systemPromptWarning": "WARNING: Custom system prompt override active. This can severely break functionality and cause unpredictable behavior.",
 	"profileViolationWarning": "The current profile isn't compatible with your organization's settings",
 	"shellIntegration": {
 		"title": "Command Execution Warning",
@@ -423,7 +413,8 @@
 		"indexing": "Indexing {{percentage}}%",
 		"indexed": "Indexed",
 		"error": "Index error",
-		"status": "Index status"
+		"status": "Index status",
+		"stopping": "Stopping indexing..."
 	},
 	"versionIndicator": {
 		"ariaLabel": "Version {{version}} - Click to view release notes"
@@ -471,5 +462,23 @@
 		"updated": "Updated the to-do list",
 		"completed": "Completed",
 		"started": "Started"
+	},
+	"tooManyTools": {
+		"title": "Too many tools enabled",
+		"toolsPart_one": "{{count}} tool",
+		"toolsPart_other": "{{count}} tools",
+		"serversPart_one": "{{count}} MCP server",
+		"serversPart_other": "{{count}} MCP servers",
+		"messageTemplate": "You have {{tools}} enabled via {{servers}}. Such a high number can confuse the model and lead to errors. Try to keep it below {{threshold}}.",
+		"openMcpSettings": "Open MCP Settings"
+	},
+	"readCommandOutput": {
+		"title": "Copilot read command output"
+	},
+	"retiredProvider": {
+		"title": "Provider no longer supported",
+		"message": "This provider is no longer supported. Please select a different provider in your API profile settings.",
+		"openSettings": "Open Settings",
+		"rooMessage": "As part of our decision to sunset the Datacoves Copilot extension, we also ended the Datacoves Copilot Router, which only existed to support the extension. Sorry about the hassle."
 	}
 }

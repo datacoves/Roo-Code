@@ -26,9 +26,6 @@
 		"noImageGenerated": "Tidak ada gambar yang dihasilkan dalam respons",
 		"invalidImageData": "Data gambar tidak valid dalam respons",
 		"invalidImageFormat": "Format gambar tidak valid diterima",
-		"unknownError": "Terjadi kesalahan yang tidak diketahui",
-		"roo": {
-			"authRequired": "Autentikasi Datacoves Copilot Cloud diperlukan untuk menghasilkan gambar. Silakan masuk ke Datacoves Copilot Cloud."
-		}
+		"unknownError": "Terjadi kesalahan yang tidak diketahui"
 	}
 }

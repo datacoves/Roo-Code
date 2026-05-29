@@ -16,26 +16,23 @@
 		"delete": "タスクを削除（Shift + クリックで確認をスキップ）",
 		"condenseContext": "コンテキストをインテリジェントに圧縮",
 		"share": "タスクを共有",
-		"shareWithOrganization": "組織と共有",
-		"shareWithOrganizationDescription": "組織のメンバーのみがアクセスできます",
-		"sharePublicly": "公開で共有",
-		"sharePubliclyDescription": "リンクを持つ誰でもアクセスできます",
-		"connectToCloud": "クラウドに接続",
-		"connectToCloudDescription": "タスクを共有するためにDatacoves Copilot Cloudにサインイン",
-		"sharingDisabledByOrganization": "組織により共有が無効化されています",
-		"shareSuccessOrganization": "組織リンクをクリップボードにコピーしました",
 		"shareSuccessPublic": "公開リンクをクリップボードにコピーしました",
-		"openInCloud": "Datacoves Copilot Cloudでタスクを開く",
-		"openInCloudIntro": "どこからでもCopilotの監視や操作を続けられます。スキャン、クリック、またはコピーして開いてください。",
 		"openApiHistory": "API履歴を開く",
-		"openUiHistory": "UI履歴を開く"
+		"openUiHistory": "UI履歴を開く",
+		"backToParentTask": "親タスク"
 	},
 	"unpin": "ピン留めを解除",
 	"pin": "ピン留め",
+	"fileChangesInConversation": {
+		"header": "この会話で {{count}} 個のファイルが変更されました"
+	},
 	"tokenProgress": {
 		"availableSpace": "利用可能な空き容量: {{amount}} トークン",
 		"tokensUsed": "使用トークン: {{used}} / {{total}}",
-		"reservedForResponse": "モデル応答用に予約: {{amount}} トークン"
+		"reservedForResponse": "モデル応答用に予約: {{amount}} トークン",
+		"tokensUsedLabel": "使用トークン",
+		"reservedForResponseLabel": "応答用に予約",
+		"availableSpaceLabel": "利用可能な空き容量"
 	},
 	"retry": {
 		"title": "再試行",
@@ -82,11 +79,17 @@
 		"title": "終了",
 		"tooltip": "現在のタスクを終了"
 	},
+	"stop": {
+		"title": "停止",
+		"tooltip": "現在のタスクを停止"
+	},
 	"cancel": {
 		"title": "キャンセル",
 		"tooltip": "現在の操作をキャンセル"
 	},
+	"enqueueMessage": "メッセージをキューに追加（現在のタスク完了後に送信されます）",
 	"scrollToBottom": "チャットの最下部にスクロール",
+	"scrollToLatestCheckpoint": "前のチェックポイントまでスクロール",
 	"about": "Datacoves Copilotは、エディタに常駐するAI開発チームです。",
 	"docs": "詳細については、<DocsLink>ドキュメント</DocsLink>をご確認ください。",
 	"onboarding": "このワークスペースのタスクリストは空です。",
@@ -102,6 +105,8 @@
 	},
 	"selectMode": "対話モードを選択",
 	"selectApiConfig": "API構成を選択",
+	"lockApiConfigAcrossModes": "このワークスペースのすべてのモードでAPI構成をロック",
+	"unlockApiConfigAcrossModes": "このワークスペースのすべてのモードでAPI構成がロックされています（クリックで解除）",
 	"enhancePrompt": "追加コンテキストでプロンプトを強化",
 	"addImages": "メッセージに画像を追加",
 	"sendMessage": "メッセージを送信",
@@ -115,7 +120,6 @@
 	"enhancePromptDescription": "「プロンプトを強化」ボタンは、追加コンテキスト、説明、または言い換えを提供することで、リクエストを改善します。ここにリクエストを入力し、ボタンを再度クリックして動作を確認してください。",
 	"modeSelector": {
 		"title": "モード",
-		"marketplace": "モードマーケットプレイス",
 		"settings": "モード設定",
 		"description": "Copilotの動作をカスタマイズする専門的なペルソナ。",
 		"searchPlaceholder": "モードを検索...",
@@ -141,15 +145,15 @@
 		"rateLimitWait": "レート制限中",
 		"errorTitle": "プロバイダーエラー {{code}}",
 		"errorMessage": {
-			"docs": "ドキュメント",
-			"goToSettings": "設定",
 			"400": "プロバイダーはリクエストをそのまま処理できませんでした。タスクを停止して別のアプローチを試してください。",
 			"401": "プロバイダーで認証できませんでした。API キーの設定を確認してください。",
 			"402": "アカウントの資金/クレジットが不足しているようです。プロバイダーに移動してさらに追加してください。",
 			"403": "認可されていません。API キーは有効ですが、プロバイダーがこのリクエストの完了を拒否しました。",
 			"429": "リクエストが多すぎます。プロバイダーによってレート制限されています。次の API 呼び出しの前にお待ちください。",
 			"500": "プロバイダー サーバー エラー。プロバイダー側に問題があり、リクエスト自体に問題はありません。",
-			"unknown": "不明な API エラー。Datacoves Copilot のサポートにお問い合わせください。",
+			"docs": "ドキュメント",
+			"goToSettings": "設定",
+			"unknown": "Unknown API error. Please report this on GitHub.",
 			"connection": "接続エラー。インターネット接続が機能していることを確認してください。",
 			"claudeCodeNotAuthenticated": "Claude Codeを使用するにはサインインが必要です。設定に移動して「Claude Codeにサインイン」をクリックして認証してください。"
 		}
@@ -209,7 +213,8 @@
 		"wantsToViewTopLevelOutsideWorkspace": "Copilotはこのディレクトリ（ワークスペース外）のトップレベルファイルを表示したい",
 		"didViewTopLevelOutsideWorkspace": "Copilotはこのディレクトリ（ワークスペース外）のトップレベルファイルを表示しました",
 		"wantsToViewRecursiveOutsideWorkspace": "Copilotはこのディレクトリ（ワークスペース外）のすべてのファイルを再帰的に表示したい",
-		"didViewRecursiveOutsideWorkspace": "Copilotはこのディレクトリ（ワークスペース外）のすべてのファイルを再帰的に表示しました"
+		"didViewRecursiveOutsideWorkspace": "Copilotはこのディレクトリ（ワークスペース外）のすべてのファイルを再帰的に表示しました",
+		"wantsToViewMultipleDirectories": "Copilot は複数のディレクトリを表示したい"
 	},
 	"commandOutput": "コマンド出力",
 	"commandExecution": {
@@ -253,7 +258,8 @@
 		"completionContent": "サブタスク完了",
 		"resultContent": "サブタスク結果",
 		"defaultResult": "次のタスクに進んでください。",
-		"completionInstructions": "サブタスク完了！結果を確認し、修正や次のステップを提案できます。問題なければ、親タスクに結果を返すために確認してください。"
+		"completionInstructions": "サブタスク完了！結果を確認し、修正や次のステップを提案できます。問題なければ、親タスクに結果を返すために確認してください。",
+		"goToSubtask": "タスクを表示"
 	},
 	"questions": {
 		"hasQuestion": "Copilotは質問があります"
@@ -271,7 +277,8 @@
 		"title": "エラー詳細",
 		"copyToClipboard": "クリップボードにコピー",
 		"copied": "コピーしました！",
-		"diagnostics": "詳細なエラー情報を取得"
+		"diagnostics": "詳細なエラー情報を取得",
+		"proxyProvider": "プロキシベースのプロバイダーを使用しているようです。ログを確認し、Copilotのリクエストを書き換えていないことを確認してください。"
 	},
 	"powershell": {
 		"issues": "Windows PowerShellに問題があるようです。こちらを参照してください"
@@ -292,7 +299,7 @@
 		"triggerLabel_zero": "0個の自動承認",
 		"triggerLabel_one": "1個の自動承認済み",
 		"triggerLabel_other": "{{count}}個の自動承認済み",
-		"triggerLabelAll": "YOLO"
+		"triggerLabelAll": "BRRR"
 	},
 	"reasoning": {
 		"thinking": "考え中",
@@ -313,6 +320,10 @@
 			"description": "コンテキストウィンドウの制限内に収めるため、古いメッセージが会話から削除されました。これは圧縮と比較して高速ですが、コンテキストの保持性が低いアプローチです。"
 		}
 	},
+	"skill": {
+		"wantsToLoad": "Copilotはスキルを読み込もうとしています",
+		"didLoad": "Copilotはスキルを読み込みました"
+	},
 	"followUpSuggest": {
 		"copyToInput": "入力欄にコピー（またはShift + クリック）",
 		"timerPrefix": "自動承認が有効です。{{seconds}}秒後に選択中…"
@@ -320,62 +331,30 @@
 	"announcement": {
 		"title": "Datacoves Copilot {{version}} リリース",
 		"support": "<githubLink>GitHub</githubLink>でスターを付けてDatacoves Copilotを応援してください。",
-		"stealthModel": {
-			"feature": "<bold>期間限定無料ステルスモデル</bold> - Code Supernova：<bold>1Mトークンコンテキストウィンドウ</bold>にアップグレード！画像入力をサポートする多目的エージェントコーディングモデル、Datacoves Copilot Cloud 経由で利用可能。",
-			"note": "(注意：プロンプトと補完はモデル作成者によってログに記録され、モデルの改善に使用されます)",
-			"connectButton": "Datacoves Copilot Cloud に接続",
-			"selectModel": "設定で Datacoves Copilot Cloud プロバイダーから <code>roo/code-supernova</code> を選択して開始してください。",
-			"goToSettingsButton": "設定に移動"
+		"finalRelease": {
+			"title": "Datacoves Copilot 最後のリリース",
+			"intro": "これは Datacoves Copilot の最後のリリースです。<announcementLink>数週間前にお知らせしたとおり</announcementLink>、私たちは今後、ソフトウェア開発の未来だと考えているクラウドエージェントプラットフォーム <roomoteLink>Roomote</roomoteLink> に注力することにしました。この約1年間のご支援、本当にありがとうございました。",
+			"continuity": "この拡張機能は今後も無期限に動作し続けるはずですが、バグ修正、新機能、モデル更新は提供されません。",
+			"alternatives": "拡張機能を使いたい場合は、コミュニティによる Datacoves Copilot のフォークである <zooCodeLink>ZooCode</zooCodeLink> と、Datacoves Copilot の出発点である <clineLink>Cline</clineLink> をぜひ確認してみてください。",
+			"signoff": "Happy coding!"
 		},
 		"release": {
 			"heading": "新機能:",
-			"skills": "Copilotが<skillsLink>Agent Skills</skillsLink>に対応しました - Copilotの機能を拡張するためのプロンプト、ツール、リソースの再利用可能なパッケージです。",
-			"nativeToolCalling": "すべての新しいタスクではネイティブツール呼び出しが必須になりました。<blogLink>詳しく知る</blogLink>理由と問題が発生した場合の対応方法について。"
+			"gpt55": "OpenAI Codex 経由の GPT-5.5: OpenAI Codex プロバイダーで GPT-5.5 のサポートを追加しました。Datacoves Copilot から最新モデルを直接利用できます。",
+			"claudeOpus47": "Vertex AI 上の Claude Opus 4.7: Anthropic の最新フラッグシップ推論モデルとして、Vertex AI プロバイダーに Claude Opus 4.7 を追加しました。",
+			"checkpointNav": "以前のチェックポイントへのナビゲーション: チャットから以前のチェックポイントへ戻るためのコントロールを追加しました。i18n にも完全対応しています。"
 		},
 		"cloudAgents": {
 			"heading": "クラウドの新機能:",
 			"specialized": "<bold>Explainer</bold>、<bold>Planner</bold>、<bold>Coder</bold> の 3 つの専門クラウドエージェントを紹介します。ワークフローを強化します。",
 			"description": "エージェントはクラウドで連携して動作し、Web または Slack からトリガーできます。",
 			"tryButton": "クラウドエージェントを試す"
-		},
-		"careers": "また、<careersLink>採用中です！</careersLink>"
-	},
-	"browser": {
-		"session": "ブラウザセッション",
-		"rooWantsToUse": "Copilotはブラウザを使用したい",
-		"consoleLogs": "コンソールログ",
-		"noNewLogs": "(新しいログはありません)",
-		"screenshot": "ブラウザのスクリーンショット",
-		"cursor": "カーソル",
-		"navigation": {
-			"step": "ステップ {{current}} / {{total}}",
-			"previous": "前へ",
-			"next": "次へ"
-		},
-		"sessionStarted": "ブラウザセッション開始",
-		"actions": {
-			"title": "ブラウザ操作: ",
-			"launched": "ブラウザを起動しました",
-			"launch": "{{url}} でブラウザを起動",
-			"clicked": "クリック: {{coordinate}}",
-			"click": "クリック ({{coordinate}})",
-			"typed": "入力: {{text}}",
-			"type": "入力 \"{{text}}\"",
-			"pressed": "{{key}}を押しました",
-			"press": "{{key}}を押す",
-			"scrolledDown": "下にスクロールしました",
-			"scrollDown": "下にスクロール",
-			"scrolledUp": "上にスクロールしました",
-			"scrollUp": "上にスクロール",
-			"hovered": "ホバー: {{coordinate}}",
-			"hover": "ホバー ({{coordinate}})",
-			"resized": "サイズを変更しました: {{size}}",
-			"resize": "サイズを {{size}} に変更",
-			"screenshotSaved": "スクリーンショットを保存しました",
-			"screenshot": "スクリーンショットを {{path}} に保存",
-			"closed": "ブラウザを閉じました",
-			"close": "ブラウザを閉じる"
 		}
+	},
+	"costs": {
+		"totalWithSubtasks": "合計コスト（サブタスク含む）: ${{cost}}",
+		"total": "合計コスト: ${{cost}}",
+		"includesSubtasks": "サブタスクのコストを含む"
 	},
 	"codeblock": {
 		"tooltips": {
@@ -384,7 +363,6 @@
 			"copy_code": "コードをコピー"
 		}
 	},
-	"systemPromptWarning": "警告：カスタムシステムプロンプトの上書きが有効です。これにより機能が深刻に損なわれ、予測不可能な動作が発生する可能性があります。",
 	"profileViolationWarning": "現在のプロファイルは組織の設定と互換性がありません",
 	"shellIntegration": {
 		"title": "コマンド実行警告",
@@ -418,20 +396,32 @@
 			"title": "すべて拒否"
 		}
 	},
+	"list-batch": {
+		"approve": {
+			"title": "すべて承認"
+		},
+		"deny": {
+			"title": "すべて拒否"
+		}
+	},
+	"edit-batch": {
+		"approve": {
+			"title": "すべて保存"
+		},
+		"deny": {
+			"title": "すべて拒否"
+		}
+	},
 	"indexingStatus": {
 		"ready": "インデックス準備完了",
 		"indexing": "インデックス作成中 {{percentage}}%",
 		"indexed": "インデックス作成済み",
 		"error": "インデックスエラー",
-		"status": "インデックス状態"
+		"status": "インデックス状態",
+		"stopping": "インデックス作成を停止中..."
 	},
 	"versionIndicator": {
 		"ariaLabel": "バージョン {{version}} - クリックしてリリースノートを表示"
-	},
-	"rooCloudCTA": {
-		"title": "Datacoves Copilot Cloud が進化中！",
-		"description": "クラウドでリモートエージェントを実行し、どこからでもタスクにアクセスし、他の人と協力し、その他多くの機能を利用できます。",
-		"joinWaitlist": "最新のアップデートを受け取るためにサインアップしてください。"
 	},
 	"editMessage": {
 		"placeholder": "メッセージを編集..."
@@ -479,5 +469,23 @@
 		"updated": "To-Doリストを更新しました",
 		"completed": "完了",
 		"started": "開始"
+	},
+	"tooManyTools": {
+		"title": "有効になっているツールが多すぎます",
+		"toolsPart_one": "{{count}} ツール",
+		"toolsPart_other": "{{count}} ツール",
+		"serversPart_one": "{{count}} MCP サーバー",
+		"serversPart_other": "{{count}} MCP サーバー",
+		"messageTemplate": "{{servers}}経由で{{tools}}が有効になっています。このような高い数は、モデルを混乱させてエラーを引き起こす可能性があります。{{threshold}}以下に保つようにしてください。",
+		"openMcpSettings": "MCP 設定を開く"
+	},
+	"readCommandOutput": {
+		"title": "Copilotがコマンド出力を読み込みました"
+	},
+	"retiredProvider": {
+		"title": "プロバイダーのサポート終了",
+		"message": "This provider is no longer supported. Please select a different provider in your API profile settings.",
+		"openSettings": "設定を開く",
+		"rooMessage": "As part of our decision to sunset the Datacoves Copilot extension, we also ended the Datacoves Copilot Router, which only existed to support the extension. Sorry about the hassle."
 	}
 }

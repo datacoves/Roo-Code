@@ -1,5 +1,5 @@
 import { BedrockRuntimeClient, InvokeModelCommand, InvokeModelCommandInput } from "@aws-sdk/client-bedrock-runtime"
-import { fromEnv, fromIni } from "@aws-sdk/credential-providers"
+import { fromIni, fromNodeProviderChain } from "@aws-sdk/credential-providers"
 import { IEmbedder, EmbeddingResponse, EmbedderInfo } from "../interfaces"
 import {
 	MAX_BATCH_TOKENS,
@@ -11,8 +11,6 @@ import { getDefaultModelId } from "../../../shared/embeddingModels"
 import { Package } from "../../../shared/package"
 import { t } from "../../../i18n"
 import { withValidationErrorHandling, formatEmbeddingError, HttpError } from "../shared/validation-helpers"
-import { TelemetryEventName } from "@roo-code/types"
-import { TelemetryService } from "@roo-code/telemetry"
 
 /**
  * Amazon Bedrock implementation of the embedder interface with batching and rate limiting
@@ -38,7 +36,7 @@ export class BedrockEmbedder implements IEmbedder {
 
 		// Initialize the Bedrock client with credentials
 		// If profile is specified, use it; otherwise use default credential chain
-		const credentials = this.profile ? fromIni({ profile: this.profile }) : fromEnv()
+		const credentials = this.profile ? fromIni({ profile: this.profile }) : fromNodeProviderChain()
 
 		this.bedrockClient = new BedrockRuntimeClient({
 			userAgentAppId: `RooCode#${Package.version}`,
@@ -158,14 +156,6 @@ export class BedrockEmbedder implements IEmbedder {
 					continue
 				}
 
-				// Capture telemetry before reformatting the error
-				TelemetryService.instance.captureEvent(TelemetryEventName.CODE_INDEX_ERROR, {
-					error: error instanceof Error ? error.message : String(error),
-					stack: error instanceof Error ? error.stack : undefined,
-					location: "BedrockEmbedder:_embedBatchWithRetries",
-					attempt: attempts + 1,
-				})
-
 				// Log the error for debugging
 				console.error(`Bedrock embedder error (attempt ${attempts + 1}/${MAX_RETRIES}):`, error)
 
@@ -209,10 +199,18 @@ export class BedrockEmbedder implements IEmbedder {
 			requestBody = {
 				inputText: text,
 			}
-		} else if (model.startsWith("cohere.embed")) {
+		} else if (model.startsWith("cohere.embed-v4")) {
+			// Cohere Embed v4 requires embedding_types parameter
 			requestBody = {
 				texts: [text],
-				input_type: "search_document", // or "search_query" depending on use case
+				input_type: "search_document",
+				embedding_types: ["float"],
+			}
+		} else if (model.startsWith("cohere.embed")) {
+			// Cohere Embed v3 format
+			requestBody = {
+				texts: [text],
+				input_type: "search_document",
 			}
 		} else {
 			// Default to Titan format
@@ -248,10 +246,15 @@ export class BedrockEmbedder implements IEmbedder {
 				embedding: responseBody.embedding,
 				inputTextTokenCount: responseBody.inputTextTokenCount,
 			}
+		} else if (model.startsWith("cohere.embed-v4")) {
+			// Cohere Embed v4 returns { embeddings: { float: [[...]] } }
+			return {
+				embedding: responseBody.embeddings?.float?.[0] || responseBody.embeddings?.[0],
+			}
 		} else if (model.startsWith("cohere.embed")) {
+			// Cohere Embed v3 returns { embeddings: [[...]] }
 			return {
 				embedding: responseBody.embeddings[0],
-				// Cohere doesn't provide token count in response
 			}
 		} else {
 			// Default to Titan format
@@ -303,13 +306,6 @@ export class BedrockEmbedder implements IEmbedder {
 						error: t("embeddings:bedrock.modelNotFound", { model: this.defaultModelId }),
 					}
 				}
-
-				// Capture telemetry for validation errors
-				TelemetryService.instance.captureEvent(TelemetryEventName.CODE_INDEX_ERROR, {
-					error: error instanceof Error ? error.message : String(error),
-					stack: error instanceof Error ? error.stack : undefined,
-					location: "BedrockEmbedder:validateConfiguration",
-				})
 				throw error
 			}
 		}, "bedrock")

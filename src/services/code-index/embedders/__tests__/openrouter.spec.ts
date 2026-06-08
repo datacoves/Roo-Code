@@ -7,16 +7,6 @@ import { getModelDimension, getDefaultModelId } from "../../../../shared/embeddi
 // Mock the OpenAI SDK
 vi.mock("openai")
 
-// Mock TelemetryService
-vi.mock("@roo-code/telemetry", () => ({
-	TelemetryService: {
-		instance: {
-			captureEvent: vi.fn(),
-		},
-	},
-	TelemetryEventName: {},
-}))
-
 // Mock i18n
 vi.mock("../../../../i18n", () => ({
 	t: (key: string, params?: Record<string, any>) => {
@@ -91,7 +81,7 @@ describe("OpenRouterEmbedder", () => {
 				apiKey: mockApiKey,
 				defaultHeaders: {
 					"HTTP-Referer": "https://github.com/RooCodeInc/Roo-Code",
-					"X-Title": "Roo Code",
+					"X-Title": "Datacoves Copilot",
 				},
 			})
 		})

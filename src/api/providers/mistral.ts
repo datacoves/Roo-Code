@@ -2,14 +2,7 @@ import { Anthropic } from "@anthropic-ai/sdk"
 import { Mistral } from "@mistralai/mistralai"
 import OpenAI from "openai"
 
-import {
-	type MistralModelId,
-	mistralDefaultModelId,
-	mistralModels,
-	MISTRAL_DEFAULT_TEMPERATURE,
-	ApiProviderError,
-} from "@roo-code/types"
-import { TelemetryService } from "@roo-code/telemetry"
+import { type MistralModelId, mistralDefaultModelId, mistralModels, MISTRAL_DEFAULT_TEMPERATURE } from "@roo-code/types"
 
 import { ApiHandlerOptions } from "../../shared/api"
 
@@ -94,13 +87,9 @@ export class MistralHandler extends BaseProvider implements SingleCompletionHand
 			temperature,
 		}
 
-		// Add tools if provided and toolProtocol is not 'xml' and model supports native tools
-		const supportsNativeTools = info.supportsNativeTools ?? false
-		if (metadata?.tools && metadata.tools.length > 0 && metadata?.toolProtocol !== "xml" && supportsNativeTools) {
-			requestOptions.tools = this.convertToolsForMistral(metadata.tools)
-			// Always use "any" to require tool use
-			requestOptions.toolChoice = "any"
-		}
+		requestOptions.tools = this.convertToolsForMistral(metadata?.tools ?? [])
+		// Always use "any" to require tool use
+		requestOptions.toolChoice = "any"
 
 		// Temporary debug log for QA
 		// console.log("[MISTRAL DEBUG] Raw API request body:", requestOptions)
@@ -110,8 +99,6 @@ export class MistralHandler extends BaseProvider implements SingleCompletionHand
 			response = await this.client.chat.stream(requestOptions)
 		} catch (error) {
 			const errorMessage = error instanceof Error ? error.message : String(error)
-			const apiError = new ApiProviderError(errorMessage, this.providerName, model, "createMessage")
-			TelemetryService.instance.captureException(apiError)
 			throw new Error(`Mistral completion error: ${errorMessage}`)
 		}
 
@@ -220,8 +207,6 @@ export class MistralHandler extends BaseProvider implements SingleCompletionHand
 			return content || ""
 		} catch (error) {
 			const errorMessage = error instanceof Error ? error.message : String(error)
-			const apiError = new ApiProviderError(errorMessage, this.providerName, model, "completePrompt")
-			TelemetryService.instance.captureException(apiError)
 			throw new Error(`Mistral completion error: ${errorMessage}`)
 		}
 	}

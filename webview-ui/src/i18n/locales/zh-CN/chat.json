@@ -16,26 +16,23 @@
 		"delete": "删除任务（Shift + 点击跳过确认）",
 		"share": "分享任务",
 		"condenseContext": "智能压缩上下文",
-		"shareWithOrganization": "与组织分享",
-		"shareWithOrganizationDescription": "仅组织成员可访问",
-		"sharePublicly": "公开分享",
-		"sharePubliclyDescription": "任何拥有链接的人都可访问",
-		"connectToCloud": "连接到云端",
-		"connectToCloudDescription": "登录 Datacoves Copilot Cloud 以分享任务",
-		"sharingDisabledByOrganization": "组织已禁用分享功能",
-		"shareSuccessOrganization": "组织链接已复制到剪贴板",
 		"shareSuccessPublic": "公开链接已复制到剪贴板",
-		"openInCloud": "在 Datacoves Copilot Cloud 中打开任务",
-		"openInCloudIntro": "从任何地方继续监控或与 Copilot 交互。扫描、点击或复制以打开。",
 		"openApiHistory": "打开 API 历史",
-		"openUiHistory": "打开 UI 历史"
+		"openUiHistory": "打开 UI 历史",
+		"backToParentTask": "父任务"
 	},
 	"unpin": "取消置顶",
 	"pin": "置顶",
+	"fileChangesInConversation": {
+		"header": "此对话中已更改 {{count}} 个文件"
+	},
 	"tokenProgress": {
 		"availableSpace": "可用: {{amount}}",
 		"tokensUsed": "已使用: {{used}} / {{total}}",
-		"reservedForResponse": "已保留: {{amount}}"
+		"reservedForResponse": "已保留: {{amount}}",
+		"tokensUsedLabel": "已使用 Token",
+		"reservedForResponseLabel": "为回复保留",
+		"availableSpaceLabel": "可用空间"
 	},
 	"retry": {
 		"title": "重试",
@@ -86,7 +83,13 @@
 		"title": "取消",
 		"tooltip": "取消当前操作"
 	},
+	"stop": {
+		"title": "停止",
+		"tooltip": "停止当前任务"
+	},
+	"enqueueMessage": "将消息加入队列（当前任务完成后发送）",
 	"scrollToBottom": "滚动到聊天底部",
+	"scrollToLatestCheckpoint": "滚动到上一个检查点",
 	"about": "Datacoves Copilot 是您编辑器中的整个 AI 开发团队。",
 	"docs": "查看我们的 <DocsLink>文档</DocsLink> 了解更多信息。",
 	"onboarding": "此工作区中的任务列表为空。",
@@ -102,6 +105,8 @@
 	},
 	"selectMode": "选择交互模式",
 	"selectApiConfig": "选择 API 配置",
+	"lockApiConfigAcrossModes": "锁定此工作区所有模式的 API 配置",
+	"unlockApiConfigAcrossModes": "此工作区所有模式的 API 配置已锁定（点击解锁）",
 	"enhancePrompt": "增强提示词",
 	"addImages": "添加图片到消息",
 	"sendMessage": "发送消息",
@@ -115,7 +120,6 @@
 	"enhancePromptDescription": "'增强提示'按钮通过提供额外上下文、澄清或重新表述来帮助改进您的请求。尝试在此处输入请求，然后再次点击按钮查看其工作原理。",
 	"modeSelector": {
 		"title": "模式",
-		"marketplace": "模式市场",
 		"settings": "模式设置",
 		"description": "专门定制Copilot行为的角色。",
 		"searchPlaceholder": "搜索模式...",
@@ -141,15 +145,15 @@
 		"rateLimitWait": "请求频率限制",
 		"errorTitle": "提供商错误 {{code}}",
 		"errorMessage": {
-			"docs": "文档",
-			"goToSettings": "设置",
 			"400": "提供商无法按此方式处理请求。请停止任务并尝试不同方法。",
 			"401": "无法向提供商进行身份验证。请检查您的 API 密钥配置。",
 			"402": "您的账户余额/积分似乎已用尽。请前往提供商处充值以继续。",
 			"403": "无权限。您的 API 密钥有效，但提供商拒绝完成此请求。",
 			"429": "请求过于频繁。提供商已对您的请求进行速率限制。请在下一次 API 调用前稍候。",
 			"500": "提供商服务器错误。提供商端出现问题，您的请求无问题。",
-			"unknown": "未知 API 错误。请联系 Datacoves Copilot 支持。",
+			"docs": "文档",
+			"goToSettings": "设置",
+			"unknown": "Unknown API error. Please report this on GitHub.",
 			"connection": "连接错误。确保您有可用的互联网连接。",
 			"claudeCodeNotAuthenticated": "你需要登录才能使用 Claude Code。前往设置并点击「登录到 Claude Code」进行身份验证。"
 		}
@@ -209,7 +213,8 @@
 		"wantsToViewTopLevelOutsideWorkspace": "需要查看目录文件列表（工作区外）",
 		"didViewTopLevelOutsideWorkspace": "已查看目录文件列表（工作区外）",
 		"wantsToViewRecursiveOutsideWorkspace": "需要查看目录所有文件（工作区外）",
-		"didViewRecursiveOutsideWorkspace": "已查看目录所有文件（工作区外）"
+		"didViewRecursiveOutsideWorkspace": "已查看目录所有文件（工作区外）",
+		"wantsToViewMultipleDirectories": "Copilot 想要查看多个目录"
 	},
 	"commandOutput": "命令输出",
 	"commandExecution": {
@@ -254,7 +259,8 @@
 		"completionContent": "子任务已完成",
 		"resultContent": "子任务结果",
 		"defaultResult": "请继续下一个任务。",
-		"completionInstructions": "子任务已完成！您可以查看结果并提出修改或下一步建议。如果一切正常，请确认以将结果返回给主任务。"
+		"completionInstructions": "子任务已完成！您可以查看结果并提出修改或下一步建议。如果一切正常，请确认以将结果返回给主任务。",
+		"goToSubtask": "查看任务"
 	},
 	"questions": {
 		"hasQuestion": "Copilot有一个问题"
@@ -272,7 +278,8 @@
 		"title": "错误详情",
 		"copyToClipboard": "复制到剪贴板",
 		"copied": "已复制!",
-		"diagnostics": "获取详细错误信息"
+		"diagnostics": "获取详细错误信息",
+		"proxyProvider": "看起来你在使用基于代理的提供商。请检查日志并确保它不会重写 Copilot 的请求。"
 	},
 	"powershell": {
 		"issues": "看起来您遇到了Windows PowerShell问题，请参阅此"
@@ -293,7 +300,7 @@
 		"triggerLabel_zero": "0 个自动批准",
 		"triggerLabel_one": "1 个自动批准",
 		"triggerLabel_other": "{{count}} 个自动批准",
-		"triggerLabelAll": "YOLO"
+		"triggerLabelAll": "BRRR"
 	},
 	"reasoning": {
 		"thinking": "思考中",
@@ -314,6 +321,10 @@
 			"description": "为保持在上下文窗口限制内，已从对话中移除较旧的消息。与压缩相比，这是一种快速但上下文保留较少的方法。"
 		}
 	},
+	"skill": {
+		"wantsToLoad": "Copilot 想要加载技能",
+		"didLoad": "Copilot 加载了技能"
+	},
 	"followUpSuggest": {
 		"copyToInput": "复制到输入框（或按住Shift点击）",
 		"timerPrefix": "自动批准已启用。{{seconds}}秒后选择中…"
@@ -321,62 +332,30 @@
 	"announcement": {
 		"title": "Datacoves Copilot {{version}} 已发布",
 		"support": "请在 <githubLink>GitHub</githubLink> 上为我们点星支持 Datacoves Copilot。",
-		"stealthModel": {
-			"feature": "<bold>限时免费隐形模型</bold> - Code Supernova：现已升级为 <bold>1M Token 上下文窗口</bold>！一个支持图像输入的多功能代理编程模型，通过 Datacoves Copilot Cloud 提供。",
-			"note": "(注意：提示词和补全内容会被模型创建者记录并用于改进模型)",
-			"connectButton": "连接到 Datacoves Copilot Cloud",
-			"selectModel": "在设置中从 Datacoves Copilot Cloud 提供商选择 <code>roo/code-supernova</code> 开始使用。",
-			"goToSettingsButton": "前往设置"
+		"finalRelease": {
+			"title": "Datacoves Copilot 的最后一个版本",
+			"intro": "这是 Datacoves Copilot 的最后一个版本。<announcementLink>正如我们几周前宣布的那样</announcementLink>，我们决定将重心转向 <roomoteLink>Roomote</roomoteLink>，这是我们的云端智能体平台，我们相信它代表着软件开发的未来。非常感谢你在过去一年左右时间里的支持。",
+			"continuity": "这个扩展应该会继续无限期工作，但不会再收到错误修复、新功能或模型更新。",
+			"alternatives": "如果你想继续使用扩展，我们建议看看 <zooCodeLink>ZooCode</zooCodeLink>（社区维护的 Datacoves Copilot fork）和 <clineLink>Cline</clineLink>（Datacoves Copilot 最初起源的项目）。",
+			"signoff": "编码愉快！"
 		},
 		"release": {
 			"heading": "新增功能：",
-			"skills": "Copilot 现支持 <skillsLink>Agent Skills</skillsLink> - 可复用的提示词、工具和资源包，扩展 Copilot 的功能。",
-			"nativeToolCalling": "所有新任务现在需要使用原生工具调用。<blogLink>了解更多</blogLink>相关信息和解决方案。"
+			"gpt55": "通过 OpenAI Codex 支持 GPT-5.5：已在 OpenAI Codex 提供商中新增 GPT-5.5 支持，让你可以直接在 Datacoves Copilot 中使用最新模型。",
+			"claudeOpus47": "Vertex AI 上的 Claude Opus 4.7：已将 Anthropic 最新旗舰推理模型 Claude Opus 4.7 添加到 Vertex AI 提供商。",
+			"checkpointNav": "上一存档点导航：在聊天中新增控件，可回退到此前的存档点，并提供完整的 i18n 支持。"
 		},
 		"cloudAgents": {
 			"heading": "云端新功能：",
 			"specialized": "推出 <bold>Explainer</bold>、<bold>Planner</bold> 和 <bold>Coder</bold> - 三个专业云代理来增强你的工作流程。",
 			"description": "代理在云端协同工作，可从网页或通过 Slack 触发。",
 			"tryButton": "试用云代理"
-		},
-		"careers": "此外，<careersLink>我们正在招聘！</careersLink>"
-	},
-	"browser": {
-		"session": "浏览器会话",
-		"rooWantsToUse": "Copilot想使用浏览器",
-		"consoleLogs": "控制台日志",
-		"noNewLogs": "(没有新日志)",
-		"screenshot": "浏览器截图",
-		"cursor": "光标",
-		"navigation": {
-			"step": "步骤 {{current}} / {{total}}",
-			"previous": "上一步",
-			"next": "下一步"
-		},
-		"sessionStarted": "浏览器会话已启动",
-		"actions": {
-			"title": "浏览器操作: ",
-			"launched": "浏览器已启动",
-			"launch": "访问 {{url}}",
-			"clicked": "点击位置: {{coordinate}}",
-			"click": "点击 ({{coordinate}})",
-			"typed": "输入: {{text}}",
-			"type": "输入 \"{{text}}\"",
-			"pressed": "已按 {{key}}",
-			"press": "按 {{key}}",
-			"scrolledDown": "已向下滚动",
-			"scrollDown": "向下滚动",
-			"scrolledUp": "已向上滚动",
-			"scrollUp": "向上滚动",
-			"hovered": "悬停位置: {{coordinate}}",
-			"hover": "悬停 ({{coordinate}})",
-			"resized": "大小已更改: {{size}}",
-			"resize": "调整大小为 {{size}}",
-			"screenshotSaved": "截图已保存",
-			"screenshot": "将截图保存到 {{path}}",
-			"closed": "浏览器已关闭",
-			"close": "关闭浏览器"
 		}
+	},
+	"costs": {
+		"totalWithSubtasks": "总成本（包括子任务）: ${{cost}}",
+		"total": "总成本: ${{cost}}",
+		"includesSubtasks": "包括子任务成本"
 	},
 	"codeblock": {
 		"tooltips": {
@@ -385,7 +364,6 @@
 			"copy_code": "复制代码"
 		}
 	},
-	"systemPromptWarning": "警告：自定义系统提示词覆盖已激活。这可能严重破坏功能并导致不可预测的行为。",
 	"profileViolationWarning": "当前配置文件与您的组织设置不兼容",
 	"shellIntegration": {
 		"title": "命令执行警告",
@@ -419,20 +397,32 @@
 			"title": "全部拒绝"
 		}
 	},
+	"list-batch": {
+		"approve": {
+			"title": "全部批准"
+		},
+		"deny": {
+			"title": "全部拒绝"
+		}
+	},
+	"edit-batch": {
+		"approve": {
+			"title": "全部保存"
+		},
+		"deny": {
+			"title": "全部拒绝"
+		}
+	},
 	"indexingStatus": {
 		"ready": "索引就绪",
 		"indexing": "索引中 {{percentage}}%",
 		"indexed": "已索引",
 		"error": "索引错误",
-		"status": "索引状态"
+		"status": "索引状态",
+		"stopping": "正在停止索引..."
 	},
 	"versionIndicator": {
 		"ariaLabel": "版本 {{version}} - 点击查看发布说明"
-	},
-	"rooCloudCTA": {
-		"title": "Datacoves Copilot Cloud 正在进化！",
-		"description": "在云端运行远程代理，随时随地访问任务，与他人协作等更多功能。",
-		"joinWaitlist": "注册获取最新更新。"
 	},
 	"command": {
 		"triggerDescription": "触发 {{name}} 命令"
@@ -480,5 +470,23 @@
 		"updated": "已更新待办事项列表",
 		"completed": "已完成",
 		"started": "已开始"
+	},
+	"tooManyTools": {
+		"title": "启用的工具过多",
+		"toolsPart_one": "{{count}} 个工具",
+		"toolsPart_other": "{{count}} 个工具",
+		"serversPart_one": "{{count}} 个 MCP 服务",
+		"serversPart_other": "{{count}} 个 MCP 服务",
+		"messageTemplate": "你通过 {{servers}} 启用了 {{tools}}。这么多数量会混淆模型并导致错误。建议将其保持在 {{threshold}} 以下。",
+		"openMcpSettings": "打开 MCP 设置"
+	},
+	"readCommandOutput": {
+		"title": "Copilot read command output"
+	},
+	"retiredProvider": {
+		"title": "供应商不再受支持",
+		"message": "This provider is no longer supported. Please select a different provider in your API profile settings.",
+		"openSettings": "打开设置",
+		"rooMessage": "As part of our decision to sunset the Datacoves Copilot extension, we also ended the Datacoves Copilot Router, which only existed to support the extension. Sorry about the hassle."
 	}
 }

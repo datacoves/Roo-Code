@@ -4,7 +4,6 @@ import { RooCodeEventName } from "./events.js"
 import type { RooCodeSettings } from "./global-settings.js"
 import type { ClineMessage, QueuedMessage, TokenUsage } from "./message.js"
 import type { ToolUsage, ToolName } from "./tool.js"
-import type { StaticAppProperties, GitProperties, TelemetryProperties } from "./telemetry.js"
 import type { TodoItem } from "./todo.js"
 
 /**
@@ -36,10 +35,6 @@ export interface TaskProviderLike {
 	getProviderProfile(): Promise<string>
 	setProviderProfile(providerProfile: string): Promise<void>
 
-	// Telemetry
-	readonly appProperties: StaticAppProperties
-	readonly gitProperties: GitProperties | undefined
-	getTelemetryProperties(): Promise<TelemetryProperties>
 	readonly cwd: string
 
 	// Event Emitter
@@ -89,14 +84,16 @@ export type TaskProviderEvents = {
  */
 
 export interface CreateTaskOptions {
-	enableDiff?: boolean
+	taskId?: string
 	enableCheckpoints?: boolean
-	fuzzyMatchThreshold?: number
 	consecutiveMistakeLimit?: number
 	experiments?: Record<string, boolean>
 	initialTodos?: TodoItem[]
 	/** Initial status for the task's history item (e.g., "active" for child tasks) */
 	initialStatus?: "active" | "delegated" | "completed"
+	/** Whether to start the task loop immediately (default: true).
+	 *  When false, the caller must invoke `task.start()` manually. */
+	startTask?: boolean
 }
 
 export enum TaskStatus {
@@ -156,6 +153,7 @@ export type TaskEvents = {
 	[RooCodeEventName.TaskModeSwitched]: [taskId: string, mode: string]
 	[RooCodeEventName.TaskAskResponded]: []
 	[RooCodeEventName.TaskUserMessage]: [taskId: string]
+	[RooCodeEventName.QueuedMessagesUpdated]: [taskId: string, messages: QueuedMessage[]]
 
 	// Task Analytics
 	[RooCodeEventName.TaskToolFailed]: [taskId: string, tool: ToolName, error: string]

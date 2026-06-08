@@ -111,9 +111,9 @@ describe("OpenAiHandler", () => {
 				baseURL: expect.any(String),
 				apiKey: expect.any(String),
 				defaultHeaders: {
-					"HTTP-Referer": "https://github.com/RooVetGit/Roo-Cline",
-					"X-Title": "Roo Code",
-					"User-Agent": `RooCode/${Package.version}`,
+					"HTTP-Referer": "https://github.com/datacoves/Roo-Code",
+					"X-Title": "Datacoves Copilot",
+					"User-Agent": `DatacovesCopilot/${Package.version}`,
 				},
 				timeout: expect.any(Number),
 			})
@@ -633,11 +633,14 @@ describe("OpenAiHandler", () => {
 					stream: true,
 					stream_options: { include_usage: true },
 					temperature: 0,
+					tools: undefined,
+					tool_choice: undefined,
+					parallel_tool_calls: true,
 				},
 				{ path: "/models/chat/completions" },
 			)
 
-			// Verify max_tokens is NOT included when includeMaxTokens is not set
+			// Verify max_tokens is NOT included when not explicitly set
 			const callArgs = mockCreate.mock.calls[0][0]
 			expect(callArgs).not.toHaveProperty("max_completion_tokens")
 		})
@@ -679,11 +682,14 @@ describe("OpenAiHandler", () => {
 						{ role: "system", content: systemPrompt },
 						{ role: "user", content: "Hello!" },
 					],
+					tools: undefined,
+					tool_choice: undefined,
+					parallel_tool_calls: true,
 				},
 				{ path: "/models/chat/completions" },
 			)
 
-			// Verify max_tokens is NOT included when includeMaxTokens is not set
+			// Verify max_tokens is NOT included when not explicitly set
 			const callArgs = mockCreate.mock.calls[0][0]
 			expect(callArgs).not.toHaveProperty("max_completion_tokens")
 		})

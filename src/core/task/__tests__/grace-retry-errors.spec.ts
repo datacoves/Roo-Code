@@ -5,7 +5,6 @@ import * as path from "path"
 import * as vscode from "vscode"
 
 import type { GlobalState, ProviderSettings } from "@roo-code/types"
-import { TelemetryService } from "@roo-code/telemetry"
 
 import { Task } from "../Task"
 import { ClineProvider } from "../../webview/ClineProvider"
@@ -111,7 +110,7 @@ vi.mock("vscode", () => {
 
 vi.mock("../../mentions", () => ({
 	parseMentions: vi.fn().mockImplementation((text) => {
-		return Promise.resolve(`processed: ${text}`)
+		return Promise.resolve({ text: `processed: ${text}`, mode: undefined, contentBlocks: [] })
 	}),
 	openMention: vi.fn(),
 	getLatestTerminalOutput: vi.fn(),
@@ -147,10 +146,6 @@ describe("Grace Retry Error Handling", () => {
 	let mockExtensionContext: vscode.ExtensionContext
 
 	beforeEach(() => {
-		if (!TelemetryService.hasInstance()) {
-			TelemetryService.createInstance([])
-		}
-
 		const storageUri = {
 			fsPath: path.join(os.tmpdir(), "test-storage"),
 		}
@@ -206,6 +201,7 @@ describe("Grace Retry Error Handling", () => {
 
 		mockProvider.postMessageToWebview = vi.fn().mockResolvedValue(undefined)
 		mockProvider.postStateToWebview = vi.fn().mockResolvedValue(undefined)
+		mockProvider.postStateToWebviewWithoutTaskHistory = vi.fn().mockResolvedValue(undefined)
 		mockProvider.getState = vi.fn().mockResolvedValue({})
 	})
 

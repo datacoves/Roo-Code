@@ -18,6 +18,8 @@ interface ApiConfigSelectorProps {
 	listApiConfigMeta: Array<{ id: string; name: string; modelId?: string }>
 	pinnedApiConfigs?: Record<string, boolean>
 	togglePinnedApiConfig: (id: string) => void
+	lockApiConfigAcrossModes: boolean
+	onToggleLockApiConfig: () => void
 }
 
 export const ApiConfigSelector = ({
@@ -225,6 +227,16 @@ export const ApiConfigSelector = ({
 								title={t("chat:edit")}
 								onClick={handleEditClick}
 								tooltip={false}
+							/>
+							<IconButton
+								iconClass={lockApiConfigAcrossModes ? "codicon-lock" : "codicon-unlock"}
+								title={
+									lockApiConfigAcrossModes
+										? t("chat:unlockApiConfigAcrossModes")
+										: t("chat:lockApiConfigAcrossModes")
+								}
+								className={lockApiConfigAcrossModes ? "text-vscode-focusBorder" : "opacity-60"}
+								onClick={onToggleLockApiConfig}
 							/>
 						</div>
 

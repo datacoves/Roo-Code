@@ -16,25 +16,19 @@
 		"export": "Ekspor riwayat tugas",
 		"share": "Bagikan tugas",
 		"delete": "Hapus Tugas (Shift + Klik untuk lewati konfirmasi)",
-		"shareWithOrganization": "Bagikan dengan organisasi",
-		"shareWithOrganizationDescription": "Hanya anggota organisasi Anda yang dapat mengakses",
-		"sharePublicly": "Bagikan secara publik",
-		"sharePubliclyDescription": "Siapa pun dengan tautan dapat mengakses",
-		"connectToCloud": "Hubungkan ke Cloud",
-		"connectToCloudDescription": "Masuk ke Datacoves Copilot Cloud untuk berbagi tugas",
-		"sharingDisabledByOrganization": "Berbagi dinonaktifkan oleh organisasi",
-		"shareSuccessOrganization": "Tautan organisasi disalin ke clipboard",
 		"shareSuccessPublic": "Tautan publik disalin ke clipboard",
-		"openInCloud": "Buka tugas di Datacoves Copilot Cloud",
-		"openInCloudIntro": "Terus pantau atau berinteraksi dengan Copilot dari mana saja. Pindai, klik atau salin untuk membuka.",
 		"openApiHistory": "Buka Riwayat API",
-		"openUiHistory": "Buka Riwayat UI"
+		"openUiHistory": "Buka Riwayat UI",
+		"backToParentTask": "Tugas Induk"
 	},
 	"history": {
 		"title": "Riwayat"
 	},
 	"unpin": "Lepas Pin",
 	"pin": "Pin",
+	"fileChangesInConversation": {
+		"header": "{{count}} file diubah dalam percakapan ini"
+	},
 	"retry": {
 		"title": "Coba Lagi",
 		"tooltip": "Coba operasi lagi"
@@ -57,7 +51,10 @@
 	"tokenProgress": {
 		"availableSpace": "Ruang tersedia: {{amount}} token",
 		"tokensUsed": "Token digunakan: {{used}} dari {{total}}",
-		"reservedForResponse": "Dicadangkan untuk respons model: {{amount}} token"
+		"reservedForResponse": "Dicadangkan untuk respons model: {{amount}} token",
+		"tokensUsedLabel": "Token digunakan",
+		"reservedForResponseLabel": "Dicadangkan untuk respons",
+		"availableSpaceLabel": "Ruang tersedia"
 	},
 	"reject": {
 		"title": "Tolak",
@@ -71,6 +68,22 @@
 	"read-batch": {
 		"approve": {
 			"title": "Setujui Semua"
+		},
+		"deny": {
+			"title": "Tolak Semua"
+		}
+	},
+	"list-batch": {
+		"approve": {
+			"title": "Setujui Semua"
+		},
+		"deny": {
+			"title": "Tolak Semua"
+		}
+	},
+	"edit-batch": {
+		"approve": {
+			"title": "Simpan Semua"
 		},
 		"deny": {
 			"title": "Tolak Semua"
@@ -96,11 +109,17 @@
 		"title": "Hentikan",
 		"tooltip": "Akhiri tugas saat ini"
 	},
+	"stop": {
+		"title": "Stop",
+		"tooltip": "Hentikan tugas saat ini"
+	},
 	"cancel": {
 		"title": "Batal",
 		"tooltip": "Batalkan operasi saat ini"
 	},
+	"enqueueMessage": "Tambahkan pesan ke antrean (akan dikirim setelah tugas saat ini selesai)",
 	"scrollToBottom": "Gulir ke bawah chat",
+	"scrollToLatestCheckpoint": "Gulir ke checkpoint sebelumnya",
 	"about": "Datacoves Copilot adalah seluruh tim pengembang AI di editor Anda.",
 	"docs": "Lihat <DocsLink>dokumentasi</DocsLink> kami untuk mempelajari lebih lanjut.",
 	"onboarding": "Daftar tugas Anda di ruang kerja ini kosong.",
@@ -116,11 +135,12 @@
 	},
 	"selectMode": "Pilih mode untuk interaksi",
 	"selectApiConfig": "Pilih konfigurasi API",
+	"lockApiConfigAcrossModes": "Kunci konfigurasi API di semua mode dalam workspace ini",
+	"unlockApiConfigAcrossModes": "Konfigurasi API terkunci di semua mode dalam workspace ini (klik untuk membuka kunci)",
 	"enhancePrompt": "Tingkatkan prompt dengan konteks tambahan",
 	"enhancePromptDescription": "Tombol 'Tingkatkan Prompt' membantu memperbaiki prompt kamu dengan memberikan konteks tambahan, klarifikasi, atau penyusunan ulang. Coba ketik prompt di sini dan klik tombol lagi untuk melihat cara kerjanya.",
 	"modeSelector": {
 		"title": "Mode",
-		"marketplace": "Marketplace Mode",
 		"settings": "Pengaturan Mode",
 		"description": "Persona khusus yang menyesuaikan perilaku Copilot.",
 		"searchPlaceholder": "Cari mode...",
@@ -150,15 +170,15 @@
 		"rateLimitWait": "Pembatasan rate",
 		"errorTitle": "Kesalahan Penyedia {{code}}",
 		"errorMessage": {
-			"docs": "Dokumentasi",
-			"goToSettings": "Pengaturan",
 			"400": "Penyedia tidak dapat memproses permintaan seperti yang dibuat. Hentikan tugas dan coba pendekatan berbeda.",
 			"401": "Tidak dapat mengautentikasi dengan penyedia. Harap periksa konfigurasi kunci API Anda.",
 			"402": "Tampaknya Anda telah kehabisan dana/kredit di akun Anda. Pergi ke penyedia Anda dan tambahkan lebih banyak untuk melanjutkan.",
 			"403": "Tidak sah. Kunci API Anda valid, tetapi penyedia menolak untuk menyelesaikan permintaan ini.",
 			"429": "Terlalu banyak permintaan. Anda dibatasi tingkat oleh penyedia. Harap tunggu sebentar sebelum panggilan API berikutnya Anda.",
 			"500": "Kesalahan server penyedia. Ada yang salah di sisi penyedia, tidak ada yang salah dengan permintaan Anda.",
-			"unknown": "Kesalahan API yang tidak diketahui. Harap hubungi dukungan Datacoves Copilot.",
+			"docs": "Dokumentasi",
+			"goToSettings": "Pengaturan",
+			"unknown": "Unknown API error. Please report this on GitHub.",
 			"connection": "Kesalahan koneksi. Pastikan Anda memiliki koneksi internet yang berfungsi.",
 			"claudeCodeNotAuthenticated": "Anda perlu masuk untuk menggunakan Claude Code. Buka Pengaturan dan klik \"Masuk ke Claude Code\" untuk mengautentikasi."
 		}
@@ -197,6 +217,10 @@
 			"description": "Pesan lama telah dihapus dari percakapan untuk tetap dalam batas jendela konteks. Ini adalah pendekatan yang cepat tetapi kurang mempertahankan konteks dibandingkan dengan kondensasi."
 		}
 	},
+	"skill": {
+		"wantsToLoad": "Copilot ingin memuat keterampilan",
+		"didLoad": "Copilot telah memuat keterampilan"
+	},
 	"instructions": {
 		"wantsToFetch": "Copilot ingin mengambil instruksi detail untuk membantu tugas saat ini"
 	},
@@ -233,7 +257,8 @@
 		"wantsToViewTopLevelOutsideWorkspace": "Copilot ingin melihat file tingkat atas di direktori ini (di luar workspace)",
 		"didViewTopLevelOutsideWorkspace": "Copilot melihat file tingkat atas di direktori ini (di luar workspace)",
 		"wantsToViewRecursiveOutsideWorkspace": "Copilot ingin melihat semua file secara rekursif di direktori ini (di luar workspace)",
-		"didViewRecursiveOutsideWorkspace": "Copilot melihat semua file secara rekursif di direktori ini (di luar workspace)"
+		"didViewRecursiveOutsideWorkspace": "Copilot melihat semua file secara rekursif di direktori ini (di luar workspace)",
+		"wantsToViewMultipleDirectories": "Copilot ingin melihat beberapa direktori"
 	},
 	"codebaseSearch": {
 		"wantsToSearch": "Copilot ingin mencari codebase untuk <code>{{query}}</code>",
@@ -284,7 +309,8 @@
 		"completionContent": "Subtugas Selesai",
 		"resultContent": "Hasil Subtugas",
 		"defaultResult": "Silakan lanjutkan ke tugas berikutnya.",
-		"completionInstructions": "Subtugas selesai! Kamu bisa meninjau hasilnya dan menyarankan koreksi atau langkah selanjutnya. Jika semuanya terlihat baik, konfirmasi untuk mengembalikan hasil ke tugas induk."
+		"completionInstructions": "Subtugas selesai! Kamu bisa meninjau hasilnya dan menyarankan koreksi atau langkah selanjutnya. Jika semuanya terlihat baik, konfirmasi untuk mengembalikan hasil ke tugas induk.",
+		"goToSubtask": "Lihat tugas"
 	},
 	"questions": {
 		"hasQuestion": "Copilot punya pertanyaan"
@@ -307,7 +333,8 @@
 		"title": "Detail Kesalahan",
 		"copyToClipboard": "Salin ke Clipboard",
 		"copied": "Disalin!",
-		"diagnostics": "Dapatkan informasi kesalahan terperinci"
+		"diagnostics": "Dapatkan informasi kesalahan terperinci",
+		"proxyProvider": "Tampaknya kamu menggunakan penyedia berbasis proxy. Pastikan untuk memeriksa log-nya dan memastikan tidak menulis ulang permintaan Copilot."
 	},
 	"powershell": {
 		"issues": "Sepertinya kamu mengalami masalah Windows PowerShell, silakan lihat ini"
@@ -328,30 +355,30 @@
 		"triggerLabel_zero": "0 disetujui otomatis",
 		"triggerLabel_one": "1 disetujui otomatis",
 		"triggerLabel_other": "{{count}} disetujui otomatis",
-		"triggerLabelAll": "YOLO"
+		"triggerLabelAll": "BRRR"
 	},
 	"announcement": {
 		"title": "Datacoves Copilot {{version}} Dirilis",
 		"support": "Dukung Datacoves Copilot dengan memberi kami bintang di <githubLink>GitHub</githubLink>.",
-		"stealthModel": {
-			"feature": "<bold>Model stealth GRATIS waktu terbatas</bold> - Code Supernova: Sekarang diupgrade dengan <bold>jendela konteks 1M token</bold>! Model coding agentik serbaguna yang mendukung input gambar, tersedia melalui Datacoves Copilot Cloud.",
-			"note": "(Catatan: prompt dan completion dicatat oleh pembuat model dan digunakan untuk meningkatkan model)",
-			"connectButton": "Hubungkan ke Datacoves Copilot Cloud",
-			"selectModel": "Pilih <code>roo/code-supernova</code> dari penyedia Datacoves Copilot Cloud di Pengaturan untuk memulai.",
-			"goToSettingsButton": "Pergi ke Pengaturan"
+		"finalRelease": {
+			"title": "Rilis Datacoves Copilot terakhir",
+			"intro": "Ini adalah rilis Datacoves Copilot terakhir. <announcementLink>Seperti yang kami umumkan beberapa minggu lalu</announcementLink>, kami memutuskan untuk mengalihkan fokus ke <roomoteLink>Roomote</roomoteLink>, platform agen cloud kami, yang kami yakini sebagai masa depan pengembangan perangkat lunak. Terima kasih banyak atas dukunganmu selama kira-kira setahun terakhir.",
+			"continuity": "Ekstensi ini seharusnya tetap berfungsi tanpa batas waktu, tetapi tidak akan menerima perbaikan bug, fitur baru, atau pembaruan model.",
+			"alternatives": "Jika kamu ingin menggunakan ekstensi, kami merekomendasikan <zooCodeLink>ZooCode</zooCodeLink> (fork Datacoves Copilot oleh komunitas) dan <clineLink>Cline</clineLink> (tempat Datacoves Copilot awalnya bermula).",
+			"signoff": "Selamat coding!"
 		},
 		"release": {
 			"heading": "Yang Baru:",
-			"skills": "Copilot sekarang mendukung <skillsLink>Agent Skills</skillsLink> - paket yang dapat digunakan kembali dari prompt, alat, dan sumber daya untuk memperluas kemampuan Copilot.",
-			"nativeToolCalling": "Pemanggilan alat native sekarang diperlukan untuk semua tugas baru. <blogLink>Pelajari lebih lanjut</blogLink> tentang motivasi dan apa yang harus dilakukan jika mengalami masalah."
+			"gpt55": "GPT-5.5 via OpenAI Codex: Dukungan GPT-5.5 ditambahkan di provider OpenAI Codex agar kamu bisa menggunakan model terbaru langsung dari Datacoves Copilot.",
+			"claudeOpus47": "Claude Opus 4.7 di Vertex AI: Claude Opus 4.7 ditambahkan ke provider Vertex AI untuk model reasoning andalan terbaru dari Anthropic.",
+			"checkpointNav": "Navigasi Checkpoint Sebelumnya: Menambahkan kontrol di chat untuk melompat kembali ke checkpoint sebelumnya, dengan dukungan i18n penuh."
 		},
 		"cloudAgents": {
 			"heading": "Baru di Cloud:",
 			"specialized": "Memperkenalkan <bold>Explainer</bold>, <bold>Planner</bold>, dan <bold>Coder</bold> - tiga agen cloud khusus untuk meningkatkan alur kerja Anda.",
 			"description": "Agen bekerja bersama di cloud dan dapat dipicu dari web atau melalui Slack.",
 			"tryButton": "Coba Agen Cloud"
-		},
-		"careers": "Juga, <careersLink>kami sedang merekrut!</careersLink>"
+		}
 	},
 	"reasoning": {
 		"thinking": "Berpikir",
@@ -361,42 +388,10 @@
 		"copyToInput": "Salin ke input (sama dengan shift + klik)",
 		"timerPrefix": "Persetujuan otomatis diaktifkan. Memilih dalam {{seconds}}s…"
 	},
-	"browser": {
-		"session": "Sesi Browser",
-		"rooWantsToUse": "Copilot ingin menggunakan browser",
-		"consoleLogs": "Log Konsol",
-		"noNewLogs": "(Tidak ada log baru)",
-		"screenshot": "Screenshot browser",
-		"cursor": "kursor",
-		"navigation": {
-			"step": "Langkah {{current}} dari {{total}}",
-			"previous": "Sebelumnya",
-			"next": "Selanjutnya"
-		},
-		"sessionStarted": "Sesi Browser Dimulai",
-		"actions": {
-			"title": "Aksi Browser: ",
-			"launched": "Browser diluncurkan",
-			"launch": "Luncurkan browser di {{url}}",
-			"clicked": "Diklik ({{coordinate}})",
-			"click": "Klik ({{coordinate}})",
-			"typed": "Diketik: {{text}}",
-			"type": "Ketik \"{{text}}\"",
-			"pressed": "Ditekan: {{key}}",
-			"press": "Tekan {{key}}",
-			"scrolledDown": "Digulir ke bawah",
-			"scrollDown": "Gulir ke bawah",
-			"scrolledUp": "Digulir ke atas",
-			"scrollUp": "Gulir ke atas",
-			"hovered": "Diarahkan ({{coordinate}})",
-			"hover": "Arahkan ({{coordinate}})",
-			"resized": "Ukuran diubah ke: {{size}}",
-			"resize": "Ubah ukuran ke {{size}}",
-			"screenshotSaved": "Screenshot disimpan",
-			"screenshot": "Simpan screenshot ke {{path}}",
-			"closed": "Browser ditutup",
-			"close": "Tutup browser"
-		}
+	"costs": {
+		"totalWithSubtasks": "Total Biaya (termasuk subtugas): ${{cost}}",
+		"total": "Total Biaya: ${{cost}}",
+		"includesSubtasks": "Termasuk biaya subtugas"
 	},
 	"codeblock": {
 		"tooltips": {
@@ -405,7 +400,6 @@
 			"copy_code": "Salin kode"
 		}
 	},
-	"systemPromptWarning": "PERINGATAN: Override system prompt kustom aktif. Ini dapat merusak fungsionalitas secara serius dan menyebabkan perilaku yang tidak terduga.",
 	"profileViolationWarning": "Profil saat ini tidak kompatibel dengan pengaturan organisasi kamu",
 	"shellIntegration": {
 		"title": "Peringatan Eksekusi Perintah",
@@ -429,15 +423,11 @@
 		"indexing": "Mengindeks {{percentage}}%",
 		"indexed": "Terindeks",
 		"error": "Error indeks",
-		"status": "Status indeks"
+		"status": "Status indeks",
+		"stopping": "Menghentikan pengindeksan..."
 	},
 	"versionIndicator": {
 		"ariaLabel": "Versi {{version}} - Klik untuk melihat catatan rilis"
-	},
-	"rooCloudCTA": {
-		"title": "Datacoves Copilot Cloud sedang berkembang!",
-		"description": "Jalankan agen jarak jauh di cloud, akses tugas Anda dari mana saja, berkolaborasi dengan orang lain, dan banyak lagi.",
-		"joinWaitlist": "Daftar untuk mendapatkan pembaruan terbaru."
 	},
 	"editMessage": {
 		"placeholder": "Edit pesan Anda..."
@@ -485,5 +475,23 @@
 		"updated": "Memperbarui daftar to-do",
 		"completed": "Selesai",
 		"started": "Dimulai"
+	},
+	"tooManyTools": {
+		"title": "Terlalu banyak alat diaktifkan",
+		"toolsPart_one": "{{count}} alat",
+		"toolsPart_other": "{{count}} alat",
+		"serversPart_one": "{{count}} server MCP",
+		"serversPart_other": "{{count}} server MCP",
+		"messageTemplate": "Anda memiliki {{tools}} diaktifkan melalui {{servers}}. Jumlah yang begitu besar dapat membingungkan model dan menyebabkan kesalahan. Cobalah untuk menjaganya di bawah {{threshold}}.",
+		"openMcpSettings": "Buka Pengaturan MCP"
+	},
+	"readCommandOutput": {
+		"title": "Copilot read command output"
+	},
+	"retiredProvider": {
+		"title": "Penyedia tidak lagi didukung",
+		"message": "This provider is no longer supported. Please select a different provider in your API profile settings.",
+		"openSettings": "Buka Pengaturan",
+		"rooMessage": "As part of our decision to sunset the Datacoves Copilot extension, we also ended the Datacoves Copilot Router, which only existed to support the extension. Sorry about the hassle."
 	}
 }

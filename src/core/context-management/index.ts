@@ -1,12 +1,11 @@
 import { Anthropic } from "@anthropic-ai/sdk"
 import crypto from "crypto"
 
-import { TelemetryService } from "@roo-code/telemetry"
-
-import { ApiHandler } from "../../api"
+import { ApiHandler, ApiHandlerCreateMessageMetadata } from "../../api"
 import { MAX_CONDENSE_THRESHOLD, MIN_CONDENSE_THRESHOLD, summarizeConversation, SummarizeResponse } from "../condense"
 import { ApiMessage } from "../task-persistence/apiMessages"
 import { ANTHROPIC_DEFAULT_MAX_TOKENS } from "@roo-code/types"
+import { RooIgnoreController } from "../ignore/RooIgnoreController"
 
 /**
  * Context Management
@@ -60,12 +59,10 @@ export type TruncationResult = {
  *
  * @param {ApiMessage[]} messages - The conversation messages.
  * @param {number} fracToRemove - The fraction (between 0 and 1) of messages (excluding the first) to hide.
- * @param {string} taskId - The task ID for the conversation, used for telemetry
+ * @param {string} taskId - The task ID for the conversation
  * @returns {TruncationResult} Object containing the tagged messages, truncation ID, and count of messages removed.
  */
 export function truncateConversation(messages: ApiMessage[], fracToRemove: number, taskId: string): TruncationResult {
-	TelemetryService.instance.captureSlidingWindowTruncation(taskId)
-
 	const truncationId = crypto.randomUUID()
 
 	// Filter to only visible messages (those not already truncated)
@@ -216,10 +213,18 @@ export type ContextManagementOptions = {
 	systemPrompt: string
 	taskId: string
 	customCondensingPrompt?: string
-	condensingApiHandler?: ApiHandler
 	profileThresholds: Record<string, number>
 	currentProfileId: string
-	useNativeTools?: boolean
+	/** Optional metadata to pass through to the condensing API call (tools, taskId, etc.) */
+	metadata?: ApiHandlerCreateMessageMetadata
+	/** Optional environment details string to include in the condensed summary */
+	environmentDetails?: string
+	/** Optional array of file paths read by Roo during the task (will be folded via tree-sitter) */
+	filesReadByRoo?: string[]
+	/** Optional current working directory for resolving file paths (required if filesReadByRoo is provided) */
+	cwd?: string
+	/** Optional controller for file access validation */
+	rooIgnoreController?: RooIgnoreController
 }
 
 export type ContextManagementResult = SummarizeResponse & {
@@ -246,12 +251,16 @@ export async function manageContext({
 	systemPrompt,
 	taskId,
 	customCondensingPrompt,
-	condensingApiHandler,
 	profileThresholds,
 	currentProfileId,
-	useNativeTools,
+	metadata,
+	environmentDetails,
+	filesReadByRoo,
+	cwd,
+	rooIgnoreController,
 }: ContextManagementOptions): Promise<ContextManagementResult> {
 	let error: string | undefined
+	let errorDetails: string | undefined
 	let cost = 0
 	// Calculate the maximum tokens reserved for response
 	const reservedTokens = maxTokens || ANTHROPIC_DEFAULT_MAX_TOKENS
@@ -294,19 +303,22 @@ export async function manageContext({
 		const contextPercent = (100 * prevContextTokens) / contextWindow
 		if (contextPercent >= effectiveThreshold || prevContextTokens > allowedTokens) {
 			// Attempt to intelligently condense the context
-			const result = await summarizeConversation(
+			const result = await summarizeConversation({
 				messages,
 				apiHandler,
 				systemPrompt,
 				taskId,
-				prevContextTokens,
-				true, // automatic trigger
+				isAutomaticTrigger: true,
 				customCondensingPrompt,
-				condensingApiHandler,
-				useNativeTools,
-			)
+				metadata,
+				environmentDetails,
+				filesReadByRoo,
+				cwd,
+				rooIgnoreController,
+			})
 			if (result.error) {
 				error = result.error
+				errorDetails = result.errorDetails
 				cost = result.cost
 			} else {
 				return { ...result, prevContextTokens }
@@ -349,11 +361,12 @@ export async function manageContext({
 			summary: "",
 			cost,
 			error,
+			errorDetails,
 			truncationId: truncationResult.truncationId,
 			messagesRemoved: truncationResult.messagesRemoved,
 			newContextTokensAfterTruncation,
 		}
 	}
 	// No truncation or condensation needed
-	return { messages, summary: "", cost, prevContextTokens, error }
+	return { messages, summary: "", cost, prevContextTokens, error, errorDetails }
 }

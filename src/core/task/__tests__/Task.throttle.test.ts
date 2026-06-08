@@ -14,24 +14,12 @@ vi.mock("../../../integrations/terminal/TerminalRegistry", () => ({
 vi.mock("../../ignore/RooIgnoreController")
 vi.mock("../../protect/RooProtectedController")
 vi.mock("../../context-tracking/FileContextTracker")
-vi.mock("../../../services/browser/UrlContentFetcher")
-vi.mock("../../../services/browser/BrowserSession")
 vi.mock("../../../integrations/editor/DiffViewProvider")
 vi.mock("../../tools/ToolRepetitionDetector")
 vi.mock("../../../api", () => ({
 	buildApiHandler: vi.fn(() => ({
 		getModel: () => ({ info: {}, id: "test-model" }),
 	})),
-}))
-
-// Mock TelemetryService
-vi.mock("@roo-code/telemetry", () => ({
-	TelemetryService: {
-		instance: {
-			captureTaskCreated: vi.fn(),
-			captureTaskRestarted: vi.fn(),
-		},
-	},
 }))
 
 // Mock task persistence to avoid disk writes
@@ -79,6 +67,7 @@ describe("Task token usage throttling", () => {
 			getState: vi.fn().mockResolvedValue({ mode: "code" }),
 			log: vi.fn(),
 			postStateToWebview: vi.fn().mockResolvedValue(undefined),
+			postStateToWebviewWithoutTaskHistory: vi.fn().mockResolvedValue(undefined),
 			updateTaskHistory: vi.fn().mockResolvedValue(undefined),
 		}
 

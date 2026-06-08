@@ -1,14 +1,3 @@
-// Mock TelemetryService before other imports
-const mockCaptureException = vi.fn()
-
-vi.mock("@roo-code/telemetry", () => ({
-	TelemetryService: {
-		instance: {
-			captureException: (...args: unknown[]) => mockCaptureException(...args),
-		},
-	},
-}))
-
 // Mock AWS SDK credential providers
 vi.mock("@aws-sdk/credential-providers", () => {
 	const mockFromIni = vi.fn().mockReturnValue({
@@ -36,12 +25,7 @@ vi.mock("@aws-sdk/client-bedrock-runtime", () => {
 
 import { AwsBedrockHandler } from "../bedrock"
 import { ConverseStreamCommand, BedrockRuntimeClient, ConverseCommand } from "@aws-sdk/client-bedrock-runtime"
-import {
-	BEDROCK_1M_CONTEXT_MODEL_IDS,
-	BEDROCK_SERVICE_TIER_MODEL_IDS,
-	bedrockModels,
-	ApiProviderError,
-} from "@roo-code/types"
+import { BEDROCK_1M_CONTEXT_MODEL_IDS, BEDROCK_SERVICE_TIER_MODEL_IDS, bedrockModels } from "@roo-code/types"
 
 import type { Anthropic } from "@anthropic-ai/sdk"
 
@@ -701,6 +685,21 @@ describe("AwsBedrockHandler", () => {
 			expect(model.info.contextWindow).toBe(1_000_000)
 		})
 
+		it("should apply 1M tier pricing when awsBedrock1MContext is true for Claude Sonnet 4.6", () => {
+			const handler = new AwsBedrockHandler({
+				apiModelId: "anthropic.claude-sonnet-4-6",
+				awsAccessKey: "test",
+				awsSecretKey: "test",
+				awsRegion: "us-east-1",
+				awsBedrock1MContext: true,
+			})
+
+			const model = handler.getModel()
+			expect(model.info.contextWindow).toBe(1_000_000)
+			expect(model.info.inputPrice).toBe(6.0)
+			expect(model.info.outputPrice).toBe(22.5)
+		})
+
 		it("should use default context window when awsBedrock1MContext is false for Claude Sonnet 4", () => {
 			const handler = new AwsBedrockHandler({
 				apiModelId: BEDROCK_1M_CONTEXT_MODEL_IDS[0],
@@ -754,14 +753,17 @@ describe("AwsBedrockHandler", () => {
 			expect(mockConverseStreamCommand).toHaveBeenCalled()
 			const commandArg = mockConverseStreamCommand.mock.calls[0][0] as any
 
-			// Should include anthropic_beta in additionalModelRequestFields
+			// Should include anthropic_beta in additionalModelRequestFields with both 1M context and fine-grained-tool-streaming
 			expect(commandArg.additionalModelRequestFields).toBeDefined()
-			expect(commandArg.additionalModelRequestFields.anthropic_beta).toEqual(["context-1m-2025-08-07"])
+			expect(commandArg.additionalModelRequestFields.anthropic_beta).toContain("context-1m-2025-08-07")
+			expect(commandArg.additionalModelRequestFields.anthropic_beta).toContain(
+				"fine-grained-tool-streaming-2025-05-14",
+			)
 			// Should not include anthropic_version since thinking is not enabled
 			expect(commandArg.additionalModelRequestFields.anthropic_version).toBeUndefined()
 		})
 
-		it("should not include anthropic_beta parameter when 1M context is disabled", async () => {
+		it("should not include 1M context beta when 1M context is disabled but still include fine-grained-tool-streaming", async () => {
 			const handler = new AwsBedrockHandler({
 				apiModelId: BEDROCK_1M_CONTEXT_MODEL_IDS[0],
 				awsAccessKey: "test",
@@ -784,11 +786,16 @@ describe("AwsBedrockHandler", () => {
 			expect(mockConverseStreamCommand).toHaveBeenCalled()
 			const commandArg = mockConverseStreamCommand.mock.calls[0][0] as any
 
-			// Should not include anthropic_beta in additionalModelRequestFields
-			expect(commandArg.additionalModelRequestFields).toBeUndefined()
+			// Should include anthropic_beta with fine-grained-tool-streaming for Claude models
+			expect(commandArg.additionalModelRequestFields).toBeDefined()
+			expect(commandArg.additionalModelRequestFields.anthropic_beta).toContain(
+				"fine-grained-tool-streaming-2025-05-14",
+			)
+			// Should NOT include 1M context beta
+			expect(commandArg.additionalModelRequestFields.anthropic_beta).not.toContain("context-1m-2025-08-07")
 		})
 
-		it("should not include anthropic_beta parameter for non-Claude Sonnet 4 models", async () => {
+		it("should not include 1M context beta for non-Claude Sonnet 4 models but still include fine-grained-tool-streaming", async () => {
 			const handler = new AwsBedrockHandler({
 				apiModelId: "anthropic.claude-3-5-sonnet-20241022-v2:0",
 				awsAccessKey: "test",
@@ -811,8 +818,13 @@ describe("AwsBedrockHandler", () => {
 			expect(mockConverseStreamCommand).toHaveBeenCalled()
 			const commandArg = mockConverseStreamCommand.mock.calls[0][0] as any
 
-			// Should not include anthropic_beta for non-Sonnet 4 models
-			expect(commandArg.additionalModelRequestFields).toBeUndefined()
+			// Should include anthropic_beta with fine-grained-tool-streaming for Claude models (even non-Sonnet 4)
+			expect(commandArg.additionalModelRequestFields).toBeDefined()
+			expect(commandArg.additionalModelRequestFields.anthropic_beta).toContain(
+				"fine-grained-tool-streaming-2025-05-14",
+			)
+			// Should NOT include 1M context beta for non-Sonnet 4 models
+			expect(commandArg.additionalModelRequestFields.anthropic_beta).not.toContain("context-1m-2025-08-07")
 		})
 
 		it("should enable 1M context window with cross-region inference for Claude Sonnet 4", () => {
@@ -859,9 +871,12 @@ describe("AwsBedrockHandler", () => {
 				mockConverseStreamCommand.mock.calls.length - 1
 			][0] as any
 
-			// Should include anthropic_beta in additionalModelRequestFields
+			// Should include anthropic_beta in additionalModelRequestFields with both 1M context and fine-grained-tool-streaming
 			expect(commandArg.additionalModelRequestFields).toBeDefined()
-			expect(commandArg.additionalModelRequestFields.anthropic_beta).toEqual(["context-1m-2025-08-07"])
+			expect(commandArg.additionalModelRequestFields.anthropic_beta).toContain("context-1m-2025-08-07")
+			expect(commandArg.additionalModelRequestFields.anthropic_beta).toContain(
+				"fine-grained-tool-streaming-2025-05-14",
+			)
 			// Should not include anthropic_version since thinking is not enabled
 			expect(commandArg.additionalModelRequestFields.anthropic_version).toBeUndefined()
 			// Model ID should have cross-region prefix
@@ -1110,138 +1125,55 @@ describe("AwsBedrockHandler", () => {
 		})
 	})
 
-	describe("error telemetry", () => {
-		let mockSend: ReturnType<typeof vi.fn>
-
+	describe("prompt cache default behavior", () => {
 		beforeEach(() => {
-			mockCaptureException.mockClear()
-			// Get access to the mock send function from the mocked client
-			mockSend = vi.mocked(BedrockRuntimeClient).mock.results[0]?.value?.send
+			mockConverseStreamCommand.mockReset()
 		})
 
-		it("should capture telemetry on createMessage error", async () => {
-			// Create a handler with a fresh mock
-			const errorHandler = new AwsBedrockHandler({
+		// System prompt must exceed minTokensPerCachePoint (1024) for cache points to be placed
+		const longSystemPrompt = "You are a helpful assistant. ".repeat(200)
+		const messages: Anthropic.Messages.MessageParam[] = [{ role: "user", content: "Hello" }]
+
+		it("should enable prompt caching by default when awsUsePromptCache is undefined", async () => {
+			const defaultHandler = new AwsBedrockHandler({
 				apiModelId: "anthropic.claude-3-5-sonnet-20241022-v2:0",
 				awsAccessKey: "test-access-key",
 				awsSecretKey: "test-secret-key",
 				awsRegion: "us-east-1",
+				// awsUsePromptCache is intentionally omitted (undefined)
 			})
 
-			// Get the mock send from the new handler instance
-			const clientInstance =
-				vi.mocked(BedrockRuntimeClient).mock.results[vi.mocked(BedrockRuntimeClient).mock.results.length - 1]
-					?.value
-			const mockSendFn = clientInstance?.send as ReturnType<typeof vi.fn>
+			const generator = defaultHandler.createMessage(longSystemPrompt, messages)
+			await generator.next() // Start the generator
 
-			// Mock the send to throw an error
-			mockSendFn.mockRejectedValueOnce(new Error("Bedrock API error"))
+			expect(mockConverseStreamCommand).toHaveBeenCalled()
+			const commandArg = mockConverseStreamCommand.mock.calls[0][0] as any
 
-			const messages: Anthropic.Messages.MessageParam[] = [
-				{
-					role: "user",
-					content: "Hello",
-				},
-			]
-
-			const generator = errorHandler.createMessage("You are a helpful assistant", messages)
-
-			// Consume the generator - it should throw
-			await expect(async () => {
-				for await (const _chunk of generator) {
-					// Should throw before or during iteration
-				}
-			}).rejects.toThrow()
-
-			// Verify telemetry was captured
-			expect(mockCaptureException).toHaveBeenCalledTimes(1)
-			expect(mockCaptureException).toHaveBeenCalledWith(
-				expect.objectContaining({
-					message: "Bedrock API error",
-					provider: "Bedrock",
-					modelId: "anthropic.claude-3-5-sonnet-20241022-v2:0",
-					operation: "createMessage",
-				}),
-			)
-
-			// Verify it's an ApiProviderError
-			const capturedError = mockCaptureException.mock.calls[0][0]
-			expect(capturedError).toBeInstanceOf(ApiProviderError)
+			// System content should include a cachePoint entry since prompt caching defaults to ON
+			const systemBlocks = commandArg.system
+			const hasCachePoint = systemBlocks?.some((block: any) => block.cachePoint !== undefined)
+			expect(hasCachePoint).toBe(true)
 		})
 
-		it("should capture telemetry on completePrompt error", async () => {
-			// Create a handler with a fresh mock
-			const errorHandler = new AwsBedrockHandler({
+		it("should disable prompt caching when awsUsePromptCache is explicitly false", async () => {
+			const disabledHandler = new AwsBedrockHandler({
 				apiModelId: "anthropic.claude-3-5-sonnet-20241022-v2:0",
 				awsAccessKey: "test-access-key",
 				awsSecretKey: "test-secret-key",
 				awsRegion: "us-east-1",
+				awsUsePromptCache: false,
 			})
 
-			// Get the mock send from the new handler instance
-			const clientInstance =
-				vi.mocked(BedrockRuntimeClient).mock.results[vi.mocked(BedrockRuntimeClient).mock.results.length - 1]
-					?.value
-			const mockSendFn = clientInstance?.send as ReturnType<typeof vi.fn>
+			const generator = disabledHandler.createMessage(longSystemPrompt, messages)
+			await generator.next() // Start the generator
 
-			// Mock the send to throw an error for ConverseCommand
-			mockSendFn.mockRejectedValueOnce(new Error("Bedrock completion error"))
+			expect(mockConverseStreamCommand).toHaveBeenCalled()
+			const commandArg = mockConverseStreamCommand.mock.calls[0][0] as any
 
-			// Call completePrompt - it should throw
-			await expect(errorHandler.completePrompt("Test prompt")).rejects.toThrow()
-
-			// Verify telemetry was captured
-			expect(mockCaptureException).toHaveBeenCalledTimes(1)
-			expect(mockCaptureException).toHaveBeenCalledWith(
-				expect.objectContaining({
-					message: "Bedrock completion error",
-					provider: "Bedrock",
-					modelId: "anthropic.claude-3-5-sonnet-20241022-v2:0",
-					operation: "completePrompt",
-				}),
-			)
-
-			// Verify it's an ApiProviderError
-			const capturedError = mockCaptureException.mock.calls[0][0]
-			expect(capturedError).toBeInstanceOf(ApiProviderError)
-		})
-
-		it("should still throw the error after capturing telemetry", async () => {
-			// Create a handler with a fresh mock
-			const errorHandler = new AwsBedrockHandler({
-				apiModelId: "anthropic.claude-3-5-sonnet-20241022-v2:0",
-				awsAccessKey: "test-access-key",
-				awsSecretKey: "test-secret-key",
-				awsRegion: "us-east-1",
-			})
-
-			// Get the mock send from the new handler instance
-			const clientInstance =
-				vi.mocked(BedrockRuntimeClient).mock.results[vi.mocked(BedrockRuntimeClient).mock.results.length - 1]
-					?.value
-			const mockSendFn = clientInstance?.send as ReturnType<typeof vi.fn>
-
-			// Mock the send to throw an error
-			mockSendFn.mockRejectedValueOnce(new Error("Test error for throw verification"))
-
-			const messages: Anthropic.Messages.MessageParam[] = [
-				{
-					role: "user",
-					content: "Hello",
-				},
-			]
-
-			const generator = errorHandler.createMessage("You are a helpful assistant", messages)
-
-			// Verify the error is still thrown after telemetry capture
-			await expect(async () => {
-				for await (const _chunk of generator) {
-					// Should throw
-				}
-			}).rejects.toThrow()
-
-			// Telemetry should have been captured before the error was thrown
-			expect(mockCaptureException).toHaveBeenCalled()
+			// System content should NOT include cachePoint since caching is explicitly disabled
+			const systemBlocks = commandArg.system
+			const hasCachePoint = systemBlocks?.some((block: any) => block.cachePoint !== undefined)
+			expect(hasCachePoint).toBe(false)
 		})
 	})
 })

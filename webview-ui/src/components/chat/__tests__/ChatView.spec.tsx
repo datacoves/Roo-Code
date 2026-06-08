@@ -45,12 +45,6 @@ vi.mock("use-sound", () => ({
 }))
 
 // Mock components that use ESM dependencies
-vi.mock("../BrowserSessionRow", () => ({
-	default: function MockBrowserSessionRow({ messages }: { messages: ClineMessage[] }) {
-		return <div data-testid="browser-session">{JSON.stringify(messages)}</div>
-	},
-}))
-
 vi.mock("../ChatRow", () => ({
 	default: function MockChatRow({ message }: { message: ClineMessage }) {
 		return <div data-testid="chat-row">{JSON.stringify(message)}</div>
@@ -150,13 +144,6 @@ vi.mock("@src/components/welcome/RooTips", () => ({
 vi.mock("@src/components/welcome/RooHero", () => ({
 	default: function MockRooHero() {
 		return <div data-testid="roo-hero">Hero content</div>
-	},
-}))
-
-// Mock TelemetryBanner component
-vi.mock("../common/TelemetryBanner", () => ({
-	default: function MockTelemetryBanner() {
-		return null // Don't render anything to avoid interference
 	},
 }))
 
@@ -289,7 +276,6 @@ const mockPostMessage = (state: Partial<ExtensionState>) => {
 				allowedCommands: [],
 				alwaysAllowExecute: false,
 				cloudIsAuthenticated: false,
-				telemetrySetting: "enabled",
 				...state,
 			},
 		},
@@ -676,15 +662,13 @@ describe("ChatView - Version Indicator Tests", () => {
 	})
 })
 
-describe("ChatView - DismissibleUpsell Display Tests", () => {
+describe("ChatView - Welcome Content Display Tests", () => {
 	beforeEach(() => vi.clearAllMocks())
 
-	it("does not show DismissibleUpsell when user is authenticated to Cloud", () => {
+	it("does not show removed cloud upsell for returning users", () => {
 		const { queryByTestId } = renderChatView()
 
-		// Hydrate state with user authenticated to cloud
 		mockPostMessage({
-			cloudIsAuthenticated: true,
 			taskHistory: [
 				{ id: "1", ts: Date.now() - 3000 },
 				{ id: "2", ts: Date.now() - 2000 },
@@ -694,16 +678,13 @@ describe("ChatView - DismissibleUpsell Display Tests", () => {
 			clineMessages: [], // No active task
 		})
 
-		// Should not show DismissibleUpsell when authenticated
 		expect(queryByTestId("dismissible-upsell")).not.toBeInTheDocument()
 	})
 
-	it("does not show DismissibleUpsell when user has only run 3 tasks in their history", () => {
+	it("shows RooTips when user has only run 3 tasks in their history", () => {
 		const { queryByTestId } = renderChatView()
 
-		// Hydrate state with user not authenticated but only 3 tasks
 		mockPostMessage({
-			cloudIsAuthenticated: false,
 			taskHistory: [
 				{ id: "1", ts: Date.now() - 2000 },
 				{ id: "2", ts: Date.now() - 1000 },
@@ -712,16 +693,14 @@ describe("ChatView - DismissibleUpsell Display Tests", () => {
 			clineMessages: [], // No active task
 		})
 
-		// Should not show DismissibleUpsell with less than 4 tasks
 		expect(queryByTestId("dismissible-upsell")).not.toBeInTheDocument()
+		expect(queryByTestId("roo-tips")).toBeInTheDocument()
 	})
 
-	it("shows DismissibleUpsell when user is not authenticated and has run 6 or more tasks", async () => {
-		const { getByTestId } = renderChatView()
+	it("does not show removed cloud upsell when user has run 6 or more tasks", async () => {
+		const { queryByTestId } = renderChatView()
 
-		// Hydrate state with user not authenticated and 4 tasks
 		mockPostMessage({
-			cloudIsAuthenticated: false,
 			taskHistory: [
 				{ id: "1", ts: Date.now() - 6000 },
 				{ id: "2", ts: Date.now() - 5000 },
@@ -734,18 +713,17 @@ describe("ChatView - DismissibleUpsell Display Tests", () => {
 			clineMessages: [], // No active task
 		})
 
-		// Wait for component to render and show DismissibleUpsell
 		await waitFor(() => {
-			expect(getByTestId("dismissible-upsell")).toBeInTheDocument()
+			expect(queryByTestId("dismissible-upsell")).not.toBeInTheDocument()
+			expect(queryByTestId("roo-tips")).not.toBeInTheDocument()
+			expect(queryByTestId("roo-hero")).toBeInTheDocument()
 		})
 	})
 
-	it("does not show DismissibleUpsell when there is an active task (regardless of auth status)", async () => {
+	it("does not show welcome content when there is an active task", async () => {
 		const { queryByTestId } = renderChatView()
 
-		// Hydrate state with active task
 		mockPostMessage({
-			cloudIsAuthenticated: false,
 			taskHistory: [
 				{ id: "1", ts: Date.now() - 3000 },
 				{ id: "2", ts: Date.now() - 2000 },
@@ -762,23 +740,17 @@ describe("ChatView - DismissibleUpsell Display Tests", () => {
 			],
 		})
 
-		// Wait for component to render with active task
 		await waitFor(() => {
-			// Should not show DismissibleUpsell during active task
 			expect(queryByTestId("dismissible-upsell")).not.toBeInTheDocument()
-			// Should not show RooTips either since the entire welcome screen is hidden during active tasks
 			expect(queryByTestId("roo-tips")).not.toBeInTheDocument()
-			// Should not show RooHero either since the entire welcome screen is hidden during active tasks
 			expect(queryByTestId("roo-hero")).not.toBeInTheDocument()
 		})
 	})
 
-	it("shows RooTips when user is authenticated (instead of DismissibleUpsell)", () => {
+	it("shows RooTips for newer users", () => {
 		const { queryByTestId, getByTestId } = renderChatView()
 
-		// Hydrate state with user authenticated to cloud
 		mockPostMessage({
-			cloudIsAuthenticated: true,
 			taskHistory: [
 				{ id: "1", ts: Date.now() - 3000 },
 				{ id: "2", ts: Date.now() - 2000 },
@@ -788,17 +760,14 @@ describe("ChatView - DismissibleUpsell Display Tests", () => {
 			clineMessages: [], // No active task
 		})
 
-		// Should not show DismissibleUpsell but should show RooTips
 		expect(queryByTestId("dismissible-upsell")).not.toBeInTheDocument()
 		expect(getByTestId("roo-tips")).toBeInTheDocument()
 	})
 
-	it("shows RooTips when user has fewer than 6 tasks (instead of DismissibleUpsell)", () => {
+	it("shows RooTips when user has fewer than 6 tasks", () => {
 		const { queryByTestId, getByTestId } = renderChatView()
 
-		// Hydrate state with user not authenticated but fewer than 4 tasks
 		mockPostMessage({
-			cloudIsAuthenticated: false,
 			taskHistory: [
 				{ id: "1", ts: Date.now() - 2000 },
 				{ id: "2", ts: Date.now() - 1000 },
@@ -807,7 +776,6 @@ describe("ChatView - DismissibleUpsell Display Tests", () => {
 			clineMessages: [], // No active task
 		})
 
-		// Should not show DismissibleUpsell but should show RooTips
 		expect(queryByTestId("dismissible-upsell")).not.toBeInTheDocument()
 		expect(getByTestId("roo-tips")).toBeInTheDocument()
 	})
@@ -1078,6 +1046,68 @@ describe("ChatView - Message Queueing Tests", () => {
 			expect.objectContaining({
 				type: "askResponse",
 				askResponse: "messageResponse",
+			}),
+		)
+	})
+
+	it("queues messages during command_output state instead of losing them", async () => {
+		const { getByTestId } = renderChatView()
+
+		// Hydrate state with command_output ask (Proceed While Running state)
+		mockPostMessage({
+			clineMessages: [
+				{
+					type: "say",
+					say: "task",
+					ts: Date.now() - 2000,
+					text: "Initial task",
+				},
+				{
+					type: "ask",
+					ask: "command_output",
+					ts: Date.now(),
+					text: "",
+					partial: false, // Non-partial so buttons are enabled
+				},
+			],
+		})
+
+		// Wait for state to be updated - need to allow time for React effects to propagate
+		// (clineAsk state update -> clineAskRef.current update)
+		await waitFor(() => {
+			expect(getByTestId("chat-textarea")).toBeInTheDocument()
+		})
+
+		// Allow React effects to complete (clineAsk -> clineAskRef sync)
+		await act(async () => {
+			await new Promise((resolve) => setTimeout(resolve, 50))
+		})
+
+		// Clear message calls before simulating user input
+		vi.mocked(vscode.postMessage).mockClear()
+
+		// Simulate user typing and sending a message during command execution
+		const chatTextArea = getByTestId("chat-textarea")
+		const input = chatTextArea.querySelector("input")! as HTMLInputElement
+
+		await act(async () => {
+			fireEvent.change(input, { target: { value: "message during command execution" } })
+			fireEvent.keyDown(input, { key: "Enter", code: "Enter" })
+		})
+
+		// Verify that the message was queued (not lost via terminalOperation)
+		await waitFor(() => {
+			expect(vscode.postMessage).toHaveBeenCalledWith({
+				type: "queueMessage",
+				text: "message during command execution",
+				images: [],
+			})
+		})
+
+		// Verify it was NOT sent as terminalOperation (which would lose the message)
+		expect(vscode.postMessage).not.toHaveBeenCalledWith(
+			expect.objectContaining({
+				type: "terminalOperation",
 			}),
 		)
 	})

@@ -1,22 +1,20 @@
 import React from "react"
-import { useTranslation } from "react-i18next"
 import { Package } from "@roo/package"
 
 interface VersionIndicatorProps {
-	onClick: () => void
+	onClick?: () => void
 	className?: string
 }
 
-const VersionIndicator: React.FC<VersionIndicatorProps> = ({ onClick, className = "" }) => {
-	const { t } = useTranslation()
+// Datacoves: display-only version pill. Strips the `-datacoves` prerelease suffix
+// for display and is intentionally non-interactive (no announcement on click).
+const VersionIndicator: React.FC<VersionIndicatorProps> = ({ className = "" }) => {
+	const version = Package.version.replace(/-datacoves$/, "")
 
 	return (
-		<button
-			onClick={onClick}
-			className={`text-xs text-vscode-descriptionForeground rounded-full hover:text-vscode-foreground transition-colors cursor-pointer px-2 py-1 border ${className}`}
-			aria-label={t("chat:versionIndicator.ariaLabel", { version: Package.version })}>
-			v{Package.version}
-		</button>
+		<div className={`text-xs text-vscode-descriptionForeground rounded-full px-2 py-1 border ${className}`}>
+			v{version}
+		</div>
 	)
 }
 

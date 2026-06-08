@@ -5,15 +5,14 @@ import * as fsSync from "fs"
 import NodeCache from "node-cache"
 import { z } from "zod"
 
-import type { ProviderName } from "@roo-code/types"
-import { modelInfoSchema, TelemetryEventName } from "@roo-code/types"
-import { TelemetryService } from "@roo-code/telemetry"
+import type { ProviderName, ModelRecord } from "@roo-code/types"
+import { modelInfoSchema } from "@roo-code/types"
 
 import { safeWriteJson } from "../../../utils/safeWriteJson"
 
 import { ContextProxy } from "../../../core/config/ContextProxy"
 import { getCacheDirectoryPath } from "../../../utils/storage"
-import type { RouterName, ModelRecord } from "../../../shared/api"
+import type { RouterName } from "../../../shared/api"
 import { fileExistsAtPath } from "../../../utils/fs"
 
 import { getOpenRouterModels } from "./openrouter"
@@ -24,11 +23,7 @@ import { getLiteLLMModels } from "./litellm"
 import { GetModelsOptions } from "../../../shared/api"
 import { getOllamaModels } from "./ollama"
 import { getLMStudioModels } from "./lmstudio"
-import { getIOIntelligenceModels } from "./io-intelligence"
-import { getDeepInfraModels } from "./deepinfra"
-import { getHuggingFaceModels } from "./huggingface"
-import { getRooModels } from "./roo"
-import { getChutesModels } from "./chutes"
+import { getPoeModels } from "./poe"
 
 const memoryCache = new NodeCache({ stdTTL: 5 * 60, checkperiod: 5 * 60 })
 
@@ -74,7 +69,6 @@ async function fetchModelsFromProvider(options: GetModelsOptions): Promise<Model
 			models = await getRequestyModels(options.baseUrl, options.apiKey)
 			break
 		case "unbound":
-			// Unbound models endpoint requires an API key to fetch application specific models.
 			models = await getUnboundModels(options.apiKey)
 			break
 		case "litellm":
@@ -87,26 +81,11 @@ async function fetchModelsFromProvider(options: GetModelsOptions): Promise<Model
 		case "lmstudio":
 			models = await getLMStudioModels(options.baseUrl)
 			break
-		case "deepinfra":
-			models = await getDeepInfraModels(options.apiKey, options.baseUrl)
-			break
-		case "io-intelligence":
-			models = await getIOIntelligenceModels(options.apiKey)
-			break
 		case "vercel-ai-gateway":
 			models = await getVercelAiGatewayModels()
 			break
-		case "huggingface":
-			models = await getHuggingFaceModels()
-			break
-		case "roo": {
-			// Roo Code Cloud provider requires baseUrl and optional apiKey
-			const rooBaseUrl = options.baseUrl ?? process.env.ROO_CODE_PROVIDER_URL ?? "https://api.roocode.com/proxy"
-			models = await getRooModels(rooBaseUrl, options.apiKey)
-			break
-		}
-		case "chutes":
-			models = await getChutesModels(options.apiKey)
+		case "poe":
+			models = await getPoeModels(options.apiKey, options.baseUrl)
 			break
 		default: {
 			// Ensures router is exhaustively checked if RouterName is a strict union.
@@ -142,20 +121,14 @@ export const getModels = async (options: GetModelsOptions): Promise<ModelRecord>
 		models = await fetchModelsFromProvider(options)
 		const modelCount = Object.keys(models).length
 
-		// Only cache non-empty results to prevent persisting failed API responses
-		// Empty results could indicate API failure rather than "no models exist"
+		// Only cache non-empty results to prevent persisting failed API responses.
+		// Empty results could indicate API failure rather than "no models exist".
 		if (modelCount > 0) {
 			memoryCache.set(provider, models)
 
 			await writeModels(provider, models).catch((err) =>
 				console.error(`[MODEL_CACHE] Error writing ${provider} models to file cache:`, err),
 			)
-		} else {
-			TelemetryService.instance.captureEvent(TelemetryEventName.MODEL_CACHE_EMPTY_RESPONSE, {
-				provider,
-				context: "getModels",
-				hasExistingCache: false,
-			})
 		}
 
 		return models
@@ -199,17 +172,7 @@ export const refreshModels = async (options: GetModelsOptions): Promise<ModelRec
 			const existingCount = existingCache ? Object.keys(existingCache).length : 0
 
 			if (modelCount === 0) {
-				TelemetryService.instance.captureEvent(TelemetryEventName.MODEL_CACHE_EMPTY_RESPONSE, {
-					provider,
-					context: "refreshModels",
-					hasExistingCache: existingCount > 0,
-					existingCacheSize: existingCount,
-				})
-				if (existingCount > 0) {
-					return existingCache!
-				} else {
-					return {}
-				}
+				return existingCount > 0 ? existingCache! : {}
 			}
 
 			// Update memory cache first
@@ -249,7 +212,6 @@ export async function initializeModelCacheRefresh(): Promise<void> {
 		const publicProviders: Array<{ provider: RouterName; options: GetModelsOptions }> = [
 			{ provider: "openrouter", options: { provider: "openrouter" } },
 			{ provider: "vercel-ai-gateway", options: { provider: "vercel-ai-gateway" } },
-			{ provider: "chutes", options: { provider: "chutes" } },
 		]
 
 		// Refresh each provider in background (fire and forget)

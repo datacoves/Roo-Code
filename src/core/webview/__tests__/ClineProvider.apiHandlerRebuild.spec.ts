@@ -2,7 +2,6 @@
 
 import * as vscode from "vscode"
 
-import { TelemetryService } from "@roo-code/telemetry"
 import { getModelId } from "@roo-code/types"
 
 import { ContextProxy } from "../../config/ContextProxy"
@@ -120,21 +119,6 @@ vi.mock("../../task/Task", () => ({
 	}),
 }))
 
-vi.mock("@roo-code/cloud", () => ({
-	CloudService: {
-		hasInstance: vi.fn().mockReturnValue(true),
-		get instance() {
-			return {
-				isAuthenticated: vi.fn().mockReturnValue(false),
-			}
-		},
-	},
-	BridgeOrchestrator: {
-		isEnabled: vi.fn().mockReturnValue(false),
-	},
-	getRooCodeApiUrl: vi.fn().mockReturnValue("https://app.roocode.com"),
-}))
-
 describe("ClineProvider - API Handler Rebuild Guard", () => {
 	let provider: ClineProvider
 	let mockContext: vscode.ExtensionContext
@@ -146,10 +130,6 @@ describe("ClineProvider - API Handler Rebuild Guard", () => {
 
 	beforeEach(async () => {
 		vi.clearAllMocks()
-
-		if (!TelemetryService.hasInstance()) {
-			TelemetryService.createInstance([])
-		}
 
 		const globalState: Record<string, any> = {
 			mode: "code",
@@ -170,6 +150,11 @@ describe("ClineProvider - API Handler Rebuild Guard", () => {
 				get: vi.fn().mockImplementation((key: string) => secrets[key]),
 				store: vi.fn().mockImplementation((key: string, value: string | undefined) => (secrets[key] = value)),
 				delete: vi.fn().mockImplementation((key: string) => delete secrets[key]),
+			},
+			workspaceState: {
+				get: vi.fn().mockReturnValue(undefined),
+				update: vi.fn().mockResolvedValue(undefined),
+				keys: vi.fn().mockReturnValue([]),
 			},
 			subscriptions: [],
 			extension: {

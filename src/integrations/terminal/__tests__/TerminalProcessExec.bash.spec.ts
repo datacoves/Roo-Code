@@ -149,7 +149,7 @@ async function testTerminalCommand(
 			executeCommand: vi.fn(),
 			cwd: vscode.Uri.file("/test/path"),
 		},
-		name: "Roo Code",
+		name: "Datacoves Copilot",
 		processId: Promise.resolve(123),
 		creationOptions: {},
 		exitStatus: undefined,
@@ -354,9 +354,12 @@ describe("TerminalProcess with Bash Command Output", () => {
 			expect(capturedOutput).toBe("Red Text\r\n")
 		} else {
 			// Use printf instead of echo -e for more consistent behavior across platforms
-			// Note: ANSI escape sequences are stripped in the output processing
-			const { capturedOutput } = await testTerminalCommand('printf "\\033[31mRed Text\\033[0m\\n"', "Red Text\n")
-			expect(capturedOutput).toBe("Red Text\n")
+			// Note: ANSI escape sequences are now preserved in the output processing
+			const { capturedOutput } = await testTerminalCommand(
+				'printf "\\033[31mRed Text\\033[0m\\n"',
+				"\x1B[31mRed Text\x1B[0m\n",
+			)
+			expect(capturedOutput).toBe("\x1B[31mRed Text\x1B[0m\n")
 		}
 	})
 
